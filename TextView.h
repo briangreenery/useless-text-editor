@@ -26,7 +26,7 @@ public:
 	void OnLButtonDown  ( POINT point );
 	void OnLButtonUp    ( POINT point );
 	void OnMouseMove    ( POINT point );
-	void OnCancelMode();
+	void OnCaptureChanged();
 	UINT OnMouseActivate();
 	void OnSetCursor();
 

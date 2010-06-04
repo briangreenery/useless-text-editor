@@ -28,6 +28,7 @@ public:
 
 	size_t TextStart() const { return m_textStart; }
 	size_t TextEnd() const   { return m_textEnd; }
+
 	int Width() const        { return m_width; }
 
 private:

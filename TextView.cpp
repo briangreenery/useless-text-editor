@@ -149,18 +149,18 @@ void TextView::OnKeyDown( UINT keyCode, UINT repCnt, UINT flags )
 
 void TextView::OnLButtonDown( POINT point )
 {
-	if ( m_metrics.IsInTextOrMargin( point, m_hwnd ) )
-	{
-		m_selection.endPoint = m_metrics.ClientToText( point );
-		m_selection = m_paragraphs.CharFromPoint( &m_selection.endPoint );
+	if ( !m_metrics.IsInTextOrMargin( point, m_hwnd ) )
+		return;
 
-		ScrollToCaret();
-		UpdateCaretPos();
-		InvalidateRect( m_hwnd, NULL, TRUE );
+	m_selection.endPoint = m_metrics.ClientToText( point );
+	m_selection = m_paragraphs.CharFromPoint( &m_selection.endPoint );
 
-		SetCapture( m_hwnd );
-		m_isDoingMouseSel = true;
-	}
+	ScrollToCaret();
+	UpdateCaretPos();
+	InvalidateRect( m_hwnd, NULL, TRUE );
+
+	SetCapture( m_hwnd );
+	m_isDoingMouseSel = true;
 }
 
 void TextView::OnLButtonDblClk( POINT point )
@@ -176,7 +176,8 @@ void TextView::OnLButtonDblClk( POINT point )
 
 void TextView::OnLButtonUp( POINT point )
 {
-	OnCancelMode();
+	ReleaseCapture();
+	OnCaptureChanged();
 }
 
 void TextView::OnMouseMove( POINT point )
@@ -191,11 +192,8 @@ void TextView::OnMouseMove( POINT point )
 	}
 }
 
-void TextView::OnCancelMode()
+void TextView::OnCaptureChanged()
 {
-	if ( GetCapture() == m_hwnd )
-		ReleaseCapture();
-
 	m_isDoingMouseSel = false;
 }
 

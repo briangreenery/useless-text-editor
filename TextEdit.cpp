@@ -49,8 +49,8 @@ static LRESULT ProcessWindowMsg( TextView* view, HWND hwnd, UINT msg, WPARAM wPa
 		view->OnMouseMove( MakePOINT( lParam ) );
 		return 0;
 
-	case WM_CANCELMODE:
-		view->OnCancelMode();
+	case WM_CAPTURECHANGED:
+		view->OnCaptureChanged();
 		return 0;
 
 	case WM_MOUSEACTIVATE:
