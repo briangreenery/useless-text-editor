@@ -53,6 +53,8 @@ public:
 	void Delete   ( bool wholeWord );
 	void Insert   ( UTF16Ref );
 
+	void SelectAll();
+
 	void Clear( bool moveCaret );
 	void Cut();
 	void Copy();

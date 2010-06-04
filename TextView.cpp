@@ -132,6 +132,8 @@ void TextView::OnKeyDown( UINT keyCode, UINT repCnt, UINT flags )
 		case VK_BACK:   Backspace( isCtrlPressed ); break;
 		case VK_DELETE: Delete   ( isCtrlPressed ); break;
 
+		case 'A': if ( isCtrlPressed ) SelectAll(); break;
+
 		case 'X': if ( isCtrlPressed ) Cut();   break;
 		case 'C': if ( isCtrlPressed ) Copy();  break;
 		case 'V': if ( isCtrlPressed ) Paste(); break;
@@ -388,6 +390,17 @@ void TextView::Insert( UTF16Ref text )
 
 	m_selection = m_selection.end + change.count;
 	MoveCaret( m_selection.end, true );
+}
+
+void TextView::SelectAll()
+{
+	ResetLineUp();
+
+	m_selection.start = 0;
+	m_selection.end   = m_doc.Length();
+
+	MoveCaret( m_selection.end, true );
+	InvalidateRect( m_hwnd, NULL, TRUE );
 }
 
 void TextView::Clear( bool moveCaret )
