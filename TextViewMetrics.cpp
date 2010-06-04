@@ -7,13 +7,13 @@
 #undef max
 
 TextViewMetrics::TextViewMetrics()
-	: m_caretWidth( GetSystemMetrics( SM_CXBORDER ) )
-	, m_marginWidth( 0 )
-	, m_gutterWidth( 0 )
-	, m_lineHeight( 0 )
-	, m_linesPerPage( 0 )
-	, m_xOffset( 0 )
-	, m_yOffset( 0 )
+	: caretWidth( GetSystemMetrics( SM_CXBORDER ) )
+	, marginWidth( 0 )
+	, gutterWidth( 0 )
+	, lineHeight( 0 )
+	, linesPerPage( 0 )
+	, xOffset( 0 )
+	, yOffset( 0 )
 {
 }
 
@@ -22,7 +22,7 @@ RECT TextViewMetrics::GutterRect( HWND hwnd ) const
 	RECT rect;
 	GetClientRect( hwnd, &rect );
 
-	rect.right = m_gutterWidth;
+	rect.right = gutterWidth;
 	return rect;
 }
 
@@ -31,8 +31,8 @@ RECT TextViewMetrics::TextRect( HWND hwnd ) const
 	RECT rect;
 	GetClientRect( hwnd, &rect );
 
-	rect.left += m_gutterWidth;
-	InflateRect( &rect, -m_marginWidth, -m_marginWidth );
+	rect.left += gutterWidth;
+	InflateRect( &rect, -marginWidth, -marginWidth );
 	return rect;
 }
 
@@ -41,7 +41,7 @@ RECT TextViewMetrics::TextOrMarginRect( HWND hwnd ) const
 	RECT rect;
 	GetClientRect( hwnd, &rect );
 
-	rect.left += m_gutterWidth;
+	rect.left += gutterWidth;
 	return rect;
 }
 
@@ -110,13 +110,13 @@ RECT TextViewMetrics::ClientToGutter( RECT rect ) const
 
 POINT TextViewMetrics::ClientToGutter( POINT pt ) const
 {
-	pt.y += -m_yOffset;
+	pt.y += -yOffset;
 	return pt;
 }
 
 POINT TextViewMetrics::GutterToClient( POINT pt ) const
 {
-	pt.y += -m_yOffset;
+	pt.y += -yOffset;
 	return pt;
 }
 
@@ -143,14 +143,14 @@ RECT TextViewMetrics::ClientToText( RECT rect ) const
 
 POINT TextViewMetrics::ClientToText( POINT pt ) const
 {
-	pt.y -= m_marginWidth - m_yOffset;
-	pt.x -= m_marginWidth + m_gutterWidth - m_xOffset;
+	pt.y -= marginWidth - yOffset;
+	pt.x -= marginWidth + gutterWidth - xOffset;
 	return pt;
 }
 
 POINT TextViewMetrics::TextToClient( POINT pt ) const
 {
-	pt.y += m_marginWidth - m_yOffset;
-	pt.x += m_marginWidth + m_gutterWidth - m_xOffset;
+	pt.y += marginWidth - yOffset;
+	pt.x += marginWidth + gutterWidth - xOffset;
 	return pt;
 }

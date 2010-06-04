@@ -16,9 +16,9 @@ TextView::TextView( HWND hwnd )
 	, m_mouseWheelRemainder( 0 )
 	, m_lineUpCount( 0 )
 {
-	m_metrics.SetGutterWidth( 25 );
-	m_metrics.SetMarginWidth( 5 );
-	m_metrics.SetLineHeight ( 20 );
+	m_metrics.gutterWidth = 25;
+	m_metrics.marginWidth = 5;
+	m_metrics.lineHeight  = 20;
 }
 
 int TextView::OnCreate( LPCREATESTRUCT )
@@ -32,7 +32,7 @@ int TextView::OnCreate( LPCREATESTRUCT )
 
 void TextView::OnSize( UINT state, int cx, int cy )
 {
-	m_metrics.SetLinesPerPage( cy / m_metrics.LineHeight() );
+	m_metrics.linesPerPage = cy / m_metrics.lineHeight;
 	ScrollDelta( 0, 0 );
 	InvalidateRect( m_hwnd, NULL, TRUE );
 }
@@ -214,7 +214,7 @@ void TextView::OnSetCursor()
 
 void TextView::OnSetFocus( HWND )
 {
-	CreateCaret( m_hwnd, NULL, m_metrics.CaretWidth(), m_metrics.LineHeight() );
+	CreateCaret( m_hwnd, NULL, m_metrics.caretWidth, m_metrics.lineHeight );
 	::ShowCaret( m_hwnd );
 	UpdateCaretPos();
 }
@@ -532,17 +532,17 @@ void TextView::ScrollToCaret()
 	RECT textRect = m_metrics.ClientToText( m_metrics.TextRect( m_hwnd ) );
 
 	int textHeight         = textRect.bottom - textRect.top;
-	int adjustedTextHeight = textHeight - textHeight % m_metrics.LineHeight();
+	int adjustedTextHeight = textHeight - textHeight % m_metrics.lineHeight;
 
-	int xOffset = m_metrics.XOffset();
-	int yOffset = m_metrics.YOffset();
+	int xOffset = m_metrics.xOffset;
+	int yOffset = m_metrics.yOffset;
 
-	if ( m_selection.endPoint.y + m_metrics.LineHeight() > textRect.bottom )
-		yOffset = m_selection.endPoint.y + m_metrics.LineHeight() - adjustedTextHeight;
+	if ( m_selection.endPoint.y + m_metrics.lineHeight > textRect.bottom )
+		yOffset = m_selection.endPoint.y + m_metrics.lineHeight - adjustedTextHeight;
 	else if ( m_selection.endPoint.y < textRect.top )
 		yOffset = m_selection.endPoint.y;
 
-	if ( xOffset != m_metrics.XOffset() || yOffset != m_metrics.YOffset() )
+	if ( xOffset != m_metrics.xOffset || yOffset != m_metrics.yOffset )
 		ScrollTo( xOffset, yOffset );
 }
 
@@ -550,7 +550,7 @@ void TextView::UpdateCaretPos()
 {
 	POINT point = m_metrics.TextToClient( m_selection.endPoint );
 
-	RECT rect = { point.x, point.y, point.x + m_metrics.CaretWidth(), point.y + m_metrics.LineHeight() };
+	RECT rect = { point.x, point.y, point.x + m_metrics.caretWidth, point.y + m_metrics.lineHeight };
 	RECT intersection = m_metrics.IntersectWithText( rect, m_hwnd );
 
 	if ( IsRectEmpty( &intersection ) )
@@ -587,21 +587,21 @@ void TextView::ShowCaret()
 
 void TextView::ScrollTo( int x, int y )
 {
-	y = std::min( y, ( m_paragraphs.VisualLineCount() - m_metrics.LinesPerPage() ) * m_metrics.LineHeight() );
+	y = std::min( y, ( m_paragraphs.VisualLineCount() - m_metrics.linesPerPage ) * m_metrics.lineHeight );
 	y = std::max( y, int( 0 ) );
 
 	//RECT textRect = m_metrics.TextRect( m_hwnd );
-	//ScrollWindowEx( m_hwnd, 0, ( m_metrics.YOffset() - y ) * m_metrics.LineHeight(), &textRect, &textRect, NULL, &textRect, SW_ERASE | SW_INVALIDATE );
+	//ScrollWindowEx( m_hwnd, 0, ( m_metrics.yOffset - y ) * m_metrics.lineHeight, &textRect, &textRect, NULL, &textRect, SW_ERASE | SW_INVALIDATE );
 	InvalidateRect( m_hwnd, NULL, TRUE );
 
-	m_metrics.SetYOffset( y );
+	m_metrics.yOffset = y;
 
 	SCROLLINFO si = { sizeof si };
 	si.fMask      = SIF_PAGE | SIF_POS | SIF_RANGE;
-	si.nPage      = m_metrics.LinesPerPage() * m_metrics.LineHeight();
+	si.nPage      = m_metrics.linesPerPage * m_metrics.lineHeight;
 	si.nMin       = 0;
-	si.nMax       = ( m_paragraphs.VisualLineCount() - 1 ) * m_metrics.LineHeight();
-	si.nPos       = m_metrics.YOffset();
+	si.nMax       = ( m_paragraphs.VisualLineCount() - 1 ) * m_metrics.lineHeight;
+	si.nPos       = m_metrics.yOffset;
 
 	SetScrollInfo( m_hwnd, SB_VERT, &si, TRUE );
 	UpdateCaretPos();
@@ -609,7 +609,7 @@ void TextView::ScrollTo( int x, int y )
 
 void TextView::ScrollDelta( int x, int y )
 {
-	ScrollTo( m_metrics.XOffset() + x, m_metrics.YOffset() + y );
+	ScrollTo( m_metrics.xOffset + x, m_metrics.yOffset + y );
 }
 
 void TextView::OnMouseWheel( int zDelta )
@@ -619,7 +619,7 @@ void TextView::OnMouseWheel( int zDelta )
 		scrollLines = 3;
 
 	if ( scrollLines == WHEEL_PAGESCROLL )
-		scrollLines = m_metrics.LinesPerPage();
+		scrollLines = m_metrics.linesPerPage;
 
 	if ( scrollLines == 0 )
 		return;
@@ -629,21 +629,21 @@ void TextView::OnMouseWheel( int zDelta )
 	int dy = zDelta * (int)scrollLines / WHEEL_DELTA;
 	m_mouseWheelRemainder = zDelta - dy * WHEEL_DELTA / (int)scrollLines;
 
-	ScrollDelta( 0, -dy * m_metrics.LineHeight() );
+	ScrollDelta( 0, -dy * m_metrics.lineHeight );
 }
 
 void TextView::OnVScroll( UINT code )
 {
 	switch ( code )
 	{
-	case SB_LINEUP:         ScrollDelta( 0, -m_metrics.LineHeight() ); break;
-	case SB_LINEDOWN:       ScrollDelta( 0,  m_metrics.LineHeight() ); break;
-	case SB_PAGEUP:         ScrollDelta( 0, -m_metrics.LinesPerPage() * m_metrics.LineHeight() ); break;
-	case SB_PAGEDOWN:       ScrollDelta( 0,  m_metrics.LinesPerPage() * m_metrics.LineHeight() ); break;
-	case SB_THUMBPOSITION:  ScrollTo( m_metrics.XOffset(), GetTrackPos( SB_VERT ) ); break;
-	case SB_THUMBTRACK:     ScrollTo( m_metrics.XOffset(), GetTrackPos( SB_VERT ) ); break;
-	case SB_TOP:            ScrollTo( m_metrics.XOffset(), 0 );                      break;
-	case SB_BOTTOM:         ScrollTo( m_metrics.XOffset(), MAXLONG );                break;
+	case SB_LINEUP:         ScrollDelta( 0, -m_metrics.lineHeight ); break;
+	case SB_LINEDOWN:       ScrollDelta( 0,  m_metrics.lineHeight ); break;
+	case SB_PAGEUP:         ScrollDelta( 0, -m_metrics.linesPerPage * m_metrics.lineHeight ); break;
+	case SB_PAGEDOWN:       ScrollDelta( 0,  m_metrics.linesPerPage * m_metrics.lineHeight ); break;
+	case SB_THUMBPOSITION:  ScrollTo( m_metrics.xOffset, GetTrackPos( SB_VERT ) ); break;
+	case SB_THUMBTRACK:     ScrollTo( m_metrics.xOffset, GetTrackPos( SB_VERT ) ); break;
+	case SB_TOP:            ScrollTo( m_metrics.xOffset, 0 );                      break;
+	case SB_BOTTOM:         ScrollTo( m_metrics.xOffset, MAXLONG );                break;
 	}
 }
 
@@ -651,8 +651,8 @@ void TextView::OnHScroll( UINT code )
 {
 	//switch ( code )
 	//{
-	//case SB_LINEUP:         ScrollDelta( m_metrics.HOffset(), -m_metrics.LineHeight() );   break;
-	//case SB_LINEDOWN:       ScrollDelta( m_metrics.HOffset(), +m_metrics.LineHeight() );   break;
+	//case SB_LINEUP:         ScrollDelta( m_metrics.HOffset(), -m_metrics.lineHeight );   break;
+	//case SB_LINEDOWN:       ScrollDelta( m_metrics.HOffset(), +m_metrics.lineHeight );   break;
 	//case SB_PAGEUP:         ScrollDelta( m_metrics.HOffset(), -m_metrics.LinesPerPage() ); break;
 	//case SB_PAGEDOWN:       ScrollDelta( m_metrics.HOffset(), +m_metrics.LinesPerPage() ); break;
 	//case SB_THUMBPOSITION:  ScrollTo( m_metrics.HOffset(),     pos ); break;

@@ -10,28 +10,6 @@ class TextViewMetrics
 public:
 	TextViewMetrics();
 
-	int CaretWidth() const                   { return m_caretWidth; }
-
-	int MarginWidth() const                  { return m_marginWidth; }
-	int GutterWidth() const                  { return m_gutterWidth; }
-
-	int LineHeight() const                   { return m_lineHeight; }
-	int LinesPerPage() const                 { return m_linesPerPage; }
-
-	int XOffset() const                      { return m_xOffset; }
-	int YOffset() const                      { return m_yOffset; }
-
-	void SetCaretWidth( int caretWidth )     { m_caretWidth = caretWidth; }
-
-	void SetMarginWidth( int marginWidth )   { m_marginWidth = marginWidth; }
-	void SetGutterWidth( int gutterWidth )   { m_gutterWidth = gutterWidth; }
-
-	void SetLineHeight( int lineHeight )     { m_lineHeight = lineHeight; }
-	void SetLinesPerPage( int linesPerPage ) { m_linesPerPage = linesPerPage; }
-
-	void SetXOffset( int xOffset )           { m_xOffset = xOffset; }
-	void SetYOffset( int yOffset )           { m_yOffset = yOffset; }
-
 	RECT GutterRect      ( HWND ) const;
 	RECT TextRect        ( HWND ) const;
 	RECT TextOrMarginRect( HWND ) const;
@@ -54,17 +32,16 @@ public:
 	POINT ClientToText( POINT ) const;
 	POINT TextToClient( POINT ) const;
 
-private:
-	int m_caretWidth;
+	int caretWidth;
 
-	int m_marginWidth;
-	int m_gutterWidth;
+	int marginWidth;
+	int gutterWidth;
 
-	int m_lineHeight;
-	int m_linesPerPage;
+	int lineHeight;
+	int linesPerPage;
 
-	int m_xOffset;
-	int m_yOffset;
+	int xOffset;
+	int yOffset;
 };
 
 #endif
