@@ -401,40 +401,8 @@ void TextView::Cut()
 
 void TextView::Copy()
 {
-	if ( m_selection.IsEmpty() )
-		return;
-
-	if ( !OpenClipboard( m_hwnd ) )
-		return;
-
-	EmptyClipboard();
-
-	size_t sizeWithCRLF = m_doc.ReadWithCRLFSize( m_selection.Min(), m_selection.Size() );
-	HGLOBAL hGlobal = GlobalAlloc( GMEM_MOVEABLE, ( sizeWithCRLF + 1 ) * sizeof( UTF16::Unit ) );
-
-	if ( hGlobal != 0 )
-	{
-		UTF16::Unit* dest = static_cast<UTF16::Unit*>( GlobalLock( hGlobal ) );
-
-		if ( dest != 0 )
-		{
-			try
-			{
-				m_doc.ReadWithCRLF( m_selection.Min(), m_selection.Size(), ArrayOf<UTF16::Unit>( dest, dest + sizeWithCRLF ) );
-				dest[sizeWithCRLF] = UTF16::Unit( 0 );
-			}
-			catch (...)
-			{
-			}
-
-			GlobalUnlock( hGlobal );
-
-			if ( !SetClipboardData( CF_UNICODETEXT, hGlobal ) )
-				GlobalFree( hGlobal );
-		}
-	}
-
-	CloseClipboard();
+	if ( !m_selection.IsEmpty() )
+		m_doc.CopyToClipboard( m_selection.Min(), m_selection.Size() );
 }
 
 void TextView::Paste()

@@ -2,6 +2,7 @@
 
 #include "TextDocument.h"
 #include "Require.h"
+#include <Windows.h>
 
 #undef min
 #undef max
@@ -48,6 +49,41 @@ void TextDocument::ReadWithCRLF( size_t start, size_t count, ArrayOf<UTF16::Unit
 		if ( unit == 0x0A )
 			*write-- = 0x0D;
 	}
+}
+
+void TextDocument::CopyToClipboard( size_t start, size_t count ) const
+{
+	if ( !OpenClipboard( NULL ) )
+		return;
+
+	EmptyClipboard();
+
+	size_t sizeWithCRLF = ReadWithCRLFSize( start, count );
+	HGLOBAL hGlobal = GlobalAlloc( GMEM_MOVEABLE, ( sizeWithCRLF + 1 ) * sizeof( UTF16::Unit ) );
+
+	if ( hGlobal != 0 )
+	{
+		UTF16::Unit* dest = static_cast<UTF16::Unit*>( GlobalLock( hGlobal ) );
+
+		if ( dest != 0 )
+		{
+			try
+			{
+				ReadWithCRLF( start, count, ArrayOf<UTF16::Unit>( dest, dest + sizeWithCRLF ) );
+				dest[sizeWithCRLF] = UTF16::Unit( 0 );
+			}
+			catch (...)
+			{
+			}
+
+			GlobalUnlock( hGlobal );
+
+			if ( !SetClipboardData( CF_UNICODETEXT, hGlobal ) )
+				GlobalFree( hGlobal );
+		}
+	}
+
+	CloseClipboard();
 }
 
 static const UTF16::Unit* NextLineBreak( const UTF16::Unit* it, const UTF16::Unit* end )

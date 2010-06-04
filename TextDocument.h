@@ -15,11 +15,10 @@ public:
 	UTF16::Unit CharAt( size_t pos ) const;
 	size_t Read( size_t start, size_t count, UTF16::Unit* dest ) const;
 
-	size_t ReadWithCRLFSize( size_t start, size_t count ) const;
-	void   ReadWithCRLF    ( size_t start, size_t count, ArrayOf<UTF16::Unit> out ) const;
-
 	TextChange Insert( size_t pos, UTF16Ref );
 	TextChange Delete( size_t pos, size_t count );
+
+	void CopyToClipboard( size_t start, size_t count ) const;
 
 	//TextChange Undo();
 	//TextChange Redo();
@@ -31,6 +30,9 @@ public:
 	//void EndUndoGroup();
 
 private:
+	size_t ReadWithCRLFSize( size_t start, size_t count ) const;
+	void   ReadWithCRLF    ( size_t start, size_t count, ArrayOf<UTF16::Unit> out ) const;
+
 	GapBuffer<UTF16::Unit> m_buffer;
 };
 
