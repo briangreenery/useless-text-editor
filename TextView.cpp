@@ -45,18 +45,20 @@ void TextView::OnPaint()
 	PAINTSTRUCT ps;
 	HDC hdc = BeginPaint( m_hwnd, &ps );
 
-	//HPAINTBUFFER hpb = BeginBufferedPaint( ps.hdc, &ps.rcPaint, BPBF_COMPATIBLEBITMAP, NULL, &hdc );
+	HPAINTBUFFER hpb = BeginBufferedPaint( ps.hdc, &ps.rcPaint, BPBF_COMPATIBLEBITMAP, NULL, &hdc );
 
 	PaintGutter( hdc, ps.rcPaint );
 
 	RECT fillRect = m_metrics.IntersectWithTextOrMargin( ps.rcPaint, m_hwnd );
 	FillRect( hdc, &fillRect, GetSysColorBrush( COLOR_WINDOW ) );
 
-	m_paragraphs.Draw( m_metrics.ClientToText( hdc ),
+	POINT oldOrigin;
+	m_paragraphs.Draw( m_metrics.ClientToText( hdc, &oldOrigin ),
 	                   m_metrics.ClientToText( m_metrics.IntersectWithText( ps.rcPaint, m_hwnd ) ),
 	                   m_selection );
 
-	//EndBufferedPaint( hpb, TRUE );
+	SetWindowOrgEx( hdc, oldOrigin.x, oldOrigin.y, NULL );
+	EndBufferedPaint( hpb, TRUE );
 	EndPaint( m_hwnd, &ps );
 }
 

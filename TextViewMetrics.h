@@ -27,7 +27,7 @@ public:
 	POINT ClientToGutter( POINT ) const;
 	POINT GutterToClient( POINT ) const;
 
-	HDC   ClientToText( HDC ) const;
+	HDC   ClientToText( HDC, POINT* ) const;
 	RECT  ClientToText( RECT ) const;
 	POINT ClientToText( POINT ) const;
 	POINT TextToClient( POINT ) const;

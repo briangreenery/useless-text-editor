@@ -120,12 +120,12 @@ POINT TextViewMetrics::GutterToClient( POINT pt ) const
 	return pt;
 }
 
-HDC TextViewMetrics::ClientToText( HDC hdc ) const
+HDC TextViewMetrics::ClientToText( HDC hdc, POINT* oldOrigin ) const
 {
 	POINT clientOrigin = { 0, 0 };
 	clientOrigin = ClientToText( clientOrigin );
 
-	SetWindowOrgEx( hdc, clientOrigin.x, clientOrigin.y, NULL );
+	SetWindowOrgEx( hdc, clientOrigin.x, clientOrigin.y, oldOrigin );
 	return hdc;
 }
 
