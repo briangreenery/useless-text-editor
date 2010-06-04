@@ -47,7 +47,6 @@ public:
 	void End ( bool gotoDocEnd,   bool moveSelection );
 
 	void LineUp( bool moveSelection, bool up );
-	void ResetLineUp();
 
 	void Backspace( bool wholeWord );
 	void Delete   ( bool wholeWord );

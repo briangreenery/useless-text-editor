@@ -116,6 +116,9 @@ void TextView::OnKeyDown( UINT keyCode, UINT repCnt, UINT flags )
 	bool isCtrlPressed  = GetKeyState( VK_CONTROL ) < 0;
 	bool isShiftPressed = GetKeyState( VK_SHIFT   ) < 0;
 
+	if ( keyCode != VK_UP && keyCode != VK_DOWN )
+		m_lineUpCount = 0;
+
 	for ( ; repCnt > 0; --repCnt )
 	{
 		switch ( keyCode )
@@ -146,8 +149,6 @@ void TextView::OnKeyDown( UINT keyCode, UINT repCnt, UINT flags )
 
 void TextView::OnLButtonDown( POINT point )
 {
-	ResetLineUp();
-
 	if ( m_metrics.IsInTextOrMargin( point, m_hwnd ) )
 	{
 		m_selection.endPoint = m_metrics.ClientToText( point );
@@ -231,8 +232,6 @@ void TextView::OnKillFocus( HWND )
 
 void TextView::AdvanceCaret( bool wholeWord, bool moveSelection )
 {
-	ResetLineUp();
-
 	if ( !wholeWord && !moveSelection && !m_selection.IsEmpty() )
 	{
 		m_selection = m_selection.Max();
@@ -256,8 +255,6 @@ void TextView::AdvanceCaret( bool wholeWord, bool moveSelection )
 
 void TextView::RetireCaret( bool wholeWord, bool moveSelection )
 {
-	ResetLineUp();
-
 	if ( !wholeWord && !moveSelection && !m_selection.IsEmpty() )
 	{
 		m_selection = m_selection.Min();
@@ -281,8 +278,6 @@ void TextView::RetireCaret( bool wholeWord, bool moveSelection )
 
 void TextView::Home( bool gotoDocStart, bool moveSelection )
 {
-	ResetLineUp();
-
 	m_selection.end = gotoDocStart
 	                     ? 0
 	                     : m_paragraphs.LineStart( m_selection.endPoint.y );
@@ -296,8 +291,6 @@ void TextView::Home( bool gotoDocStart, bool moveSelection )
 
 void TextView::End( bool gotoDocEnd, bool moveSelection )
 {
-	ResetLineUp();
-
 	m_selection.end = gotoDocEnd
 	                     ? m_doc.Length()
 	                     : m_paragraphs.LineEnd( m_selection.endPoint.y );
@@ -336,15 +329,8 @@ void TextView::LineUp( bool moveSelection, bool up )
 	InvalidateRect( m_hwnd, NULL, TRUE );
 }
 
-void TextView::ResetLineUp()
-{
-	m_lineUpCount = 0;
-}
-
 void TextView::Backspace( bool wholeWord )
 {
-	ResetLineUp();
-
 	if ( m_selection.IsEmpty() )
 	{
 		if ( m_selection.end == 0 )
@@ -360,8 +346,6 @@ void TextView::Backspace( bool wholeWord )
 
 void TextView::Delete( bool wholeWord )
 {
-	ResetLineUp();
-
 	if ( m_selection.IsEmpty() )
 	{
 		if ( m_selection.end == m_doc.Length() )
@@ -377,8 +361,6 @@ void TextView::Delete( bool wholeWord )
 
 void TextView::Insert( UTF16Ref text )
 {
-	ResetLineUp();
-
 	Clear( false );
 	Assert( m_selection.IsEmpty() );
 
@@ -392,8 +374,6 @@ void TextView::Insert( UTF16Ref text )
 
 void TextView::SelectAll()
 {
-	ResetLineUp();
-
 	m_selection.start = 0;
 	m_selection.end   = m_doc.Length();
 
@@ -405,8 +385,6 @@ void TextView::Clear( bool moveCaret )
 {
 	if ( m_selection.IsEmpty() )
 		return;
-
-	ResetLineUp();
 
 	TextChange change = m_doc.Delete( m_selection.Min(), m_selection.Size() );
 	m_paragraphs.ProcessTextChanges( change );
@@ -420,8 +398,6 @@ void TextView::Clear( bool moveCaret )
 
 void TextView::Cut()
 {
-	ResetLineUp();
-
 	Copy();
 	Clear( true );
 }
@@ -466,8 +442,6 @@ void TextView::Copy()
 
 void TextView::Paste()
 {
-	ResetLineUp();
-
 	if ( !IsClipboardFormatAvailable( CF_UNICODETEXT ) )
 		return;
 
@@ -509,16 +483,12 @@ void TextView::Undo()
 {
 	if ( !CanUndo() )
 		return;
-
-	ResetLineUp();
 }
 
 void TextView::Redo()
 {
 	if ( !CanRedo() )
 		return;
-
-	ResetLineUp();
 }
 
 void TextView::UpdateLayout()
