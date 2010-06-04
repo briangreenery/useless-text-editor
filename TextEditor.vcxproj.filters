@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Universe">
+      <UniqueIdentifier>{0d0accc7-2dc3-4276-9a70-40d856baa633}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Buffer">
+      <UniqueIdentifier>{8ce30050-f6b2-4e40-ab6f-bfcf645888a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TextView">
+      <UniqueIdentifier>{e0c88b8e-b27a-4ca0-b69c-c0a8f57e5d53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TextEdit">
+      <UniqueIdentifier>{aee8ffd2-ac89-4bf5-8820-20e5b4ce6f6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TextDocument">
+      <UniqueIdentifier>{3e23faf4-05a2-44fd-9346-1ad100ab3ac1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Style">
+      <UniqueIdentifier>{9dfcb392-4b14-493f-a2e1-050ade9e56be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lexer">
+      <UniqueIdentifier>{01e98e77-53bd-4c5a-8737-e385986223a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Layout">
+      <UniqueIdentifier>{edcf1d03-811e-43fe-9e55-62938956cd50}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ArrayOf.cpp">
+      <Filter>Universe</Filter>
+    </ClCompile>
+    <ClCompile Include="SizedAutoArray.cpp">
+      <Filter>Universe</Filter>
+    </ClCompile>
+    <ClCompile Include="DocumentIterator.cpp">
+      <Filter>Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="DocumentReader.cpp">
+      <Filter>Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="GapBuffer.cpp">
+      <Filter>Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorAllocator.cpp">
+      <Filter>Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorCache.cpp">
+      <Filter>Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawLineSelection.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="ParagraphWithInfo.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptBreakLoop.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectionLineLoop.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="TextParagraph.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="TextParagraphs.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="TextSelection.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="TextView.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="TextViewMetrics.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="VisualLine.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEdit.cpp">
+      <Filter>TextEdit</Filter>
+    </ClCompile>
+    <ClCompile Include="TextChange.cpp">
+      <Filter>TextDocument</Filter>
+    </ClCompile>
+    <ClCompile Include="TextDocument.cpp">
+      <Filter>TextDocument</Filter>
+    </ClCompile>
+    <ClCompile Include="FontCollection.cpp">
+      <Filter>Style</Filter>
+    </ClCompile>
+    <ClCompile Include="StyleRun.cpp">
+      <Filter>Style</Filter>
+    </ClCompile>
+    <ClCompile Include="TextStyleCollection.cpp">
+      <Filter>Style</Filter>
+    </ClCompile>
+    <ClCompile Include="LexerState.cpp">
+      <Filter>Lexer</Filter>
+    </ClCompile>
+    <ClCompile Include="NextRelevanceToken.cpp">
+      <Filter>Lexer</Filter>
+    </ClCompile>
+    <ClCompile Include="LayoutAllocator.cpp">
+      <Filter>Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="LayoutData.cpp">
+      <Filter>Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="LayoutEngine.cpp">
+      <Filter>Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="TextRun.cpp">
+      <Filter>Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="TextRunLoop.cpp">
+      <Filter>Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ArrayOf.h">
+      <Filter>Universe</Filter>
+    </ClInclude>
+    <ClInclude Include="Assert.h">
+      <Filter>Universe</Filter>
+    </ClInclude>
+    <ClInclude Include="DebuggableException.h">
+      <Filter>Universe</Filter>
+    </ClInclude>
+    <ClInclude Include="Error.h">
+      <Filter>Universe</Filter>
+    </ClInclude>
+    <ClInclude Include="Integers.h">
+      <Filter>Universe</Filter>
+    </ClInclude>
+    <ClInclude Include="Require.h">
+      <Filter>Universe</Filter>
+    </ClInclude>
+    <ClInclude Include="SizedAutoArray.h">
+      <Filter>Universe</Filter>
+    </ClInclude>
+    <ClInclude Include="UString.h">
+      <Filter>Universe</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentIterator.h">
+      <Filter>Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentReader.h">
+      <Filter>Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="GapBuffer.h">
+      <Filter>Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorAllocator.h">
+      <Filter>Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorCache.h">
+      <Filter>Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawLineSelection.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="ParagraphWithInfo.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptBreakLoop.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectionLineLoop.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="TextParagraph.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="TextParagraphs.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="TextSelection.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="TextView.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="TextViewMetrics.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualLine.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEdit.h">
+      <Filter>TextEdit</Filter>
+    </ClInclude>
+    <ClInclude Include="TextChange.h">
+      <Filter>TextDocument</Filter>
+    </ClInclude>
+    <ClInclude Include="TextDocument.h">
+      <Filter>TextDocument</Filter>
+    </ClInclude>
+    <ClInclude Include="FontCollection.h">
+      <Filter>Style</Filter>
+    </ClInclude>
+    <ClInclude Include="StyleRun.h">
+      <Filter>Style</Filter>
+    </ClInclude>
+    <ClInclude Include="TextStyleCollection.h">
+      <Filter>Style</Filter>
+    </ClInclude>
+    <ClInclude Include="LexerState.h">
+      <Filter>Lexer</Filter>
+    </ClInclude>
+    <ClInclude Include="NextRelevanceToken.h">
+      <Filter>Lexer</Filter>
+    </ClInclude>
+    <ClInclude Include="LayoutAllocator.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="LayoutData.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="LayoutEngine.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="TextRun.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="TextRunLoop.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NextRelevanceToken.re2c">
+      <Filter>Lexer</Filter>
+    </None>
+  </ItemGroup>
+</Project>

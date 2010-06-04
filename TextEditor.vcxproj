@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5B0EBDBB-FBDD-493F-A7BB-AE83BC81BA85}</ProjectGuid>
+    <RootNamespace>TextEditor</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>usp10.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="ArrayOf.cpp" />
+    <ClCompile Include="SizedAutoArray.cpp" />
+    <ClCompile Include="DocumentIterator.cpp" />
+    <ClCompile Include="DocumentReader.cpp" />
+    <ClCompile Include="GapBuffer.cpp" />
+    <ClCompile Include="VectorAllocator.cpp" />
+    <ClCompile Include="VectorCache.cpp" />
+    <ClCompile Include="DrawLineSelection.cpp" />
+    <ClCompile Include="ParagraphWithInfo.cpp" />
+    <ClCompile Include="ScriptBreakLoop.cpp" />
+    <ClCompile Include="SelectionLineLoop.cpp" />
+    <ClCompile Include="TextParagraph.cpp" />
+    <ClCompile Include="TextParagraphs.cpp" />
+    <ClCompile Include="TextSelection.cpp" />
+    <ClCompile Include="TextView.cpp" />
+    <ClCompile Include="TextViewMetrics.cpp" />
+    <ClCompile Include="VisualLine.cpp" />
+    <ClCompile Include="TextEdit.cpp" />
+    <ClCompile Include="TextChange.cpp" />
+    <ClCompile Include="TextDocument.cpp" />
+    <ClCompile Include="FontCollection.cpp" />
+    <ClCompile Include="StyleRun.cpp" />
+    <ClCompile Include="TextStyleCollection.cpp" />
+    <ClCompile Include="LexerState.cpp" />
+    <ClCompile Include="NextRelevanceToken.cpp" />
+    <ClCompile Include="LayoutAllocator.cpp" />
+    <ClCompile Include="LayoutData.cpp" />
+    <ClCompile Include="LayoutEngine.cpp" />
+    <ClCompile Include="TextRun.cpp" />
+    <ClCompile Include="TextRunLoop.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ArrayOf.h" />
+    <ClInclude Include="Assert.h" />
+    <ClInclude Include="DebuggableException.h" />
+    <ClInclude Include="Error.h" />
+    <ClInclude Include="Integers.h" />
+    <ClInclude Include="Require.h" />
+    <ClInclude Include="SizedAutoArray.h" />
+    <ClInclude Include="UString.h" />
+    <ClInclude Include="DocumentIterator.h" />
+    <ClInclude Include="DocumentReader.h" />
+    <ClInclude Include="GapBuffer.h" />
+    <ClInclude Include="VectorAllocator.h" />
+    <ClInclude Include="VectorCache.h" />
+    <ClInclude Include="DrawLineSelection.h" />
+    <ClInclude Include="ParagraphWithInfo.h" />
+    <ClInclude Include="ScriptBreakLoop.h" />
+    <ClInclude Include="SelectionLineLoop.h" />
+    <ClInclude Include="TextParagraph.h" />
+    <ClInclude Include="TextParagraphs.h" />
+    <ClInclude Include="TextSelection.h" />
+    <ClInclude Include="TextView.h" />
+    <ClInclude Include="TextViewMetrics.h" />
+    <ClInclude Include="VisualLine.h" />
+    <ClInclude Include="TextEdit.h" />
+    <ClInclude Include="TextChange.h" />
+    <ClInclude Include="TextDocument.h" />
+    <ClInclude Include="FontCollection.h" />
+    <ClInclude Include="StyleRun.h" />
+    <ClInclude Include="TextStyleCollection.h" />
+    <ClInclude Include="LexerState.h" />
+    <ClInclude Include="NextRelevanceToken.h" />
+    <ClInclude Include="LayoutAllocator.h" />
+    <ClInclude Include="LayoutData.h" />
+    <ClInclude Include="LayoutEngine.h" />
+    <ClInclude Include="TextRun.h" />
+    <ClInclude Include="TextRunLoop.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NextRelevanceToken.re2c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

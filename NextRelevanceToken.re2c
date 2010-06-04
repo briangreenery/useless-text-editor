@@ -1,0 +1,118 @@
+
+// To generate this file run: re2c -b -i -w NextRelevanceToken.re2c > NextRelevanceToken.cpp
+
+#include "NextRelevanceToken.h"
+
+#define RET( c, l ) \
+	token->colorType = c; \
+	return
+	
+namespace C = ColorType;
+
+void NextRelevanceToken( RelevanceToken* token, LexerState* scanner, const UTF16::Unit* cursor )
+{
+	scanner->marker    = cursor;
+	scanner->ctxmarker = cursor;
+
+/*!re2c
+
+	re2c:define:YYCTYPE      = UTF16::Unit;
+	re2c:define:YYCURSOR     = cursor;
+	re2c:define:YYLIMIT      = scanner->end;
+	re2c:define:YYMARKER     = scanner->marker;
+	re2c:define:YYCTXMARKER  = scanner->ctxmarker;
+	re2c:define:YYFILL:naked = 1;
+	re2c:define:YYFILL       = "{ cursor = scanner->Fill( cursor ); }";
+
+	ws           = '\t' | '\r' | '\n' | ' ';
+	ignored      = 'a' | 'an' | 'the';
+	keywordspace = ws+ ( ignored ws+ )*;
+	ks           = keywordspace;
+	nonword      = [^a-zA-Z_'] | [\000];
+	nw           = nonword;
+	word         = [a-zA-Z_']+;
+	any          = [\000-\377];
+
+	any         { RET( C::illegal,   L::illegal    ); }
+	ws+         { RET( C::automatic, L::whitespace ); }
+	[0-9]+      { RET( C::number,    L::number     ); }
+	["][^"]*["] { RET( C::string,    L::string     ); }
+
+	word        { RET( C::automatic, L::word ); }
+
+	"("         { RET( C::automatic, L::openParen  ); }
+	")"         { RET( C::automatic, L::closeParen ); }
+
+	"!="        { RET( C::op, L::notEqual       ); }
+	"&"         { RET( C::op, L::concat         ); }
+	"*"         { RET( C::op, L::star           ); }
+	"+"         { RET( C::op, L::plus           ); }
+	","         { RET( C::op, L::comma          ); }
+	"-"         { RET( C::op, L::minus          ); }
+	"/"         { RET( C::op, L::slash          ); }
+	";"         { RET( C::op, L::semiColon      ); }
+	"<"         { RET( C::op, L::less           ); }
+	"<="        { RET( C::op, L::lessOrEqual    ); }
+	"="         { RET( C::op, L::equal          ); }
+	">"         { RET( C::op, L::greater        ); }
+	">="        { RET( C::op, L::greaterOrEqual ); }
+
+	'a'                                                             /nw { RET( C::ignored, L::ignored           ); }
+	'an'                                                            /nw { RET( C::ignored, L::ignored           ); }
+	'the'                                                           /nw { RET( C::ignored, L::ignored           ); }
+
+	'and'                                                           /nw { RET( C::keyword, L::and               ); }
+	'as'                                                            /nw { RET( C::keyword, L::as                ); }
+	'contains'                                                      /nw { RET( C::keyword, L::contains          ); }
+	'does' ks 'not' ks 'contain'                                    /nw { RET( C::keyword, L::notContains       ); }
+	'does' ks 'not' ks 'end' ks 'with'                              /nw { RET( C::keyword, L::notEndsWith       ); }
+	'does' ks 'not' ks 'equal'                                      /nw { RET( C::keyword, L::notEqual          ); }
+	'does' ks 'not' ks 'start' ks 'with'                            /nw { RET( C::keyword, L::notStartsWith     ); }
+	'else'                                                          /nw { RET( C::keyword, L::else              ); }
+	'ends' ks 'with'                                                /nw { RET( C::keyword, L::endsWith          ); }
+	'equals'                                                        /nw { RET( C::keyword, L::equal             ); }
+	'exist'                                                         /nw { RET( C::keyword, L::exists            ); }
+	'exist' ks 'no'                                                 /nw { RET( C::keyword, L::notExists         ); }
+	'exists'                                                        /nw { RET( C::keyword, L::exists            ); }
+	'exists' ks 'no'                                                /nw { RET( C::keyword, L::notExists         ); }
+	'false'                                                         /nw { RET( C::keyword, L::word              ); }
+	'if'                                                            /nw { RET( C::keyword, L::if                ); }
+	'is'                                                            /nw { RET( C::keyword, L::equal             ); }
+	'is' ks 'contained' ks 'by'                                     /nw { RET( C::keyword, L::containedBy       ); }
+	'is' ks 'equal' ks 'to'                                         /nw { RET( C::keyword, L::equal             ); }
+	'is' ks 'greater' ks 'than'                                     /nw { RET( C::keyword, L::greater           ); }
+	'is' ks 'greater' ks 'than' ks 'or' ks 'equal' ks 'to'          /nw { RET( C::keyword, L::greaterOrEqual    ); }
+	'is' ks 'less' ks 'than'                                        /nw { RET( C::keyword, L::less              ); }
+	'is' ks 'less' ks 'than' ks 'or' ks 'equal' ks 'to'             /nw { RET( C::keyword, L::lessOrEqual       ); }
+	'is' ks 'not'                                                   /nw { RET( C::keyword, L::notEqual          ); }
+	'is' ks 'not' ks 'contained' ks 'by'                            /nw { RET( C::keyword, L::notContainedBy    ); }
+	'is' ks 'not' ks 'equal' ks 'to'                                /nw { RET( C::keyword, L::notEqual          ); }
+	'is' ks 'not' ks 'greater' ks 'than'                            /nw { RET( C::keyword, L::notGreater        ); }
+	'is' ks 'not' ks 'greater' ks 'than' ks 'or' ks 'equal' ks 'to' /nw { RET( C::keyword, L::notGreaterOrEqual ); }
+	'is' ks 'not' ks 'less' ks 'than'                               /nw { RET( C::keyword, L::notLess           ); }
+	'is' ks 'not' ks 'less' ks 'than' ks 'or' ks 'equal' ks 'to'    /nw { RET( C::keyword, L::notLessOrEqual    ); }
+	'it'                                                            /nw { RET( C::keyword, L::it                ); }
+	'item'                                                          /nw { RET( C::keyword, L::word              ); }
+	'items'                                                         /nw { RET( C::keyword, L::word              ); }
+	'mod'                                                           /nw { RET( C::keyword, L::mod               ); }
+	'nil'                                                           /nw { RET( C::keyword, L::word              ); }
+	'not'                                                           /nw { RET( C::keyword, L::not               ); }
+	'nothing'                                                       /nw { RET( C::keyword, L::word              ); }
+	'nothings'                                                      /nw { RET( C::keyword, L::word              ); }
+	'null'                                                          /nw { RET( C::keyword, L::word              ); }
+	'number'                                                        /nw { RET( C::keyword, L::word              ); }
+	'of'                                                            /nw { RET( C::keyword, L::of                ); }
+	'or'                                                            /nw { RET( C::keyword, L::or                ); }
+	'starts' ks 'with'                                              /nw { RET( C::keyword, L::startsWith        ); }
+	'then'                                                          /nw { RET( C::keyword, L::then              ); }
+	'there' ks 'do' ks 'not' ks 'exist'                             /nw { RET( C::keyword, L::notExists         ); }
+	'there' ks 'does' ks 'not' ks 'exist'                           /nw { RET( C::keyword, L::notExists         ); }
+	'there' ks 'exist'                                              /nw { RET( C::keyword, L::exists            ); }
+	'there' ks 'exist' ks 'no'                                      /nw { RET( C::keyword, L::notExists         ); }
+	'there' ks 'exists'                                             /nw { RET( C::keyword, L::exists            ); }
+	'there' ks 'exists' ks 'no'                                     /nw { RET( C::keyword, L::notExists         ); }
+	'true'                                                          /nw { RET( C::keyword, L::word              ); }
+	'whose'                                                         /nw { RET( C::keyword, L::whose             ); }
+*/
+
+}
