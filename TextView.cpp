@@ -311,8 +311,6 @@ void TextView::End( bool gotoDocEnd, bool moveSelection )
 
 void TextView::LineUp( bool moveSelection, bool up )
 {
-	static const int lineHeight = 20;
-
 	if ( m_lineUpCount == 0 )
 		m_lineUpStart = m_selection.endPoint;
 
@@ -320,7 +318,7 @@ void TextView::LineUp( bool moveSelection, bool up )
 	            ? m_lineUpCount + 1
 	            : m_lineUpCount - 1;
 
-	int y = m_lineUpStart.y - ( lineHeight * count );
+	int y = m_lineUpStart.y - ( m_metrics.lineHeight * count );
 
 	if ( 0 <= y && y < m_paragraphs.Height() )
 	{
