@@ -80,7 +80,6 @@
   <ItemGroup>
     <ClCompile Include="ArrayOf.cpp" />
     <ClCompile Include="SizedAutoArray.cpp" />
-    <ClCompile Include="DocumentIterator.cpp" />
     <ClCompile Include="DocumentReader.cpp" />
     <ClCompile Include="GapBuffer.cpp" />
     <ClCompile Include="VectorAllocator.cpp" />
@@ -119,7 +118,6 @@
     <ClInclude Include="Require.h" />
     <ClInclude Include="SizedAutoArray.h" />
     <ClInclude Include="UString.h" />
-    <ClInclude Include="DocumentIterator.h" />
     <ClInclude Include="DocumentReader.h" />
     <ClInclude Include="GapBuffer.h" />
     <ClInclude Include="VectorAllocator.h" />

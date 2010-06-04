@@ -103,10 +103,7 @@ void TextView::OnChar( UINT keyCode, UINT repCnt, UINT flags )
 
 	for ( ; repCnt > 0; --repCnt )
 	{
-		UTF16::Unit unit = ( keyCode == VK_RETURN )
-		                      ? 0x0A
-		                      : keyCode;
-
+		UTF16::Unit unit = ( keyCode == VK_RETURN ) ? 0x0A : keyCode;
 		Insert( UTF16Ref( &unit, 1 ) );
 	}
 }

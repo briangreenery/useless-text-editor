@@ -33,9 +33,6 @@
     <ClCompile Include="SizedAutoArray.cpp">
       <Filter>Universe</Filter>
     </ClCompile>
-    <ClCompile Include="DocumentIterator.cpp">
-      <Filter>Buffer</Filter>
-    </ClCompile>
     <ClCompile Include="DocumentReader.cpp">
       <Filter>Buffer</Filter>
     </ClCompile>
@@ -143,9 +140,6 @@
     </ClInclude>
     <ClInclude Include="UString.h">
       <Filter>Universe</Filter>
-    </ClInclude>
-    <ClInclude Include="DocumentIterator.h">
-      <Filter>Buffer</Filter>
     </ClInclude>
     <ClInclude Include="DocumentReader.h">
       <Filter>Buffer</Filter>
