@@ -177,19 +177,18 @@ void TextView::OnLButtonDblClk( POINT point )
 void TextView::OnLButtonUp( POINT point )
 {
 	ReleaseCapture();
-	OnCaptureChanged();
 }
 
 void TextView::OnMouseMove( POINT point )
 {
-	if ( m_isDoingMouseSel )
-	{
-		// "ClampToVisibleText" firefox suggests that maybe the yOffset should be in terms of pixels, and that we should snap whenever the mouse is finished.
-		m_selection.endPoint = m_metrics.ClientToText( point );
-		m_selection.end = m_paragraphs.CharFromPoint( &m_selection.endPoint );
-		UpdateCaretPos();
-		InvalidateRect( m_hwnd, NULL, TRUE );
-	}
+	if ( !m_isDoingMouseSel )
+		return;
+
+	// "ClampToVisibleText" firefox suggests that maybe the yOffset should be in terms of pixels, and that we should snap whenever the mouse is finished.
+	m_selection.endPoint = m_metrics.ClientToText( point );
+	m_selection.end = m_paragraphs.CharFromPoint( &m_selection.endPoint );
+	UpdateCaretPos();
+	InvalidateRect( m_hwnd, NULL, TRUE );
 }
 
 void TextView::OnCaptureChanged()
