@@ -146,6 +146,8 @@ void TextView::OnKeyDown( UINT keyCode, UINT repCnt, UINT flags )
 
 void TextView::OnLButtonDown( POINT point )
 {
+	m_lineUpCount = 0;
+
 	if ( !m_metrics.IsInTextOrMargin( point, m_hwnd ) )
 		return;
 
