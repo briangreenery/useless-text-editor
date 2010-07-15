@@ -54,9 +54,10 @@
       <AdditionalIncludeDirectories>C:\Users\brian_green\Desktop\icu\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;icuucd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>C:\Users\brian_green\Desktop\icu\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -72,11 +73,12 @@
       <AdditionalIncludeDirectories>C:\Users\brian_green\Desktop\icu\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;icuucd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>C:\Users\brian_green\Desktop\icu\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -89,7 +91,6 @@
     <ClCompile Include="VectorCache.cpp" />
     <ClCompile Include="DrawLineSelection.cpp" />
     <ClCompile Include="ParagraphWithInfo.cpp" />
-    <ClCompile Include="ScriptBreakLoop.cpp" />
     <ClCompile Include="SelectionLineLoop.cpp" />
     <ClCompile Include="TextParagraph.cpp" />
     <ClCompile Include="TextParagraphs.cpp" />
@@ -128,7 +129,6 @@
     <ClInclude Include="VectorCache.h" />
     <ClInclude Include="DrawLineSelection.h" />
     <ClInclude Include="ParagraphWithInfo.h" />
-    <ClInclude Include="ScriptBreakLoop.h" />
     <ClInclude Include="SelectionLineLoop.h" />
     <ClInclude Include="TextParagraph.h" />
     <ClInclude Include="TextParagraphs.h" />

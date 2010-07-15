@@ -63,50 +63,6 @@ SelectionRanges TextParagraph::Draw( HDC hdc, RECT rect, SCRIPT_CACHE cache, Tex
 	return topSelection;
 }
 
-size_t TextParagraph::NextCharStop( size_t pos, const DocumentReader& reader ) const
-{
-	ScriptBreakLoop it( pos, reader, m_layout.items );
-
-	for ( ; it.Unfinished(); ++it )
-		if ( it->fCharStop )
-			break;
-
-	return it.Pos();
-}
-
-size_t TextParagraph::NextWordStop( size_t pos, const DocumentReader& reader ) const
-{
-	ScriptBreakLoop it( pos, reader, m_layout.items );
-
-	for ( ; it.Unfinished(); ++it )
-		if ( it->fWordStop )
-			break;
-
-	return it.Pos();
-}
-
-size_t TextParagraph::PrevCharStop( size_t pos, const DocumentReader& reader ) const
-{
-	ScriptBreakLoop it( pos, reader, m_layout.items );
-
-	for ( ; it.Unfinished(); --it )
-		if ( it->fCharStop )
-			break;
-
-	return it.Pos();
-}
-
-size_t TextParagraph::PrevWordStop( size_t pos, const DocumentReader& reader ) const
-{
-	ScriptBreakLoop it( pos, reader, m_layout.items );
-
-	for ( ; it.Unfinished(); --it )
-		if ( it->fWordStop )
-			break;
-
-	return it.Pos();
-}
-
 POINT TextParagraph::PointFromChar( size_t pos, bool advancing ) const
 {
 	POINT result;

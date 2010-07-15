@@ -18,11 +18,6 @@ public:
 
 	void Draw( HDC hdc, RECT rect, TextSelection );
 
-	size_t NextCharStop( size_t pos ) const { return FindBreak( pos, nextChar  ); }
-	size_t NextWordStop( size_t pos ) const { return FindBreak( pos, nextWord  ); }
-	size_t PrevCharStop( size_t pos ) const { return FindBreak( pos, prevChar  ); }
-	size_t PrevWordStop( size_t pos ) const { return FindBreak( pos, prevWord  ); }
-
 	size_t LineStart( LONG y ) const;
 	size_t LineEnd  ( LONG y ) const;
 

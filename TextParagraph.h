@@ -19,11 +19,6 @@ public:
 
 	SelectionRanges Draw( HDC hdc, RECT, SCRIPT_CACHE, TextSelection, SelectionRanges, bool isLast ) const;
 
-	size_t NextCharStop( size_t pos, const DocumentReader& ) const;
-	size_t NextWordStop( size_t pos, const DocumentReader& ) const;
-	size_t PrevCharStop( size_t pos, const DocumentReader& ) const;
-	size_t PrevWordStop( size_t pos, const DocumentReader& ) const;
-
 	size_t LineStart( LONG y ) const;
 	size_t LineEnd  ( LONG y ) const;
 

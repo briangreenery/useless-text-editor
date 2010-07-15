@@ -164,8 +164,8 @@ void TextView::OnLButtonDown( POINT point )
 
 void TextView::OnLButtonDblClk( POINT point )
 {
-	size_t wordStart = m_paragraphs.PrevWordStop( m_selection.end > 0 ? m_selection.end - 1 : 0 );
-	size_t wordEnd   = m_paragraphs.NextWordStop( m_selection.end );
+	size_t wordStart = m_doc.PrevWordStop( m_selection.end > 0 ? m_selection.end - 1 : 0 );
+	size_t wordEnd   = m_doc.NextWordStop( m_selection.end );
 
 	m_selection.start = wordStart;
 	m_selection.end   = wordEnd;
@@ -234,12 +234,9 @@ void TextView::AdvanceCaret( bool wholeWord, bool moveSelection )
 	}
 	else
 	{
-		if ( m_selection.end < m_doc.Length() )
-			++m_selection.end;
-
 		m_selection.end = wholeWord
-		                     ? m_paragraphs.NextWordStop( m_selection.end )
-		                     : m_paragraphs.NextCharStop( m_selection.end );
+		                     ? m_doc.NextNonWhitespace( m_doc.NextWordStop( m_selection.end ) )
+		                     : m_doc.NextCharStop( m_selection.end );
 
 		if ( !moveSelection )
 			m_selection.start = m_selection.end;
@@ -257,12 +254,9 @@ void TextView::RetireCaret( bool wholeWord, bool moveSelection )
 	}
 	else
 	{
-		if ( m_selection.end > 0 )
-			--m_selection.end;
-
 		m_selection.end = wholeWord
-		                     ? m_paragraphs.PrevWordStop( m_selection.end )
-		                     : m_paragraphs.PrevCharStop( m_selection.end );
+		                     ? m_doc.PrevWordStop( m_doc.PrevNonWhitespace( m_selection.end ) )
+		                     : m_doc.PrevCharStop( m_selection.end );
 
 		if ( !moveSelection )
 			m_selection.start = m_selection.end;
@@ -333,7 +327,7 @@ void TextView::Backspace( bool wholeWord )
 			return;
 
 		m_selection.end = wholeWord
-		                     ? m_paragraphs.PrevWordStop( m_selection.end - 1 )
+		                     ? m_doc.PrevWordStop( m_selection.end - 1 )
 		                     : m_selection.end - 1;
 	}
 
@@ -348,8 +342,8 @@ void TextView::Delete( bool wholeWord )
 			return;
 
 		m_selection.end = wholeWord
-		                     ? m_paragraphs.NextWordStop( m_selection.end + 1 )
-		                     : m_paragraphs.NextCharStop( m_selection.end + 1 );
+		                     ? m_doc.NextWordStop( m_selection.end + 1 )
+		                     : m_doc.NextCharStop( m_selection.end + 1 );
 	}
 
 	Clear( true );

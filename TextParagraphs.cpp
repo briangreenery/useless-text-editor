@@ -203,25 +203,6 @@ bool TextParagraphs::IsLastParagraph( iterator it )
 	return ++it == m_paragraphs.end();
 }
 
-size_t TextParagraphs::FindBreak( size_t pos, BreakType type ) const
-{
-	ParagraphInfo para;
-	iterator paragraph = ParagraphContaining( pos, &para );
-
-	DocumentReader reader( m_doc, para.textStart, paragraph->Length() );
-	pos -= para.textStart;
-
-	switch ( type )
-	{
-	case nextChar:  pos = paragraph->NextCharStop( pos, reader ); break;
-	case nextWord:  pos = paragraph->NextWordStop( pos, reader ); break;
-	case prevChar:  pos = paragraph->PrevCharStop( pos, reader ); break;
-	case prevWord:  pos = paragraph->PrevWordStop( pos, reader ); break;
-	}
-
-	return pos + para.textStart;
-}
-
 size_t TextParagraphs::LineStart( LONG y ) const
 {
 	ParagraphInfo para;

@@ -51,9 +51,6 @@
     <ClCompile Include="ParagraphWithInfo.cpp">
       <Filter>TextView</Filter>
     </ClCompile>
-    <ClCompile Include="ScriptBreakLoop.cpp">
-      <Filter>TextView</Filter>
-    </ClCompile>
     <ClCompile Include="SelectionLineLoop.cpp">
       <Filter>TextView</Filter>
     </ClCompile>
@@ -160,9 +157,6 @@
       <Filter>TextView</Filter>
     </ClInclude>
     <ClInclude Include="ParagraphWithInfo.h">
-      <Filter>TextView</Filter>
-    </ClInclude>
-    <ClInclude Include="ScriptBreakLoop.h">
       <Filter>TextView</Filter>
     </ClInclude>
     <ClInclude Include="SelectionLineLoop.h">

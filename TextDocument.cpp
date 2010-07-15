@@ -1,22 +1,37 @@
 // TextDocument.cpp
 
 #include "TextDocument.h"
-#include "Require.h"
+#include "DocumentCharIter.h"
+#include "Assert.h"
 #include <Windows.h>
 
 #undef min
 #undef max
 
-size_t TextDocument::ReadWithCRLFSize( size_t start, size_t count ) const
+TextDocument::TextDocument()
+	: m_charErrorStatus( U_ZERO_ERROR )
+	, m_wordErrorStatus( U_ZERO_ERROR )
+	, m_charIter( icu::BreakIterator::createCharacterInstance( icu::Locale::getUS(), m_charErrorStatus ) )
+	, m_wordIter( icu::BreakIterator::createWordInstance     ( icu::Locale::getUS(), m_wordErrorStatus ) )
+	, m_needIterReset( true )
+{
+}
+
+TextDocument::~TextDocument()
+{
+	// TODO: Figure out why this uses ICU's allocator.
+	delete m_charIter;
+	delete m_wordIter;
+}
+
+size_t TextDocument::SizeWithCRLF( size_t start, size_t count ) const
 {
 	return count + m_buffer.count( start, count, 0x0A );
 }
 
 void TextDocument::ReadWithCRLF( size_t start, size_t count, ArrayOf<UTF16::Unit> out ) const
 {
-	Require( out.size() >= count );
 	size_t numCopied = m_buffer.copy( out.begin(), count, start );
-	Require( numCopied == count );
 
 	UTF16::Unit* read  = out.begin() + numCopied - 1;
 	UTF16::Unit* write = out.end() - 1;
@@ -40,7 +55,7 @@ void TextDocument::CopyToClipboard( size_t start, size_t count ) const
 
 	EmptyClipboard();
 
-	size_t sizeWithCRLF = ReadWithCRLFSize( start, count );
+	size_t sizeWithCRLF = SizeWithCRLF( start, count );
 	HGLOBAL hGlobal = GlobalAlloc( GMEM_MOVEABLE, ( sizeWithCRLF + 1 ) * sizeof( UTF16::Unit ) );
 
 	if ( hGlobal != 0 )
@@ -49,14 +64,8 @@ void TextDocument::CopyToClipboard( size_t start, size_t count ) const
 
 		if ( dest != 0 )
 		{
-			try
-			{
-				ReadWithCRLF( start, count, ArrayOf<UTF16::Unit>( dest, dest + sizeWithCRLF ) );
-				dest[sizeWithCRLF] = UTF16::Unit( 0 );
-			}
-			catch (...)
-			{
-			}
+			ReadWithCRLF( start, count, ArrayOf<UTF16::Unit>( dest, dest + sizeWithCRLF ) );
+			dest[sizeWithCRLF] = UTF16::Unit( 0 );
 
 			GlobalUnlock( hGlobal );
 
@@ -123,6 +132,7 @@ TextChange TextDocument::Insert( size_t pos, UTF16Ref text )
 		it = SkipLineBreak( lineBreak, text.end() );
 	}
 
+	m_needIterReset = true;
 	return TextChange::Insertion( pos, count );
 }
 
@@ -132,5 +142,53 @@ TextChange TextDocument::Delete( size_t pos, size_t count )
 		return TextChange::NoChange();
 
 	m_buffer.erase( pos, count );
+	m_needIterReset = true;
 	return TextChange::Deletion( pos, count );
+}
+
+void TextDocument::ResetIterators() const
+{
+	if ( m_needIterReset )
+	{
+		m_needIterReset = false;
+		m_charIter->adoptText( new DocumentCharIter( *this ) );
+		m_wordIter->adoptText( new DocumentCharIter( *this ) );
+	}
+}
+
+size_t TextDocument::NextBreak( icu::BreakIterator* iter, size_t pos ) const
+{
+	ResetIterators();
+	int32_t result = iter->following( pos );
+	return ( result == icu::BreakIterator::DONE ) ? pos : result;
+}
+
+size_t TextDocument::PrevBreak( icu::BreakIterator* iter, size_t pos ) const
+{
+	ResetIterators();
+	int32_t result = iter->preceding( pos );
+	return ( result == icu::BreakIterator::DONE ) ? pos : result;
+}
+
+static bool IsWhitespace( UTF16::Unit unit )
+{
+	return unit == ' ' || unit == '\t' || unit == '\n' || unit == '\r';
+}
+
+size_t TextDocument::NextNonWhitespace( size_t pos ) const
+{
+	for ( ; pos < Length(); ++pos )
+		if ( !IsWhitespace( m_buffer[pos] ) )
+			break;
+
+	return pos;
+}
+
+size_t TextDocument::PrevNonWhitespace( size_t pos ) const
+{
+	for ( ; pos != 0; --pos )
+		if ( !IsWhitespace( m_buffer[pos - 1] ) )
+			break;
+
+	return pos;
 }
