@@ -92,7 +92,7 @@ void TextParagraphs::Validate( HDC hdc, int maxWidth )
 	{
 		if ( !it->Valid() )
 		{
-			bool endsWithNewline = ( it->Length() > 0 ) && ( m_doc.CharAt( start + it->Length() - 1 ) == 0x0A );
+			bool endsWithNewline = ( it->Length() > 0 ) && ( m_doc[start + it->Length() - 1] == 0x0A );
 
 			if ( it->Length() == 0 || it->Length() == 1 && endsWithNewline )
 			{

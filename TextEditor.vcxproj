@@ -51,6 +51,7 @@
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>C:\Users\brian_green\Desktop\icu\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -68,6 +69,7 @@
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>C:\Users\brian_green\Desktop\icu\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -79,6 +81,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ArrayOf.cpp" />
+    <ClCompile Include="DocumentCharIter.cpp" />
     <ClCompile Include="SizedAutoArray.cpp" />
     <ClCompile Include="DocumentReader.cpp" />
     <ClCompile Include="GapBuffer.cpp" />
@@ -113,6 +116,7 @@
     <ClInclude Include="ArrayOf.h" />
     <ClInclude Include="Assert.h" />
     <ClInclude Include="DebuggableException.h" />
+    <ClInclude Include="DocumentCharIter.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Integers.h" />
     <ClInclude Include="Require.h" />

@@ -12,7 +12,7 @@ class TextDocument
 public:
 	size_t Length() const;
 
-	UTF16::Unit CharAt( size_t pos ) const;
+	UTF16::Unit operator[]( size_t pos ) const;
 	size_t Read( size_t start, size_t count, UTF16::Unit* dest ) const;
 
 	TextChange Insert( size_t pos, UTF16Ref );
@@ -35,5 +35,20 @@ private:
 
 	GapBuffer<UTF16::Unit> m_buffer;
 };
+
+inline size_t TextDocument::Length() const
+{
+	return m_buffer.size();
+}
+
+inline UTF16::Unit TextDocument::operator[]( size_t pos ) const
+{
+	return m_buffer[pos];
+}
+
+inline size_t TextDocument::Read( size_t start, size_t count, UTF16::Unit* dest ) const
+{
+	return m_buffer.copy( dest, count, start );
+}
 
 #endif

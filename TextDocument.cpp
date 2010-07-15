@@ -7,24 +7,6 @@
 #undef min
 #undef max
 
-size_t TextDocument::Length() const
-{
-	return m_buffer.size();
-}
-
-UTF16::Unit TextDocument::CharAt( size_t pos ) const
-{
-	UTF16::Unit unit;
-	size_t numCopied = m_buffer.copy( &unit, 1, pos );
-	Require( numCopied == 1 );
-	return unit;
-}
-
-size_t TextDocument::Read( size_t start, size_t count, UTF16::Unit* dest ) const
-{
-	return m_buffer.copy( dest, count, start );
-}
-
 size_t TextDocument::ReadWithCRLFSize( size_t start, size_t count ) const
 {
 	return count + m_buffer.count( start, count, 0x0A );
@@ -115,6 +97,8 @@ TextChange TextDocument::Insert( size_t pos, UTF16Ref text )
 {
 	if ( text.empty() )
 		return TextChange::NoChange();
+
+	// TODO: validate unicode (?)
 
 	// Normalize line endings to U+000A (Line Feed)
 

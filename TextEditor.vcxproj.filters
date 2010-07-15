@@ -115,6 +115,9 @@
       <Filter>Layout</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="DocumentCharIter.cpp">
+      <Filter>Buffer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayOf.h">
@@ -221,6 +224,9 @@
     </ClInclude>
     <ClInclude Include="TextRunLoop.h">
       <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentCharIter.h">
+      <Filter>Buffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
