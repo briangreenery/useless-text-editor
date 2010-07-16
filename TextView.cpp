@@ -68,30 +68,6 @@ void TextView::PaintGutter( HDC hdc, RECT rect )
 
 	static HBRUSH gutterBrush = CreateSolidBrush( RGB( 236, 236, 236 ) );
 	FillRect( hdc, &gutterRect, gutterBrush );
-
-	static HPEN gutterPen = CreatePen( PS_SOLID, GetSystemMetrics( SM_CXBORDER ), RGB( 165, 165, 165 ) );
-	SelectObject( hdc, gutterPen );
-	gutterRect = m_metrics.GutterRect( m_hwnd );
-	MoveToEx( hdc, gutterRect.right - 1, gutterRect.top, NULL );
-	LineTo  ( hdc, gutterRect.right - 1, gutterRect.bottom );
-
-	TRIVERTEX vertex[2];
-	vertex[0].x     = gutterRect.right - 1;
-	vertex[0].y     = gutterRect.top;
-	vertex[0].Red   = 215 << 8;
-	vertex[0].Green = 215 << 8;
-	vertex[0].Blue  = 215 << 8;
-	vertex[0].Alpha = 0x0000;
-
-	vertex[1].x     = gutterRect.right - 15;
-	vertex[1].y     = gutterRect.bottom;
-	vertex[1].Red   = 236 << 8;
-	vertex[1].Green = 236 << 8;
-	vertex[1].Blue  = 236 << 8;
-	vertex[1].Alpha = 0x0000;
-
-	GRADIENT_RECT gRect = { 1, 0 };
-	GradientFill( hdc, vertex, 2, &gRect, 1, GRADIENT_FILL_RECT_H );
 }
 
 void TextView::OnChar( UINT keyCode, UINT repCnt, UINT flags )
@@ -132,7 +108,8 @@ void TextView::OnKeyDown( UINT keyCode, UINT repCnt, UINT flags )
 		case VK_BACK:   Backspace( isCtrlPressed ); break;
 		case VK_DELETE: Delete   ( isCtrlPressed ); break;
 
-		case 'A': if ( isCtrlPressed ) SelectAll(); break;
+		case 'A': if ( isCtrlPressed ) SelectAll();  break;
+		case 'W': if ( isCtrlPressed ) SelectWord(); break;
 
 		case 'X': if ( isCtrlPressed ) Cut();   break;
 		case 'C': if ( isCtrlPressed ) Copy();  break;
