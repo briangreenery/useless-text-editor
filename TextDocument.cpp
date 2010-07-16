@@ -192,3 +192,36 @@ size_t TextDocument::PrevNonWhitespace( size_t pos ) const
 
 	return pos;
 }
+
+std::pair<size_t, size_t> TextDocument::WordAt( size_t pos ) const
+{
+	std::pair<size_t, size_t> word( pos, pos );
+
+	bool leftSpace  = ( pos > 0 )         && IsWhitespace( m_buffer[pos - 1] );
+	bool rightSpace = ( pos == Length() ) && IsWhitespace( m_buffer[pos] );
+
+	if ( leftSpace && rightSpace )
+	{
+		word.first  = PrevNonWhitespace( pos );
+		word.second = NextNonWhitespace( pos );
+	}
+	else if ( leftSpace && !rightSpace )
+	{
+		word.second = NextWordStop( pos );
+	}
+	else if ( !leftSpace && rightSpace )
+	{
+		word.first = PrevWordStop( pos );
+	}
+	else
+	{
+		ResetIterators();
+
+		if ( !m_wordIter->isBoundary( pos ) )
+			word.first = PrevWordStop( pos );
+
+		word.second = NextWordStop( pos );
+	}
+
+	return word;
+}

@@ -7,6 +7,7 @@
 #include "GapBuffer.h"
 #include "UString.h"
 #include <unicode/brkiter.h>
+#include <utility>
 
 class TextDocument
 {
@@ -32,6 +33,8 @@ public:
 	size_t NextNonWhitespace( size_t pos ) const;
 	size_t PrevNonWhitespace( size_t pos ) const;
 
+	std::pair<size_t, size_t> WordAt( size_t pos ) const;
+
 	//TextChange Undo();
 	//TextChange Redo();
 
@@ -43,7 +46,7 @@ public:
 
 private:
 	size_t SizeWithCRLF( size_t start, size_t count ) const;
-	void   ReadWithCRLF( size_t start, size_t count, ArrayOf<UTF16::Unit> out ) const;
+	void ReadWithCRLF( size_t start, size_t count, ArrayOf<UTF16::Unit> out ) const;
 
 	void ResetIterators() const;
 	size_t NextBreak( icu::BreakIterator*, size_t ) const;

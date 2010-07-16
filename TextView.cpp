@@ -164,13 +164,7 @@ void TextView::OnLButtonDown( POINT point )
 
 void TextView::OnLButtonDblClk( POINT point )
 {
-	size_t wordStart = m_doc.PrevWordStop( m_selection.end > 0 ? m_selection.end - 1 : 0 );
-	size_t wordEnd   = m_doc.NextWordStop( m_selection.end );
-
-	m_selection.start = wordStart;
-	m_selection.end   = wordEnd;
-	MoveCaret( m_selection.end, true );
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	SelectWord();
 }
 
 void TextView::OnLButtonUp( POINT point )
@@ -366,6 +360,17 @@ void TextView::SelectAll()
 {
 	m_selection.start = 0;
 	m_selection.end   = m_doc.Length();
+
+	MoveCaret( m_selection.end, true );
+	InvalidateRect( m_hwnd, NULL, TRUE );
+}
+
+void TextView::SelectWord()
+{
+	std::pair<size_t, size_t> word = m_doc.WordAt( m_selection.end );
+
+	m_selection.start = word.first;
+	m_selection.end   = word.second;
 
 	MoveCaret( m_selection.end, true );
 	InvalidateRect( m_hwnd, NULL, TRUE );

@@ -53,6 +53,7 @@ public:
 	void Insert   ( UTF16Ref );
 
 	void SelectAll();
+	void SelectWord();
 
 	void Clear( bool moveCaret );
 	void Cut();
