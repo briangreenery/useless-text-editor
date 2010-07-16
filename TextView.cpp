@@ -394,14 +394,8 @@ void TextView::Paste()
 	{
 		UTF16::Unit* clipboardString = static_cast<UTF16::Unit*>( GlobalLock( hClipboardData ) );
 
-		try
-		{
-			if ( clipboardString != 0 )
-				Insert( UTF16Ref( clipboardString, wcslen( clipboardString ) ) );
-		}
-		catch (...)
-		{
-		}
+		if ( clipboardString != 0 )
+			Insert( UTF16Ref( clipboardString, wcslen( clipboardString ) ) );
 
 		GlobalUnlock( hClipboardData );
 	}
