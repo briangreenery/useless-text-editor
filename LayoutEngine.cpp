@@ -343,6 +343,8 @@ void LayoutEngine::FinishBlock( TextRunLoop& runs, bool endsWithNewline )
 
 void LayoutEngine::LayoutBlocks( UTF16Ref text, bool endsWithNewline )
 {
+	m_allocator.DiscardAll();
+
 	int    lineWidth = 0;
 	size_t lineStart = 0;
 

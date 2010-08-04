@@ -14,7 +14,8 @@ namespace W = Windows;
 #undef max
 
 VisualLine::VisualLine()
-	: m_textStart( 0 )
+	: m_width( 0 )
+	, m_textStart( 0 )
 	, m_textEnd( 0 )
 {
 }

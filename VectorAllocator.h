@@ -29,6 +29,7 @@ public:
 
 	void DiscardFrom( size_t );
 	void DiscardFrom( T*     );
+	void DiscardAll();
 
 	size_t MakeRelative( T* p ) const          { return p - m_buffer.begin(); }
 	T*     MakeAbsolute( size_t offset ) const { return m_buffer.begin() + offset; }
@@ -127,6 +128,12 @@ void VectorAllocator<T>::DiscardFrom( T* point )
 {
 	Assert( point <= m_freeStart );
 	m_freeStart = point;
+}
+
+template < class T >
+void VectorAllocator<T>::DiscardAll()
+{
+	m_freeStart = m_buffer.begin();
 }
 
 #endif
