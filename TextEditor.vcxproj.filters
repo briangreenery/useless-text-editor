@@ -16,14 +16,14 @@
     <Filter Include="TextDocument">
       <UniqueIdentifier>{3e23faf4-05a2-44fd-9346-1ad100ab3ac1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Style">
-      <UniqueIdentifier>{9dfcb392-4b14-493f-a2e1-050ade9e56be}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Lexer">
       <UniqueIdentifier>{01e98e77-53bd-4c5a-8737-e385986223a2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Layout">
       <UniqueIdentifier>{edcf1d03-811e-43fe-9e55-62938956cd50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TextStyle">
+      <UniqueIdentifier>{9dfcb392-4b14-493f-a2e1-050ade9e56be}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -44,21 +44,6 @@
     </ClCompile>
     <ClCompile Include="VectorCache.cpp">
       <Filter>Buffer</Filter>
-    </ClCompile>
-    <ClCompile Include="DrawLineSelection.cpp">
-      <Filter>TextView</Filter>
-    </ClCompile>
-    <ClCompile Include="ParagraphWithInfo.cpp">
-      <Filter>TextView</Filter>
-    </ClCompile>
-    <ClCompile Include="SelectionLineLoop.cpp">
-      <Filter>TextView</Filter>
-    </ClCompile>
-    <ClCompile Include="TextParagraph.cpp">
-      <Filter>TextView</Filter>
-    </ClCompile>
-    <ClCompile Include="TextParagraphs.cpp">
-      <Filter>TextView</Filter>
     </ClCompile>
     <ClCompile Include="TextSelection.cpp">
       <Filter>TextView</Filter>
@@ -82,13 +67,7 @@
       <Filter>TextDocument</Filter>
     </ClCompile>
     <ClCompile Include="FontCollection.cpp">
-      <Filter>Style</Filter>
-    </ClCompile>
-    <ClCompile Include="StyleRun.cpp">
-      <Filter>Style</Filter>
-    </ClCompile>
-    <ClCompile Include="TextStyleCollection.cpp">
-      <Filter>Style</Filter>
+      <Filter>TextStyle</Filter>
     </ClCompile>
     <ClCompile Include="LexerState.cpp">
       <Filter>Lexer</Filter>
@@ -114,6 +93,21 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="DocumentCharIter.cpp">
       <Filter>Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="VisualBlock.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="TextStyle.cpp">
+      <Filter>TextStyle</Filter>
+    </ClCompile>
+    <ClCompile Include="VisualSelection.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="VisualPainter.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="VisualDocument.cpp">
+      <Filter>TextView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -153,21 +147,6 @@
     <ClInclude Include="VectorCache.h">
       <Filter>Buffer</Filter>
     </ClInclude>
-    <ClInclude Include="DrawLineSelection.h">
-      <Filter>TextView</Filter>
-    </ClInclude>
-    <ClInclude Include="ParagraphWithInfo.h">
-      <Filter>TextView</Filter>
-    </ClInclude>
-    <ClInclude Include="SelectionLineLoop.h">
-      <Filter>TextView</Filter>
-    </ClInclude>
-    <ClInclude Include="TextParagraph.h">
-      <Filter>TextView</Filter>
-    </ClInclude>
-    <ClInclude Include="TextParagraphs.h">
-      <Filter>TextView</Filter>
-    </ClInclude>
     <ClInclude Include="TextSelection.h">
       <Filter>TextView</Filter>
     </ClInclude>
@@ -190,13 +169,7 @@
       <Filter>TextDocument</Filter>
     </ClInclude>
     <ClInclude Include="FontCollection.h">
-      <Filter>Style</Filter>
-    </ClInclude>
-    <ClInclude Include="StyleRun.h">
-      <Filter>Style</Filter>
-    </ClInclude>
-    <ClInclude Include="TextStyleCollection.h">
-      <Filter>Style</Filter>
+      <Filter>TextStyle</Filter>
     </ClInclude>
     <ClInclude Include="LexerState.h">
       <Filter>Lexer</Filter>
@@ -221,6 +194,21 @@
     </ClInclude>
     <ClInclude Include="DocumentCharIter.h">
       <Filter>Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualBlock.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="TextStyle.h">
+      <Filter>TextStyle</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualSelection.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualPainter.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualDocument.h">
+      <Filter>TextView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

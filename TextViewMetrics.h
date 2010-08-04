@@ -37,7 +37,6 @@ public:
 	int marginWidth;
 	int gutterWidth;
 
-	int lineHeight;
 	int linesPerPage;
 
 	int xOffset;

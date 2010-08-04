@@ -8,6 +8,9 @@
 #include <vector>
 #include <algorithm>
 
+#undef min
+#undef max
+
 class TextSelection
 {
 public:
@@ -15,13 +18,11 @@ public:
 
 	bool Intersects( size_t start, size_t end ) const;
 
-	size_t Min() const { return (std::min)( start, end ); }
-	size_t Max() const { return (std::max)( start, end ); }
+	size_t Min() const { return std::min( start, end ); }
+	size_t Max() const { return std::max( start, end ); }
 
 	bool IsEmpty() const { return start == end; }
 	size_t Size() const  { return Max() - Min(); }
-
-	void operator=( size_t pos ) { start = end = pos; }
 
 	size_t start;
 	size_t end;

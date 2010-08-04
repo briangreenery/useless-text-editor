@@ -6,7 +6,8 @@
 #include "TextDocument.h"
 #include "TextSelection.h"
 #include "TextViewMetrics.h"
-#include "TextParagraphs.h"
+#include "TextStyle.h"
+#include "VisualDocument.h"
 
 class TextView
 {
@@ -66,6 +67,7 @@ public:
 	void Redo();
 
 private:
+	void UpdateLayout( TextChange );
 	void UpdateLayout();
 
 	void HideCaret();
@@ -77,9 +79,10 @@ private:
 	HWND m_hwnd;
 
 	TextDocument    m_doc;
+	TextStyle       m_style;
 	TextSelection   m_selection;
 	TextViewMetrics m_metrics;
-	TextParagraphs  m_paragraphs;
+	VisualDocument  m_blocks;
 
 	bool m_isDoingMouseSel;
 	bool m_isCaretVisible;

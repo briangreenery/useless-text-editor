@@ -1,22 +1,28 @@
 // LayoutEngine.cpp
 
 #include "LayoutEngine.h"
+#include "TextDocument.h"
+#include "TextStyle.h"
+#include "DocumentReader.h"
 #include "TextRunLoop.h"
 #include "LayoutData.h"
 #include "Error.h"
 
+#undef min
+#undef max
+
 namespace W = Windows;
 
-LayoutEngine::LayoutEngine( HFONT font, SCRIPT_CACHE fontCache, HDC hdc, int maxWidth, int tabSize )
-	: m_font( font )
-	, m_fontCache( fontCache )
+LayoutEngine::LayoutEngine( const TextDocument& doc, TextStyle& style, HDC hdc, int maxWidth )
+	: m_doc( doc )
+	, m_reader( doc )
+	, m_style( style )
 	, m_hdc( hdc )
 	, m_maxWidth( maxWidth )
-	, m_tabSize( tabSize )
 {
 }
 
-int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, ArrayOf<SCRIPT_ITEM> items, TextRun* run, int xStart )
+int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, SCRIPT_ITEM* items, TextRun* run, int xStart )
 {
 	size_t estimatedGlyphCount = m_allocator.EstimateGlyphCount( run->textCount );
 
@@ -30,7 +36,7 @@ int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, ArrayOf<SCRIPT_ITEM> i
 	while ( true )
 	{
 		HRESULT result = ScriptShape( hdc,
-		                              &m_fontCache,
+		                              &m_style.fontCache,
 		                              text + run->textStart,
 		                              run->textCount,
 		                              glyphs.size(),
@@ -46,7 +52,7 @@ int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, ArrayOf<SCRIPT_ITEM> i
 		switch ( result )
 		{
 		case E_PENDING:
-			SelectObject( m_hdc, m_font );
+			SelectObject( m_hdc, m_style.font );
 			hdc = m_hdc;
 			break;
 
@@ -57,8 +63,7 @@ int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, ArrayOf<SCRIPT_ITEM> i
 
 		case USP_E_SCRIPT_NOT_IN_FONT:
 			// IMLangFontLink2
-			//item->style = styles.Fallback( UTF16Ref( text + item->textStart, item->textCount ),
-			//							   hTargetDC );
+			//item->style = styles.Fallback( UTF16Ref( text + item->textStart, item->textCount ), hTargetDC );
 			//style = styles[item->style];
 			//break;
 
@@ -80,7 +85,7 @@ int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, ArrayOf<SCRIPT_ITEM> i
 	while ( true )
 	{
 		HRESULT result = ScriptPlace( hdc,
-		                              &m_fontCache,
+		                              &m_style.fontCache,
 		                              glyphs.begin(),
 		                              glyphs.size(),
 		                              visAttrs.begin(),
@@ -95,7 +100,7 @@ int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, ArrayOf<SCRIPT_ITEM> i
 		switch ( result )
 		{
 		case E_PENDING:
-			SelectObject( hdc, m_font );
+			SelectObject( m_hdc, m_style.font );
 			hdc = m_hdc;
 			break;
 
@@ -107,9 +112,9 @@ int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, ArrayOf<SCRIPT_ITEM> i
 	run->glyphStart = m_allocator.glyphs.MakeRelative( glyphs.begin() );
 	run->glyphCount = glyphCount;
 
-	if ( text[run->textStart] == '\t' && m_tabSize > 0 )
+	if ( text[run->textStart] == '\t' && m_style.tabSize > 0 )
 	{
-		run->width       = m_tabSize - ( xStart % m_tabSize );
+		run->width       = m_style.tabSize - ( xStart % m_style.tabSize );
 		advanceWidths[0] = run->width;
 	}
 	else
@@ -128,8 +133,13 @@ ArrayOf<SCRIPT_ITEM> LayoutEngine::Itemize( UTF16Ref text )
 
 	while ( true )
 	{
-		HRESULT result
-			= ScriptItemize( text.begin(), text.size(), items.size(), NULL, NULL, items.begin(), &numItems );
+		HRESULT result = ScriptItemize( text.begin(),
+		                                text.size(),
+		                                items.size(),
+		                                NULL,
+		                                NULL,
+		                                items.begin(),
+		                                &numItems );
 
 		if ( result == S_OK )
 			break;
@@ -149,7 +159,7 @@ ArrayOf<SCRIPT_ITEM> LayoutEngine::Itemize( UTF16Ref text )
 	return ArrayOf<SCRIPT_ITEM>( items.begin(), items.end() - 1 );
 }
 
-size_t LayoutEngine::EstimateLineWrap( const UTF16::Unit* text, ArrayOf<SCRIPT_ITEM> items, TextRun* run, int lineWidth )
+size_t LayoutEngine::EstimateLineWrap( const UTF16::Unit* text, SCRIPT_ITEM* items, TextRun* run, int lineWidth )
 {
 	ArrayOf<int> logWidths = m_allocator.logWidths.TempArray( run->textCount );
 
@@ -165,16 +175,16 @@ size_t LayoutEngine::EstimateLineWrap( const UTF16::Unit* text, ArrayOf<SCRIPT_I
 
 	for ( ; estimate < logWidths.size(); ++estimate )
 	{
-		if ( lineWidth + logWidths[estimate] <= m_maxWidth )
-			lineWidth += logWidths[estimate];
-		else
+		if ( lineWidth + logWidths[estimate] > m_maxWidth )
 			break;
+
+		lineWidth += logWidths[estimate];
 	}
 
 	return run->textStart + estimate;
 }
 
-size_t LayoutEngine::ForceLineWrap( const UTF16::Unit* text, ArrayOf<SCRIPT_ITEM> items, TextRun* run )
+size_t LayoutEngine::ForceLineWrap( const UTF16::Unit* text, SCRIPT_ITEM* items, TextRun* run )
 {
 	ArrayOf<SCRIPT_LOGATTR> attrs = m_allocator.logAttr.TempArray( run->textCount );
 
@@ -187,9 +197,9 @@ size_t LayoutEngine::ForceLineWrap( const UTF16::Unit* text, ArrayOf<SCRIPT_ITEM
 	return run->textStart + run->textCount;
 }
 
-size_t LayoutEngine::FindSoftBreak( const UTF16::Unit* text, SCRIPT_ITEM* item, size_t estimate )
+size_t LayoutEngine::FindSoftBreak( const UTF16::Unit* text, SCRIPT_ITEM* item, size_t blockStart, size_t estimate )
 {
-	size_t textStart = item[0].iCharPos;
+	size_t textStart = item[0].iCharPos - blockStart;
 	size_t textSize  = item[1].iCharPos - item[0].iCharPos;
 
 	ArrayOf<SCRIPT_LOGATTR> attrs = m_allocator.logAttr.TempArray( textSize );
@@ -197,7 +207,7 @@ size_t LayoutEngine::FindSoftBreak( const UTF16::Unit* text, SCRIPT_ITEM* item, 
 	W::ThrowHRESULT( ScriptBreak( text + textStart, textSize, &item->a, attrs.begin() ) );
 
 	Assert( estimate >= textStart );
-	size_t offset = (std::min)( estimate - textStart + 1, textSize ) - 1;
+	size_t offset = std::min( estimate - textStart + 1, textSize ) - 1;
 
 	const SCRIPT_LOGATTR* attr  = attrs.begin()    + offset;
 	const UTF16::Unit*    unit  = text + textStart + offset;
@@ -238,7 +248,7 @@ TextRun* LayoutEngine::DiscardRunsAfter( size_t lineEnd )
 	return run;
 }
 
-size_t LayoutEngine::WrapLine( const UTF16::Unit* text, ArrayOf<SCRIPT_ITEM> items, TextRun* run, size_t lineStart, int lineWidth )
+size_t LayoutEngine::WrapLine( const UTF16::Unit* text, SCRIPT_ITEM* items, TextRun* run, size_t blockStart, size_t lineStart, int lineWidth )
 {
 	size_t lineEndEstimate = EstimateLineWrap( text, items, run, lineWidth );
 	size_t lineEnd         = noSoftBreak;
@@ -247,10 +257,10 @@ size_t LayoutEngine::WrapLine( const UTF16::Unit* text, ArrayOf<SCRIPT_ITEM> ite
 	{
 		size_t estimate = lineEndEstimate;
 
-		for ( SCRIPT_ITEM* item = items.begin() + run->item; item != items.begin() - 1; --item )
+		for ( SCRIPT_ITEM* item = items + run->item; item != items - 1; --item )
 		{
-			lineEnd  = FindSoftBreak( text, item, estimate );
-			estimate = item->iCharPos;
+			lineEnd  = FindSoftBreak( text, item, blockStart, estimate );
+			estimate = item->iCharPos - blockStart;
 
 			if ( lineEnd != noSoftBreak || estimate <= lineStart )
 				break;
@@ -269,31 +279,79 @@ size_t LayoutEngine::WrapLine( const UTF16::Unit* text, ArrayOf<SCRIPT_ITEM> ite
 	if ( fragment )
 		ShapePlaceRun( text, items, fragment, lineWidth );
 
-	AddLine();
 	return lineEnd;
 }
 
-void LayoutEngine::AddLine()
+VisualBlockList& LayoutEngine::LayoutText( size_t start, size_t count )
 {
-	m_allocator.lines.Alloc( 1 )[0] = m_allocator.runs.Allocated().size();
+	size_t end = start + count;
+
+	while ( start < end )
+	{
+		size_t lineEnd;
+
+		for ( lineEnd = start; lineEnd < end; ++lineEnd )
+			if ( m_doc[lineEnd] == UTF16::Unit( 0x0A ) )
+				break;
+
+		if ( lineEnd == start )
+		{
+			m_result.push_back( VisualBlock( 1 ) );
+			start++;
+		}
+		else
+		{
+			LayoutBlocks( m_reader.StrictRange( start, lineEnd - start ), lineEnd != end );
+			start = lineEnd + 1;
+		}
+	}
+
+	return m_result;
 }
 
-void LayoutEngine::LayoutParagraph( UTF16Ref text, ArrayOf<StyleRun> styleRuns )
+void LayoutEngine::AddLine( TextRunLoop& runs )
 {
-	Assert( !text.empty() );
-	Assert( !styleRuns.empty() );
+	m_allocator.lines.PushBack( m_allocator.runs.Allocated().size() );
+	runs.NewLine();
+}
 
-	m_allocator.Reset( text.size() );
+void LayoutEngine::AddBlock( TextRunLoop& runs )
+{
+	m_allocator.lines.PushBack( m_allocator.runs.Allocated().size() );
 
-	ArrayOf<SCRIPT_ITEM> items = Itemize( text );
+	size_t blockStart = runs.BlockStart();
+	SCRIPT_ITEM* itemStart = runs.BlockItems().begin();
 
+	runs.NewBlock();
+
+	size_t blockEnd = runs.BlockStart();
+	SCRIPT_ITEM* itemEnd = runs.BlockItems().begin();
+
+	size_t length = blockEnd - blockStart;
+	ArrayOf<SCRIPT_ITEM> items( itemStart, itemEnd );
+
+	m_result.push_back( VisualBlock( length, m_allocator, items ) );
+}
+
+void LayoutEngine::FinishBlock( TextRunLoop& runs, bool endsWithNewline )
+{
+	m_allocator.lines.PushBack( m_allocator.runs.Allocated().size() );
+
+	size_t length = runs.BlockText().size() + ( endsWithNewline ? 1 : 0 );
+	m_result.push_back( VisualBlock( length, m_allocator, runs.BlockItems() ) );
+}
+
+void LayoutEngine::LayoutBlocks( UTF16Ref text, bool endsWithNewline )
+{
 	int    lineWidth = 0;
 	size_t lineStart = 0;
 
-	for ( TextRunLoop loop( items, styleRuns, text, m_allocator ); loop.Unfinished(); )
+	TextRunLoop runs( Itemize( text ), text, m_allocator );
+
+	while ( runs.Unfinished() )
 	{
-		TextRun* run = loop.NextRun();
-		int runWidth = ShapePlaceRun( text.begin(), items, run, lineWidth );
+		TextRun* run = runs.NextRun();
+		int runWidth = ShapePlaceRun( runs.BlockText().begin(), runs.BlockItems().begin(), run, lineWidth );
 
 		if ( lineWidth + runWidth <= m_maxWidth )
 		{
@@ -301,11 +359,20 @@ void LayoutEngine::LayoutParagraph( UTF16Ref text, ArrayOf<StyleRun> styleRuns )
 		}
 		else
 		{
-			lineStart = WrapLine( text.begin(), items, run, lineStart, lineWidth );
+			lineStart = WrapLine( runs.BlockText().begin(), runs.BlockItems().begin(), run, runs.BlockStart(), lineStart, lineWidth );
 			lineWidth = 0;
-			loop.NewLine();
+
+			if ( lineStart <= runs.BlockStart() + 1024 )
+			{
+				AddLine( runs );
+			}
+			else
+			{
+				AddBlock( runs );
+				lineStart = 0;
+			}
 		}
 	}
 
-	AddLine();
+	FinishBlock( runs, endsWithNewline );
 }

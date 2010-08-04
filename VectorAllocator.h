@@ -25,6 +25,8 @@ public:
 	ArrayOf<T> Shrink( ArrayOf<T>, size_t );
 	ArrayOf<T> Grow  ( ArrayOf<T>, size_t );
 
+	void PushBack( T );
+
 	void DiscardFrom( size_t );
 	void DiscardFrom( T*     );
 
@@ -67,7 +69,7 @@ ArrayOf<T> VectorAllocator<T>::Allocated() const
 template < class T >
 ArrayOf<T> VectorAllocator<T>::Alloc( size_t requestSize )
 {
-	if ( m_freeStart <= m_buffer.end() - requestSize )
+	if ( m_freeStart + requestSize <= m_buffer.end() )
 	{
 		T* start = m_freeStart;
 		return ArrayOf<T>( start, m_freeStart += requestSize );
@@ -105,6 +107,12 @@ ArrayOf<T> VectorAllocator<T>::Grow( ArrayOf<T> a, size_t size )
 
 	m_freeStart = a.begin();
 	return Alloc( a.size() + size );
+}
+
+template < class T >
+void VectorAllocator<T>::PushBack( T t )
+{
+	Alloc( 1 )[0] = t;
 }
 
 template < class T> 

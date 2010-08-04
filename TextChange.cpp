@@ -14,8 +14,14 @@ TextChange TextChange::Insertion( size_t pos, size_t count )
 	return change;
 }
 
-TextChange TextChange::Deletion ( size_t pos, size_t count )
+TextChange TextChange::Deletion( size_t pos, size_t count )
 {
 	TextChange change = { pos, count, deletion };
+	return change;
+}
+
+TextChange TextChange::Modification( size_t pos, size_t count )
+{
+	TextChange change = { pos, count, modification };
 	return change;
 }

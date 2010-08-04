@@ -12,7 +12,6 @@
 class LayoutAllocator
 {
 public:
-	void Reset( size_t paragraphLength );
 	void DiscardFrom( size_t textStart, size_t glyphStart );
 
 	static size_t EstimateGlyphCount( size_t textSize ) { return MulDiv( 3, textSize, 2 ) + 16; }

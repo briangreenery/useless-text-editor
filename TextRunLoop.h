@@ -4,9 +4,7 @@
 #define TextRunLoop_h
 
 #include "LayoutAllocator.h"
-#include "StyleRun.h"
 #include "UString.h"
-#include "Assert.h"
 #include <windows.h>
 #include <usp10.h>
 
@@ -14,34 +12,50 @@ class TextRunLoop
 {
 public:
 	TextRunLoop( ArrayOf<SCRIPT_ITEM>,
-				 ArrayOf<StyleRun>,
-				 UTF16Ref text,
-				 LayoutAllocator& );
+	             UTF16Ref text,
+	             LayoutAllocator& );
 
 	TextRun* NextRun();
 	bool Unfinished() const;
+
 	void NewLine();
+	void NewBlock();
+
+	size_t BlockStart() const;
+	UTF16Ref BlockText() const;
+	ArrayOf<SCRIPT_ITEM> BlockItems() const;
 
 private:
 	VectorAllocator<TextRun>& m_allocator;
 
 	ArrayOf<SCRIPT_ITEM> m_items;
-	ArrayOf<StyleRun>    m_styles;
 	UTF16Ref             m_text;
 
 	size_t m_position;
+	size_t m_blockStart;
 
 	SCRIPT_ITEM* m_item;
 	size_t       m_itemUsed;
-
-	StyleRun* m_style;
-	size_t    m_styleUsed;
 };
 
 inline bool TextRunLoop::Unfinished() const
 {
-	Assert( ( m_item == m_items.end() ) == ( m_style == m_styles.end() ) );
 	return m_item != m_items.end();
+}
+
+inline size_t TextRunLoop::BlockStart() const
+{
+	return m_blockStart;
+}
+
+inline UTF16Ref TextRunLoop::BlockText() const
+{
+	return m_text;
+}
+
+inline ArrayOf<SCRIPT_ITEM> TextRunLoop::BlockItems() const
+{
+	return m_items;
 }
 
 #endif

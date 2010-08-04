@@ -87,13 +87,12 @@
     <ClCompile Include="SizedAutoArray.cpp" />
     <ClCompile Include="DocumentReader.cpp" />
     <ClCompile Include="GapBuffer.cpp" />
+    <ClCompile Include="VisualPainter.cpp" />
+    <ClCompile Include="TextStyle.cpp" />
     <ClCompile Include="VectorAllocator.cpp" />
     <ClCompile Include="VectorCache.cpp" />
-    <ClCompile Include="DrawLineSelection.cpp" />
-    <ClCompile Include="ParagraphWithInfo.cpp" />
-    <ClCompile Include="SelectionLineLoop.cpp" />
-    <ClCompile Include="TextParagraph.cpp" />
-    <ClCompile Include="TextParagraphs.cpp" />
+    <ClCompile Include="VisualBlock.cpp" />
+    <ClCompile Include="VisualDocument.cpp" />
     <ClCompile Include="TextSelection.cpp" />
     <ClCompile Include="TextView.cpp" />
     <ClCompile Include="TextViewMetrics.cpp" />
@@ -102,8 +101,6 @@
     <ClCompile Include="TextChange.cpp" />
     <ClCompile Include="TextDocument.cpp" />
     <ClCompile Include="FontCollection.cpp" />
-    <ClCompile Include="StyleRun.cpp" />
-    <ClCompile Include="TextStyleCollection.cpp" />
     <ClCompile Include="LexerState.cpp" />
     <ClCompile Include="NextRelevanceToken.cpp" />
     <ClCompile Include="LayoutAllocator.cpp" />
@@ -112,6 +109,7 @@
     <ClCompile Include="TextRun.cpp" />
     <ClCompile Include="TextRunLoop.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="VisualSelection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayOf.h" />
@@ -122,16 +120,15 @@
     <ClInclude Include="Integers.h" />
     <ClInclude Include="Require.h" />
     <ClInclude Include="SizedAutoArray.h" />
+    <ClInclude Include="VisualPainter.h" />
+    <ClInclude Include="TextStyle.h" />
     <ClInclude Include="UString.h" />
     <ClInclude Include="DocumentReader.h" />
     <ClInclude Include="GapBuffer.h" />
     <ClInclude Include="VectorAllocator.h" />
     <ClInclude Include="VectorCache.h" />
-    <ClInclude Include="DrawLineSelection.h" />
-    <ClInclude Include="ParagraphWithInfo.h" />
-    <ClInclude Include="SelectionLineLoop.h" />
-    <ClInclude Include="TextParagraph.h" />
-    <ClInclude Include="TextParagraphs.h" />
+    <ClInclude Include="VisualBlock.h" />
+    <ClInclude Include="VisualDocument.h" />
     <ClInclude Include="TextSelection.h" />
     <ClInclude Include="TextView.h" />
     <ClInclude Include="TextViewMetrics.h" />
@@ -140,8 +137,6 @@
     <ClInclude Include="TextChange.h" />
     <ClInclude Include="TextDocument.h" />
     <ClInclude Include="FontCollection.h" />
-    <ClInclude Include="StyleRun.h" />
-    <ClInclude Include="TextStyleCollection.h" />
     <ClInclude Include="LexerState.h" />
     <ClInclude Include="NextRelevanceToken.h" />
     <ClInclude Include="LayoutAllocator.h" />
@@ -149,6 +144,7 @@
     <ClInclude Include="LayoutEngine.h" />
     <ClInclude Include="TextRun.h" />
     <ClInclude Include="TextRunLoop.h" />
+    <ClInclude Include="VisualSelection.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="NextRelevanceToken.re2c" />

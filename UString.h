@@ -32,6 +32,8 @@ public:
 	bool empty() const        { return b == e; }
 	size_t size() const       { return e - b; }
 
+	Unit operator[]( size_t pos ) const { return b[pos]; }
+
 private:
 	const Unit* b;
 	const Unit* e;

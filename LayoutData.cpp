@@ -2,11 +2,10 @@
 
 #include "LayoutData.h"
 
-void LayoutData::Copy( LayoutAllocator& allocator )
+void LayoutData::Copy( LayoutAllocator& allocator, ArrayOf<SCRIPT_ITEM> itemRange )
 {
-	SizedAutoArray<SCRIPT_ITEM> itemsWithSentinel = allocator.items.Finish();
-	size_t itemCount = itemsWithSentinel.size() - 1;
-	items = SizedAutoArray<SCRIPT_ITEM>( itemsWithSentinel.Release(), itemCount );
+	items = CreateArray<SCRIPT_ITEM>( itemRange.size() );
+	std::copy( itemRange.begin(), itemRange.end(), items.begin() );
 
 	runs          = allocator.runs         .Finish();
 	logClusters   = allocator.logClusters  .Finish();

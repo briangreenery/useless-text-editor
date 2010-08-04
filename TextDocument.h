@@ -16,14 +16,13 @@ public:
 	~TextDocument();
 
 	size_t Length() const;
+	bool Empty() const;
 
 	UTF16::Unit operator[]( size_t pos ) const;
 	size_t Read( size_t start, size_t count, UTF16::Unit* dest ) const;
 
 	TextChange Insert( size_t pos, UTF16Ref );
 	TextChange Delete( size_t pos, size_t count );
-
-	void CopyToClipboard( size_t start, size_t count ) const;
 
 	size_t NextCharStop( size_t pos ) const { return NextBreak( m_charIter, pos ); }
 	size_t NextWordStop( size_t pos ) const { return NextBreak( m_wordIter, pos ); }
@@ -35,6 +34,9 @@ public:
 
 	std::pair<size_t, size_t> WordAt( size_t pos ) const;
 
+	size_t SizeWithCRLF( size_t start, size_t count ) const;
+	void ReadWithCRLF( size_t start, size_t count, ArrayOf<UTF16::Unit> out ) const;
+
 	//TextChange Undo();
 	//TextChange Redo();
 
@@ -45,9 +47,6 @@ public:
 	//void EndUndoGroup();
 
 private:
-	size_t SizeWithCRLF( size_t start, size_t count ) const;
-	void ReadWithCRLF( size_t start, size_t count, ArrayOf<UTF16::Unit> out ) const;
-
 	void ResetIterators() const;
 	size_t NextBreak( icu::BreakIterator*, size_t ) const;
 	size_t PrevBreak( icu::BreakIterator*, size_t ) const;
@@ -64,6 +63,11 @@ private:
 inline size_t TextDocument::Length() const
 {
 	return m_buffer.size();
+}
+
+inline bool TextDocument::Empty() const
+{
+	return m_buffer.empty();
 }
 
 inline UTF16::Unit TextDocument::operator[]( size_t pos ) const

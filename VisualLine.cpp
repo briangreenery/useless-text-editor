@@ -1,15 +1,20 @@
 // VisualLine.cpp
 
 #include "VisualLine.h"
-#include "Require.h"
+#include "VisualPainter.h"
+#include "VisualSelection.h"
+#include "TextSelection.h"
+#include "Assert.h"
 #include "Error.h"
 #include <algorithm>
 
 namespace W = Windows;
 
+#undef min
+#undef max
+
 VisualLine::VisualLine()
-	: m_width( 0 )
-	, m_textStart( 0 )
+	: m_textStart( 0 )
 	, m_textEnd( 0 )
 {
 }
@@ -20,29 +25,23 @@ VisualLine::VisualLine( size_t textStart, TextRun* runStart, TextRun* runEnd )
 	, m_textStart( textStart )
 	, m_textEnd( textStart )
 {
-	if ( runStart != runEnd )
-		m_textEnd = runEnd[-1].textStart + runEnd[-1].textCount;
-
 	for ( TextRun* run = runStart; run != runEnd; ++run )
-		m_width += run->width;
+	{
+		m_width   += run->width;
+		m_textEnd += run->textCount;
+	}
 }
 
-void VisualLine::Draw( HDC hdc, RECT rect, const LayoutData& layout, SCRIPT_CACHE fontCache ) const
+void VisualLine::Draw( VisualPainter& painter, RECT rect, const LayoutData& layout ) const
 {
-	if ( m_runs.empty() )
-		return;
-
 	SizedAutoArray<int> visualToLogical = VisualToLogicalMapping( layout );
 
-	for ( size_t i = 0; i < visualToLogical.size(); ++i )
+	for ( size_t i = 0; i < visualToLogical.size() && !IsRectEmpty( &rect ); ++i )
 	{
-		if ( IsRectEmpty( &rect ) )
-			return;
-
 		TextRun* run = m_runs.begin() + visualToLogical[i];
 
-		W::ThrowHRESULT( ScriptTextOut( hdc,
-		                                &fontCache,
+		W::ThrowHRESULT( ScriptTextOut( painter.hdc,
+		                                &painter.style.fontCache,
 		                                rect.left,
 		                                rect.top,
 		                                0,
@@ -59,19 +58,22 @@ void VisualLine::Draw( HDC hdc, RECT rect, const LayoutData& layout, SCRIPT_CACH
 	}
 }
 
-SelectionRanges VisualLine::MakeSelectionRanges( size_t selStart, size_t selEnd, const LayoutData& layout ) const
+VisualSelection VisualLine::MakeVisualSelection( TextSelection selection, const LayoutData& layout ) const
 {
-	SelectionRanges result;
+	VisualSelection visualSelection;
 
-	int xRunStart = 0;
+	int    xRunStart = 0;
+	size_t selStart  = selection.Min();
+	size_t selEnd    = selection.Max();
+
 	SizedAutoArray<int> visualToLogical = VisualToLogicalMapping( layout );
 
 	for ( size_t i = 0; i < visualToLogical.size(); ++i )
 	{
 		TextRun* run = m_runs.begin() + visualToLogical[i];
 
-		size_t overlapStart = (std::max)( selStart, run->textStart );
-		size_t overlapEnd   = (std::min)( selEnd,   run->textStart + run->textCount );
+		size_t overlapStart = std::max( selStart, run->textStart );
+		size_t overlapEnd   = std::min( selEnd,   run->textStart + run->textCount );
 
 		if ( overlapStart < overlapEnd )
 		{
@@ -81,13 +83,13 @@ SelectionRanges VisualLine::MakeSelectionRanges( size_t selStart, size_t selEnd,
 			if ( xEnd < xStart )
 				std::swap( xStart, xEnd );
 
-			AddSelectionRange( SelectionRange( xStart, xEnd ), result );
+			visualSelection.Add( xStart, xEnd );
 		}
 
 		xRunStart += run->width;
 	}
 
-	return result;
+	return visualSelection;
 }
 
 LONG VisualLine::RunCPtoX( TextRun* run, size_t cp, bool trailingEdge, const LayoutData& layout ) const
@@ -109,7 +111,7 @@ LONG VisualLine::CPtoX( size_t pos, bool trailingEdge, const LayoutData& layout 
 {
 	int xStart;
 	TextRun* run = RunContaining( pos, &xStart, layout );
-	Require( run != m_runs.end() );
+	Assert( run != m_runs.end() );
 
 	return xStart + RunCPtoX( run, pos - run->textStart, trailingEdge, layout );
 }
@@ -209,6 +211,9 @@ TextRun* VisualLine::RunContaining( int x, int* xStart, const LayoutData& layout
 
 SizedAutoArray<int> VisualLine::VisualToLogicalMapping( const LayoutData& layout ) const
 {
+	if ( m_runs.empty() )
+		return SizedAutoArray<int>();
+
 	SizedAutoArray<BYTE> bidiLevel = CreateArray<BYTE>( m_runs.size() );
 
 	for ( size_t i = 0; i < m_runs.size(); ++i )
@@ -222,12 +227,4 @@ SizedAutoArray<int> VisualLine::VisualToLogicalMapping( const LayoutData& layout
 	                               NULL ) );
 
 	return visualToLogical;
-}
-
-void AddSelectionRange( SelectionRange range, SelectionRanges& ranges )
-{
-	if ( ranges.empty() || ranges.back().second != range.first )
-		ranges.push_back( std::make_pair( range.first, range.second ) );
-	else
-		ranges.back().second = range.second;
 }

@@ -10,7 +10,7 @@
 
 TextView::TextView( HWND hwnd )
 	: m_hwnd( hwnd )
-	, m_paragraphs( m_doc )
+	, m_blocks( m_doc, m_style )
 	, m_isDoingMouseSel( false )
 	, m_isCaretVisible( false )
 	, m_mouseWheelRemainder( 0 )
@@ -18,23 +18,21 @@ TextView::TextView( HWND hwnd )
 {
 	m_metrics.gutterWidth = 25;
 	m_metrics.marginWidth = 5;
-	m_metrics.lineHeight  = 20;
 }
 
 int TextView::OnCreate( LPCREATESTRUCT )
 {
 	m_selection.endPoint.x = 0;
 	m_selection.endPoint.y = 0;
-	m_selection = m_paragraphs.CharFromPoint( &m_selection.endPoint );
+	m_selection.start = m_selection.end = m_blocks.CharFromPoint( &m_selection.endPoint );
 
 	return 0;
 }
 
 void TextView::OnSize( UINT state, int cx, int cy )
 {
-	m_metrics.linesPerPage = cy / m_metrics.lineHeight;
-	ScrollDelta( 0, 0 );
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	m_metrics.linesPerPage = cy / m_style.lineHeight;
+	UpdateLayout();
 }
 
 void TextView::OnPaint()
@@ -53,9 +51,9 @@ void TextView::OnPaint()
 	FillRect( hdc, &fillRect, GetSysColorBrush( COLOR_WINDOW ) );
 
 	POINT oldOrigin;
-	m_paragraphs.Draw( m_metrics.ClientToText( hdc, &oldOrigin ),
-	                   m_metrics.ClientToText( m_metrics.IntersectWithText( ps.rcPaint, m_hwnd ) ),
-	                   m_selection );
+	m_blocks.Draw( m_metrics.ClientToText( hdc, &oldOrigin ),
+	               m_metrics.ClientToText( m_metrics.IntersectWithText( ps.rcPaint, m_hwnd ) ),
+	               m_selection );
 
 	SetWindowOrgEx( hdc, oldOrigin.x, oldOrigin.y, NULL );
 	EndBufferedPaint( hpb, TRUE );
@@ -77,7 +75,7 @@ void TextView::OnChar( UINT keyCode, UINT repCnt, UINT flags )
 	if ( isCtrlPressed || keyCode == VK_BACK )
 		return;
 
-	for ( ; repCnt > 0; --repCnt )
+	while ( repCnt-- > 0 )
 	{
 		UTF16::Unit unit = ( keyCode == VK_RETURN ) ? 0x0A : keyCode;
 		Insert( UTF16Ref( &unit, 1 ) );
@@ -92,7 +90,7 @@ void TextView::OnKeyDown( UINT keyCode, UINT repCnt, UINT flags )
 	if ( keyCode != VK_UP && keyCode != VK_DOWN )
 		m_lineUpCount = 0;
 
-	for ( ; repCnt > 0; --repCnt )
+	while ( repCnt-- > 0 )
 	{
 		switch ( keyCode )
 		{
@@ -129,7 +127,7 @@ void TextView::OnLButtonDown( POINT point )
 		return;
 
 	m_selection.endPoint = m_metrics.ClientToText( point );
-	m_selection = m_paragraphs.CharFromPoint( &m_selection.endPoint );
+	m_selection.start = m_selection.end = m_blocks.CharFromPoint( &m_selection.endPoint );
 
 	ScrollToCaret();
 	UpdateCaretPos();
@@ -156,7 +154,7 @@ void TextView::OnMouseMove( POINT point )
 
 	// "ClampToVisibleText" firefox suggests that maybe the yOffset should be in terms of pixels, and that we should snap whenever the mouse is finished.
 	m_selection.endPoint = m_metrics.ClientToText( point );
-	m_selection.end = m_paragraphs.CharFromPoint( &m_selection.endPoint );
+	m_selection.end = m_blocks.CharFromPoint( &m_selection.endPoint );
 	UpdateCaretPos();
 	InvalidateRect( m_hwnd, NULL, TRUE );
 }
@@ -186,7 +184,7 @@ void TextView::OnSetCursor()
 
 void TextView::OnSetFocus( HWND )
 {
-	CreateCaret( m_hwnd, NULL, m_metrics.caretWidth, m_metrics.lineHeight );
+	CreateCaret( m_hwnd, NULL, m_metrics.caretWidth, m_style.lineHeight );
 	::ShowCaret( m_hwnd );
 	UpdateCaretPos();
 }
@@ -201,7 +199,7 @@ void TextView::AdvanceCaret( bool wholeWord, bool moveSelection )
 {
 	if ( !wholeWord && !moveSelection && !m_selection.IsEmpty() )
 	{
-		m_selection = m_selection.Max();
+		m_selection.start = m_selection.end = m_selection.Max();
 	}
 	else
 	{
@@ -221,7 +219,7 @@ void TextView::RetireCaret( bool wholeWord, bool moveSelection )
 {
 	if ( !wholeWord && !moveSelection && !m_selection.IsEmpty() )
 	{
-		m_selection = m_selection.Min();
+		m_selection.start = m_selection.end = m_selection.Min();
 	}
 	else
 	{
@@ -241,7 +239,7 @@ void TextView::Home( bool gotoDocStart, bool moveSelection )
 {
 	m_selection.end = gotoDocStart
 	                     ? 0
-	                     : m_paragraphs.LineStart( m_selection.endPoint.y );
+	                     : m_blocks.LineStart( m_selection.endPoint.y );
 
 	if ( !moveSelection )
 		m_selection.start = m_selection.end;
@@ -254,7 +252,7 @@ void TextView::End( bool gotoDocEnd, bool moveSelection )
 {
 	m_selection.end = gotoDocEnd
 	                     ? m_doc.Length()
-	                     : m_paragraphs.LineEnd( m_selection.endPoint.y );
+	                     : m_blocks.LineEnd( m_selection.endPoint.y );
 
 	if ( !moveSelection )
 		m_selection.start = m_selection.end;
@@ -272,14 +270,14 @@ void TextView::LineUp( bool moveSelection, bool up )
 	            ? m_lineUpCount + 1
 	            : m_lineUpCount - 1;
 
-	int y = m_lineUpStart.y - ( m_metrics.lineHeight * count );
+	int y = m_lineUpStart.y - ( m_style.lineHeight * count );
 
-	if ( 0 <= y && y < m_paragraphs.Height() )
+	if ( 0 <= y && y < m_blocks.Height() )
 	{
 		m_lineUpCount = count;
 		m_selection.endPoint.y = y;
 		m_selection.endPoint.x = m_lineUpStart.x;
-		m_selection.end = m_paragraphs.CharFromPoint( &m_selection.endPoint );
+		m_selection.end = m_blocks.CharFromPoint( &m_selection.endPoint );
 	}
 
 	if ( !moveSelection )
@@ -326,10 +324,9 @@ void TextView::Insert( UTF16Ref text )
 	Assert( m_selection.IsEmpty() );
 
 	TextChange change = m_doc.Insert( m_selection.end, text );
-	m_paragraphs.ProcessTextChanges( change );
-	UpdateLayout();
+	UpdateLayout( change );
 
-	m_selection = m_selection.end + change.count;
+	m_selection.start = m_selection.end = m_selection.end + change.count;
 	MoveCaret( m_selection.end, true );
 }
 
@@ -359,10 +356,9 @@ void TextView::Clear( bool moveCaret )
 		return;
 
 	TextChange change = m_doc.Delete( m_selection.Min(), m_selection.Size() );
-	m_paragraphs.ProcessTextChanges( change );
-	UpdateLayout();
+	UpdateLayout( change );
 
-	m_selection = m_selection.Min();
+	m_selection.start = m_selection.end = m_selection.Min();
 
 	if ( moveCaret )
 		MoveCaret( m_selection.end, true );
@@ -376,8 +372,34 @@ void TextView::Cut()
 
 void TextView::Copy()
 {
-	if ( !m_selection.IsEmpty() )
-		m_doc.CopyToClipboard( m_selection.Min(), m_selection.Size() );
+	if ( m_selection.IsEmpty() )
+		return;
+	
+	if ( !OpenClipboard( NULL ) )
+		return;
+
+	EmptyClipboard();
+
+	size_t sizeWithCRLF = m_doc.SizeWithCRLF( m_selection.start, m_selection.Size() );
+	HGLOBAL hGlobal = GlobalAlloc( GMEM_MOVEABLE, ( sizeWithCRLF + 1 ) * sizeof( UTF16::Unit ) );
+
+	if ( hGlobal != 0 )
+	{
+		UTF16::Unit* dest = static_cast<UTF16::Unit*>( GlobalLock( hGlobal ) );
+
+		if ( dest != 0 )
+		{
+			m_doc.ReadWithCRLF( m_selection.start, m_selection.Size(), ArrayOf<UTF16::Unit>( dest, dest + sizeWithCRLF ) );
+			dest[sizeWithCRLF] = UTF16::Unit( 0 );
+
+			GlobalUnlock( hGlobal );
+
+			if ( !SetClipboardData( CF_UNICODETEXT, hGlobal ) )
+				GlobalFree( hGlobal );
+		}
+	}
+
+	CloseClipboard();
 }
 
 void TextView::Paste()
@@ -425,21 +447,35 @@ void TextView::Redo()
 		return;
 }
 
+void TextView::UpdateLayout( TextChange change )
+{
+	HDC hdc = GetDC( m_hwnd );
+
+	RECT rect = m_metrics.TextRect( m_hwnd );
+	m_blocks.Update( hdc, rect.right - rect.left, change );
+
+	ReleaseDC( m_hwnd, hdc );
+
+	InvalidateRect( m_hwnd, NULL, TRUE );
+	ScrollDelta( 0, 0 );
+}
+
 void TextView::UpdateLayout()
 {
 	HDC hdc = GetDC( m_hwnd );
 
 	RECT rect = m_metrics.TextRect( m_hwnd );
-	m_paragraphs.Validate( hdc, rect.right - rect.left );
+	m_blocks.UpdateAll( hdc, rect.right - rect.left );
 
 	ReleaseDC( m_hwnd, hdc );
+
 	InvalidateRect( m_hwnd, NULL, TRUE );
 	ScrollDelta( 0, 0 );
 }
 
 void TextView::MoveCaret( size_t pos, bool advancing )
 {
-	m_selection.endPoint = m_paragraphs.PointFromChar( pos, advancing );
+	m_selection.endPoint = m_blocks.PointFromChar( pos, advancing );
 	ScrollToCaret();
 	UpdateCaretPos();
 }
@@ -449,13 +485,13 @@ void TextView::ScrollToCaret()
 	RECT textRect = m_metrics.ClientToText( m_metrics.TextRect( m_hwnd ) );
 
 	int textHeight         = textRect.bottom - textRect.top;
-	int adjustedTextHeight = textHeight - textHeight % m_metrics.lineHeight;
+	int adjustedTextHeight = textHeight - textHeight % m_style.lineHeight;
 
 	int xOffset = m_metrics.xOffset;
 	int yOffset = m_metrics.yOffset;
 
-	if ( m_selection.endPoint.y + m_metrics.lineHeight > textRect.bottom )
-		yOffset = m_selection.endPoint.y + m_metrics.lineHeight - adjustedTextHeight;
+	if ( m_selection.endPoint.y + m_style.lineHeight > textRect.bottom )
+		yOffset = m_selection.endPoint.y + m_style.lineHeight - adjustedTextHeight;
 	else if ( m_selection.endPoint.y < textRect.top )
 		yOffset = m_selection.endPoint.y;
 
@@ -467,7 +503,7 @@ void TextView::UpdateCaretPos()
 {
 	POINT point = m_metrics.TextToClient( m_selection.endPoint );
 
-	RECT rect = { point.x, point.y, point.x + m_metrics.caretWidth, point.y + m_metrics.lineHeight };
+	RECT rect = { point.x, point.y, point.x + m_metrics.caretWidth, point.y + m_style.lineHeight };
 	RECT intersection = m_metrics.IntersectWithText( rect, m_hwnd );
 
 	if ( IsRectEmpty( &intersection ) )
@@ -476,7 +512,8 @@ void TextView::UpdateCaretPos()
 	}
 	else
 	{
-		// If the position on screen doesn't change, then the caret keeps blinking away.  We don't want that when scrolling up or down.
+		// If the position on screen doesn't change, then the caret keeps blinking away.
+		// We don't want that when scrolling up or down.
 		HideCaret();
 		SetCaretPos( 0, 0 );
 		SetCaretPos( point.x, point.y );
@@ -504,20 +541,20 @@ void TextView::ShowCaret()
 
 void TextView::ScrollTo( int x, int y )
 {
-	y = std::min( y, ( m_paragraphs.VisualLineCount() - m_metrics.linesPerPage ) * m_metrics.lineHeight );
+	y = std::min( y, int( ( m_blocks.LineCount() - m_metrics.linesPerPage ) * m_style.lineHeight ) );
 	y = std::max( y, int( 0 ) );
 
 	//RECT textRect = m_metrics.TextRect( m_hwnd );
-	//ScrollWindowEx( m_hwnd, 0, ( m_metrics.yOffset - y ) * m_metrics.lineHeight, &textRect, &textRect, NULL, &textRect, SW_ERASE | SW_INVALIDATE );
+	//ScrollWindowEx( m_hwnd, 0, ( m_metrics.yOffset - y ) * m_style.lineHeight, &textRect, &textRect, NULL, &textRect, SW_ERASE | SW_INVALIDATE );
 	InvalidateRect( m_hwnd, NULL, TRUE );
 
 	m_metrics.yOffset = y;
 
 	SCROLLINFO si = { sizeof si };
 	si.fMask      = SIF_PAGE | SIF_POS | SIF_RANGE;
-	si.nPage      = m_metrics.linesPerPage * m_metrics.lineHeight;
+	si.nPage      = m_metrics.linesPerPage * m_style.lineHeight;
 	si.nMin       = 0;
-	si.nMax       = ( m_paragraphs.VisualLineCount() - 1 ) * m_metrics.lineHeight;
+	si.nMax       = ( m_blocks.LineCount() - 1 ) * m_style.lineHeight;
 	si.nPos       = m_metrics.yOffset;
 
 	SetScrollInfo( m_hwnd, SB_VERT, &si, TRUE );
@@ -546,17 +583,17 @@ void TextView::OnMouseWheel( int zDelta )
 	int dy = zDelta * (int)scrollLines / WHEEL_DELTA;
 	m_mouseWheelRemainder = zDelta - dy * WHEEL_DELTA / (int)scrollLines;
 
-	ScrollDelta( 0, -dy * m_metrics.lineHeight );
+	ScrollDelta( 0, -dy * m_style.lineHeight );
 }
 
 void TextView::OnVScroll( UINT code )
 {
 	switch ( code )
 	{
-	case SB_LINEUP:         ScrollDelta( 0, -m_metrics.lineHeight ); break;
-	case SB_LINEDOWN:       ScrollDelta( 0,  m_metrics.lineHeight ); break;
-	case SB_PAGEUP:         ScrollDelta( 0, -m_metrics.linesPerPage * m_metrics.lineHeight ); break;
-	case SB_PAGEDOWN:       ScrollDelta( 0,  m_metrics.linesPerPage * m_metrics.lineHeight ); break;
+	case SB_LINEUP:         ScrollDelta( 0, -m_style.lineHeight ); break;
+	case SB_LINEDOWN:       ScrollDelta( 0,  m_style.lineHeight ); break;
+	case SB_PAGEUP:         ScrollDelta( 0, -m_metrics.linesPerPage * m_style.lineHeight ); break;
+	case SB_PAGEDOWN:       ScrollDelta( 0,  m_metrics.linesPerPage * m_style.lineHeight ); break;
 	case SB_THUMBPOSITION:  ScrollTo( m_metrics.xOffset, GetTrackPos( SB_VERT ) ); break;
 	case SB_THUMBTRACK:     ScrollTo( m_metrics.xOffset, GetTrackPos( SB_VERT ) ); break;
 	case SB_TOP:            ScrollTo( m_metrics.xOffset, 0 );                      break;
@@ -566,17 +603,6 @@ void TextView::OnVScroll( UINT code )
 
 void TextView::OnHScroll( UINT code )
 {
-	//switch ( code )
-	//{
-	//case SB_LINEUP:         ScrollDelta( m_metrics.HOffset(), -m_metrics.lineHeight );   break;
-	//case SB_LINEDOWN:       ScrollDelta( m_metrics.HOffset(), +m_metrics.lineHeight );   break;
-	//case SB_PAGEUP:         ScrollDelta( m_metrics.HOffset(), -m_metrics.LinesPerPage() ); break;
-	//case SB_PAGEDOWN:       ScrollDelta( m_metrics.HOffset(), +m_metrics.LinesPerPage() ); break;
-	//case SB_THUMBPOSITION:  ScrollTo( m_metrics.HOffset(),     pos ); break;
-	//case SB_THUMBTRACK:     ScrollTo( m_metrics.HOffset(),     pos ); break;
-	//case SB_TOP:            ScrollTo( m_metrics.HOffset(),       0 ); break;
-	//case SB_BOTTOM:         ScrollTo( m_metrics.HOffset(), MAXLONG ); break;
-	//}
 }
 
 UINT TextView::GetTrackPos( int scrollBar )

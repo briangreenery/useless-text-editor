@@ -2,7 +2,7 @@
 
 #include "DocumentReader.h"
 #include "TextDocument.h"
-#include "Require.h"
+#include "Assert.h"
 #include <limits>
 
 #undef min
@@ -35,8 +35,8 @@ UTF16Ref DocumentReader::WeakRange( size_t textStart, size_t textCount ) const
 
 UTF16Ref DocumentReader::StrictRange( size_t textStart, size_t textCount ) const
 {
-	Require( textStart + textCount <= m_paragraphCount );
+	Assert( textStart + textCount <= m_paragraphCount );
 	UTF16Ref result = WeakRange( textStart, textCount );
-	Require( result.size() == textCount );
+	Assert( result.size() == textCount );
 	return result;
 }

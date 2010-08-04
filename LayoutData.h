@@ -8,7 +8,7 @@
 class LayoutData
 {
 public:
-	void Copy( LayoutAllocator& );
+	void Copy( LayoutAllocator&, ArrayOf<SCRIPT_ITEM> );
 	void Reset();
 
 	SizedAutoArray<SCRIPT_ITEM>    items;
