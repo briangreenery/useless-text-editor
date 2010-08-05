@@ -62,7 +62,7 @@ void VisualBlock::DrawSelection( const VisualLine& line, VisualPainter& painter,
 	if ( painter.selection.Intersects( line.TextStart(), line.TextEnd() ) )
 		selection = line.MakeVisualSelection( painter.selection, m_layout );
 
-	if ( &line == &m_lines.back() && painter.selection.Intersects( line.TextEnd(), m_length ) )
+	if ( &line == &m_lines.back() && painter.selection.Intersects( line.TextEnd(), m_length ) && EndsWithNewline() )
 		selection.Add( line.Width(), line.Width() + painter.style.avgCharWidth );
 
 	selection.Draw( painter, rect );
