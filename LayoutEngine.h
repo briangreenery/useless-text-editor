@@ -20,7 +20,7 @@ class TextRunLoop;
 class LayoutEngine
 {
 public:
-	LayoutEngine( const TextDocument&, TextStyle&, HDC hdc, int maxWidth );
+	LayoutEngine( const TextDocument&, TextStyle&, HDC hdc, LONG maxWidth );
 
 	VisualBlockList& LayoutText( size_t start, size_t count );
 
@@ -48,7 +48,7 @@ private:
 	const TextDocument& m_doc;
 	TextStyle&          m_style;
 	HDC                 m_hdc;
-	int                 m_maxWidth;
+	LONG                m_maxWidth;
 
 	LayoutAllocator m_allocator;
 	DocumentReader  m_reader;

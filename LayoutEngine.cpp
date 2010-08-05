@@ -13,12 +13,12 @@
 
 namespace W = Windows;
 
-LayoutEngine::LayoutEngine( const TextDocument& doc, TextStyle& style, HDC hdc, int maxWidth )
+LayoutEngine::LayoutEngine( const TextDocument& doc, TextStyle& style, HDC hdc, LONG maxWidth )
 	: m_doc( doc )
 	, m_reader( doc )
 	, m_style( style )
 	, m_hdc( hdc )
-	, m_maxWidth( maxWidth )
+	, m_maxWidth( std::max( maxWidth, style.avgCharWidth * 10 ) )
 {
 }
 
