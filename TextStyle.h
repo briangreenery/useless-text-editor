@@ -19,6 +19,7 @@ public:
 	HFONT        font;
 	SCRIPT_CACHE fontCache;
 
+	HBRUSH gutterBrush;
 	HBRUSH selectionBrush;
 	HPEN   selectionHighlightPen;
 };

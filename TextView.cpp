@@ -40,7 +40,7 @@ void TextView::OnSize( UINT state, int cx, int cy )
 	if ( cx != ( oldClientRect.right - oldClientRect.left ) )
 		UpdateLayout();
 
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	InvalidateRect( m_hwnd, NULL, FALSE );
 }
 
 void TextView::OnPaint()
@@ -68,9 +68,7 @@ void TextView::OnPaint()
 void TextView::PaintGutter( HDC hdc, RECT rect )
 {
 	RECT gutterRect = m_metrics.IntersectWithGutter( rect, m_hwnd );
-
-	static HBRUSH gutterBrush = CreateSolidBrush( RGB( 236, 236, 236 ) );
-	FillRect( hdc, &gutterRect, gutterBrush );
+	FillRect( hdc, &gutterRect, m_style.gutterBrush );
 }
 
 void TextView::OnChar( UINT keyCode, UINT repCnt, UINT flags )
@@ -136,7 +134,7 @@ void TextView::OnLButtonDown( POINT point )
 
 	ScrollToCaret();
 	UpdateCaretPos();
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	InvalidateRect( m_hwnd, NULL, FALSE );
 
 	SetCapture( m_hwnd );
 	m_isDoingMouseSel = true;
@@ -161,7 +159,7 @@ void TextView::OnMouseMove( POINT point )
 	m_selection.endPoint = m_metrics.ClientToText( point );
 	m_selection.end = m_blocks.CharFromPoint( &m_selection.endPoint );
 	UpdateCaretPos();
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	InvalidateRect( m_hwnd, NULL, FALSE );
 }
 
 void TextView::OnCaptureChanged()
@@ -217,7 +215,7 @@ void TextView::AdvanceCaret( bool wholeWord, bool moveSelection )
 	}
 
 	MoveCaret( m_selection.end, true );
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	InvalidateRect( m_hwnd, NULL, FALSE );
 }
 
 void TextView::RetireCaret( bool wholeWord, bool moveSelection )
@@ -237,7 +235,7 @@ void TextView::RetireCaret( bool wholeWord, bool moveSelection )
 	}
 
 	MoveCaret( m_selection.end, false );
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	InvalidateRect( m_hwnd, NULL, FALSE );
 }
 
 void TextView::Home( bool gotoDocStart, bool moveSelection )
@@ -250,7 +248,7 @@ void TextView::Home( bool gotoDocStart, bool moveSelection )
 		m_selection.start = m_selection.end;
 
 	MoveCaret( m_selection.end, false );
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	InvalidateRect( m_hwnd, NULL, FALSE );
 }
 
 void TextView::End( bool gotoDocEnd, bool moveSelection )
@@ -263,7 +261,7 @@ void TextView::End( bool gotoDocEnd, bool moveSelection )
 		m_selection.start = m_selection.end;
 
 	MoveCaret( m_selection.end, true );
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	InvalidateRect( m_hwnd, NULL, FALSE );
 }
 
 void TextView::LineUp( bool moveSelection, bool up )
@@ -290,7 +288,7 @@ void TextView::LineUp( bool moveSelection, bool up )
 
 	ScrollToCaret();
 	UpdateCaretPos();
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	InvalidateRect( m_hwnd, NULL, FALSE );
 }
 
 void TextView::Backspace( bool wholeWord )
@@ -341,7 +339,7 @@ void TextView::SelectAll()
 	m_selection.end   = m_doc.Length();
 
 	MoveCaret( m_selection.end, true );
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	InvalidateRect( m_hwnd, NULL, FALSE );
 }
 
 void TextView::SelectWord()
@@ -352,7 +350,7 @@ void TextView::SelectWord()
 	m_selection.end   = word.second;
 
 	MoveCaret( m_selection.end, true );
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	InvalidateRect( m_hwnd, NULL, FALSE );
 }
 
 void TextView::Clear( bool moveCaret )
@@ -461,7 +459,7 @@ void TextView::UpdateLayout( TextChange change )
 
 	ReleaseDC( m_hwnd, hdc );
 
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	InvalidateRect( m_hwnd, NULL, FALSE );
 	ScrollDelta( 0, 0 );
 }
 
@@ -474,7 +472,7 @@ void TextView::UpdateLayout()
 
 	ReleaseDC( m_hwnd, hdc );
 
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	InvalidateRect( m_hwnd, NULL, FALSE );
 	ScrollDelta( 0, 0 );
 }
 
@@ -549,14 +547,13 @@ void TextView::ScrollTo( int x, int y )
 	y = std::min( y, int( ( m_blocks.LineCount() - m_metrics.linesPerPage ) * m_style.lineHeight ) );
 	y = std::max( y, int( 0 ) );
 
-	//RECT textRect = m_metrics.TextRect( m_hwnd );
-	//ScrollWindowEx( m_hwnd, 0, ( m_metrics.yOffset - y ) * m_style.lineHeight, &textRect, &textRect, NULL, &textRect, SW_ERASE | SW_INVALIDATE );
-	InvalidateRect( m_hwnd, NULL, TRUE );
+	//ScrollWindowEx( m_hwnd, 0, ( m_metrics.yOffset - y ) * m_style.lineHeight, NULL, NULL, NULL, NULL, SW_ERASE | SW_INVALIDATE );
+	InvalidateRect( m_hwnd, NULL, FALSE );
 
 	m_metrics.yOffset = y;
 
 	SCROLLINFO si = { sizeof si };
-	si.fMask      = SIF_PAGE | SIF_POS | SIF_RANGE;
+	si.fMask      = SIF_PAGE | SIF_POS | SIF_RANGE | SIF_DISABLENOSCROLL;
 	si.nPage      = m_metrics.linesPerPage * m_style.lineHeight;
 	si.nMin       = 0;
 	si.nMax       = ( m_blocks.LineCount() - 1 ) * m_style.lineHeight;

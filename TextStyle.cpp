@@ -10,6 +10,7 @@ TextStyle::TextStyle()
 	font = CreateFontIndirect( &logFont );
 	fontCache = 0;
 
+	gutterBrush = CreateSolidBrush( RGB( 236, 236, 236 ) );
 	selectionBrush = CreateSolidBrush( RGB( 173, 214, 255 ) );
 	selectionHighlightPen = CreatePen( PS_SOLID, 1, RGB( 214, 235, 255 ) );
 

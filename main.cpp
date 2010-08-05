@@ -21,7 +21,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
 	switch ( msg )
 	{
 	case WM_CREATE:
-		theEdit = CreateWindow( WC_TEXTEDIT, TEXT( "" ), WS_CHILD|WS_VISIBLE, 0, 0, 0, 0, hwnd, NULL, theInstance, NULL );
+		theEdit = CreateWindow( WC_TEXTEDIT, TEXT( "" ), WS_CHILD|WS_VISIBLE|WS_VSCROLL, 0, 0, 0, 0, hwnd, NULL, theInstance, NULL );
 		return theEdit ? 0 : -1;
 
 	case WM_SIZE:
