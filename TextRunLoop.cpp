@@ -58,9 +58,12 @@ void TextRunLoop::NewBlock()
 {
 	NewLine();
 
+	m_text = UTF16Ref( m_text.begin() + m_position, m_text.end() );
+	m_items = ArrayOf<SCRIPT_ITEM>( m_item, m_items.end() );
+
 	m_blockStart += m_position;
 	m_position = 0;
 
-	m_text = UTF16Ref( m_text.begin() + m_blockStart, m_text.end() );
-	m_items = ArrayOf<SCRIPT_ITEM>( m_item, m_items.end() );
+	m_item->iCharPos = m_blockStart;
+	m_itemUsed = 0;
 }

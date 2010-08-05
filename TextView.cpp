@@ -380,7 +380,7 @@ void TextView::Copy()
 
 	EmptyClipboard();
 
-	size_t sizeWithCRLF = m_doc.SizeWithCRLF( m_selection.start, m_selection.Size() );
+	size_t sizeWithCRLF = m_doc.SizeWithCRLF( m_selection.Min(), m_selection.Size() );
 	HGLOBAL hGlobal = GlobalAlloc( GMEM_MOVEABLE, ( sizeWithCRLF + 1 ) * sizeof( UTF16::Unit ) );
 
 	if ( hGlobal != 0 )
@@ -389,7 +389,7 @@ void TextView::Copy()
 
 		if ( dest != 0 )
 		{
-			m_doc.ReadWithCRLF( m_selection.start, m_selection.Size(), ArrayOf<UTF16::Unit>( dest, dest + sizeWithCRLF ) );
+			m_doc.ReadWithCRLF( m_selection.Min(), m_selection.Size(), ArrayOf<UTF16::Unit>( dest, dest + sizeWithCRLF ) );
 			dest[sizeWithCRLF] = UTF16::Unit( 0 );
 
 			GlobalUnlock( hGlobal );

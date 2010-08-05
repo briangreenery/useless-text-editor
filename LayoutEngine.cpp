@@ -325,12 +325,13 @@ void LayoutEngine::AddBlock( TextRunLoop& runs )
 	runs.NewBlock();
 
 	size_t blockEnd = runs.BlockStart();
-	SCRIPT_ITEM* itemEnd = runs.BlockItems().begin();
+	SCRIPT_ITEM* itemEnd = runs.BlockItems().begin() + 1;
 
 	size_t length = blockEnd - blockStart;
 	ArrayOf<SCRIPT_ITEM> items( itemStart, itemEnd );
 
 	m_result.push_back( VisualBlock( length, m_allocator, items ) );
+	m_allocator.lines.DiscardAll();
 }
 
 void LayoutEngine::FinishBlock( TextRunLoop& runs, bool endsWithNewline )
@@ -364,7 +365,7 @@ void LayoutEngine::LayoutBlocks( UTF16Ref text, bool endsWithNewline )
 			lineStart = WrapLine( runs.BlockText().begin(), runs.BlockItems().begin(), run, runs.BlockStart(), lineStart, lineWidth );
 			lineWidth = 0;
 
-			if ( lineStart <= runs.BlockStart() + 1024 )
+			if ( lineStart <= 2048 )
 			{
 				AddLine( runs );
 			}
