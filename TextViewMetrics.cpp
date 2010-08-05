@@ -14,32 +14,27 @@ TextViewMetrics::TextViewMetrics()
 	, xOffset( 0 )
 	, yOffset( 0 )
 {
+	ZeroMemory( &clientRect, sizeof( clientRect ) );
 }
 
 RECT TextViewMetrics::GutterRect( HWND hwnd ) const
 {
-	RECT rect;
-	GetClientRect( hwnd, &rect );
-
+	RECT rect = clientRect;
 	rect.right = gutterWidth;
 	return rect;
 }
 
 RECT TextViewMetrics::TextRect( HWND hwnd ) const
 {
-	RECT rect;
-	GetClientRect( hwnd, &rect );
-
+	RECT rect = clientRect;
 	rect.left += gutterWidth;
-	InflateRect( &rect, -marginWidth, -marginWidth );
+	InflateRect( &rect, -marginWidth, 0 );
 	return rect;
 }
 
 RECT TextViewMetrics::TextOrMarginRect( HWND hwnd ) const
 {
-	RECT rect;
-	GetClientRect( hwnd, &rect );
-
+	RECT rect = clientRect;
 	rect.left += gutterWidth;
 	return rect;
 }
@@ -142,14 +137,14 @@ RECT TextViewMetrics::ClientToText( RECT rect ) const
 
 POINT TextViewMetrics::ClientToText( POINT pt ) const
 {
-	pt.y -= marginWidth - yOffset;
+	pt.y += yOffset;
 	pt.x -= marginWidth + gutterWidth - xOffset;
 	return pt;
 }
 
 POINT TextViewMetrics::TextToClient( POINT pt ) const
 {
-	pt.y += marginWidth - yOffset;
+	pt.y -= yOffset;
 	pt.x += marginWidth + gutterWidth - xOffset;
 	return pt;
 }

@@ -41,6 +41,8 @@ public:
 
 	int xOffset;
 	int yOffset;
+
+	RECT clientRect;
 };
 
 #endif

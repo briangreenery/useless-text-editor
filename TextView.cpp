@@ -31,15 +31,20 @@ int TextView::OnCreate( LPCREATESTRUCT )
 
 void TextView::OnSize( UINT state, int cx, int cy )
 {
-	m_metrics.linesPerPage = cy / m_style.lineHeight;
-	UpdateLayout();
+	RECT oldClientRect = m_metrics.clientRect;
+	GetClientRect( m_hwnd, &m_metrics.clientRect );
+
+	if ( cy != ( oldClientRect.bottom - oldClientRect.top ) )
+		m_metrics.linesPerPage = cy / m_style.lineHeight;
+
+	if ( cx != ( oldClientRect.right - oldClientRect.left ) )
+		UpdateLayout();
+
+	InvalidateRect( m_hwnd, NULL, TRUE );
 }
 
 void TextView::OnPaint()
 {
-	RECT rect;
-	GetClientRect( m_hwnd, &rect );
-
 	PAINTSTRUCT ps;
 	HDC hdc = BeginPaint( m_hwnd, &ps );
 
@@ -594,8 +599,8 @@ void TextView::OnVScroll( UINT code )
 	case SB_LINEDOWN:       ScrollDelta( 0,  m_style.lineHeight ); break;
 	case SB_PAGEUP:         ScrollDelta( 0, -m_metrics.linesPerPage * m_style.lineHeight ); break;
 	case SB_PAGEDOWN:       ScrollDelta( 0,  m_metrics.linesPerPage * m_style.lineHeight ); break;
-	case SB_THUMBPOSITION:  ScrollTo( m_metrics.xOffset, GetTrackPos( SB_VERT ) ); break;
-	case SB_THUMBTRACK:     ScrollTo( m_metrics.xOffset, GetTrackPos( SB_VERT ) ); break;
+	case SB_THUMBPOSITION:  ScrollTo( m_metrics.xOffset, SnapToLine( GetTrackPos( SB_VERT ) ) ); break;
+	case SB_THUMBTRACK:     ScrollTo( m_metrics.xOffset, SnapToLine( GetTrackPos( SB_VERT ) ) ); break;
 	case SB_TOP:            ScrollTo( m_metrics.xOffset, 0 );                      break;
 	case SB_BOTTOM:         ScrollTo( m_metrics.xOffset, MAXLONG );                break;
 	}
@@ -613,4 +618,9 @@ UINT TextView::GetTrackPos( int scrollBar )
 		return si.nTrackPos;
 
 	return 0;
+}
+
+int TextView::SnapToLine( int y )
+{
+	return m_style.lineHeight * ( y / m_style.lineHeight );
 }

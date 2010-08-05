@@ -37,6 +37,7 @@ public:
 	void OnVScroll( UINT code );
 	void OnHScroll( UINT code );
 	UINT GetTrackPos( int scrollBar );
+	int SnapToLine( int y );
 
 	void OnSetFocus ( HWND );
 	void OnKillFocus( HWND );
