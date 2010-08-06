@@ -365,7 +365,7 @@ void LayoutEngine::LayoutBlocks( UTF16Ref text, bool endsWithNewline )
 			lineStart = WrapLine( runs.BlockText().begin(), runs.BlockItems().begin(), run, runs.BlockStart(), lineStart, lineWidth );
 			lineWidth = 0;
 
-			if ( lineStart <= 2048 )
+			if ( lineStart <= 1024 )
 			{
 				AddLine( runs );
 			}

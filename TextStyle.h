@@ -21,7 +21,6 @@ public:
 
 	HBRUSH gutterBrush;
 	HBRUSH selectionBrush;
-	HPEN   selectionHighlightPen;
 };
 
 #endif

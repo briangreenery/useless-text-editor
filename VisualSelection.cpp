@@ -34,35 +34,11 @@ void VisualSelection::Draw( VisualPainter& painter, RECT rect )
 
 		RECT selectionRect;
 
-		selectionRect.left   = std::max( rect.left,   start );
+		selectionRect.left   = start;
 		selectionRect.top    = rect.top;
-		selectionRect.right  = std::min( rect.right,  end );
+		selectionRect.right  = end;
 		selectionRect.bottom = rect.top + painter.style.lineHeight;
 
 		FillRect( painter.hdc, &selectionRect, painter.style.selectionBrush );
-
-		DrawHighlight( painter, start, end, painter.prevSelection.m_ranges, rect.top - 1 );
-		DrawHighlight( painter, start, end, Ranges(),                       rect.top + painter.style.lineHeight );
-	}
-}
-
-void VisualSelection::DrawHighlight( VisualPainter& painter, LONG start, LONG end, const Ranges& above, LONG y )
-{
-	Ranges::const_iterator it = above.begin();
-
-	while ( start < end )
-	{
-		while ( it != above.end() && *it <= start )
-			++it;
-
-		LONG aboveEnd = std::min( end, ( ( it != above.end() ) ? *it : MAXLONG ) );
-
-		if ( ( it - above.begin() ) % 2 == 0 )
-		{
-			MoveToEx( painter.hdc, start,    y, NULL );
-			LineTo  ( painter.hdc, aboveEnd, y );
-		}
-
-		start = aboveEnd;
 	}
 }

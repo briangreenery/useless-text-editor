@@ -14,14 +14,12 @@ VisualPainter::VisualPainter( HDC _hdc, TextStyle& _style, TextSelection _select
 	GetWindowOrgEx( hdc, &oldOrigin );
 
 	oldFont = SelectObject( hdc, style.font );
-	oldPen = SelectObject( hdc, style.selectionHighlightPen );
 	oldBkMode = SetBkMode( hdc, TRANSPARENT );
 }
 
 VisualPainter::~VisualPainter()
 {
 	SetBkMode( hdc, oldBkMode );
-	SelectObject( hdc, oldPen );
 	SelectObject( hdc, oldFont );
 
 	SetWindowOrgEx( hdc, oldOrigin.x, oldOrigin.y, NULL );

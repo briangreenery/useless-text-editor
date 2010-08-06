@@ -35,28 +35,18 @@ VisualLine::VisualLine( size_t textStart, TextRun* runStart, TextRun* runEnd )
 
 void VisualLine::Draw( VisualPainter& painter, RECT rect, const LayoutData& layout ) const
 {
-	SizedAutoArray<int> visualToLogical = VisualToLogicalMapping( layout );
+	if ( m_runs.empty() )
+		return;
 
-	for ( size_t i = 0; i < visualToLogical.size() && !IsRectEmpty( &rect ); ++i )
-	{
-		TextRun* run = m_runs.begin() + visualToLogical[i];
+	const TextRun& firstRun = m_runs[0];
+	const TextRun& lastRun  = m_runs[ m_runs.size() - 1 ];
 
-		W::ThrowHRESULT( ScriptTextOut( painter.hdc,
-		                                &painter.style.fontCache,
-		                                rect.left,
-		                                rect.top,
-		                                0,
-		                                &rect,
-		                                &layout.items[run->item].a,
-		                                0,
-		                                0,
-		                                layout.glyphs.begin() + run->glyphStart,
-		                                run->glyphCount,
-		                                layout.advanceWidths.begin() + run->glyphStart,
-		                                NULL,
-		                                layout.offsets.begin() + run->glyphStart ) );
-		rect.left += run->width;
-	}
+	WORD* glyphs       = layout.glyphs.begin()        + firstRun.glyphStart;
+	int* advanceWidths = layout.advanceWidths.begin() + firstRun.glyphStart;
+
+	WORD glyphCount    = lastRun.glyphStart + lastRun.glyphCount - firstRun.glyphStart;
+
+	ExtTextOutW( painter.hdc, rect.left, rect.top, ETO_GLYPH_INDEX, NULL, glyphs, glyphCount, advanceWidths );
 }
 
 VisualSelection VisualLine::MakeVisualSelection( TextSelection selection, const LayoutData& layout ) const

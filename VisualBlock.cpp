@@ -43,9 +43,6 @@ void VisualBlock::Draw( VisualPainter& painter, RECT rect ) const
 	size_t i = rect.top / painter.style.lineHeight;
 	rect.top = i * painter.style.lineHeight;
 
-	if ( 0 < i && i < m_lines.size() )
-		painter.prevSelection.Swap( m_lines[i-1].MakeVisualSelection( painter.selection, m_layout ) );
-
 	for ( ; i < m_lines.size() && !IsRectEmpty( &rect ); ++i )
 	{
 		DrawSelection( m_lines[i], painter, rect );
@@ -66,7 +63,6 @@ void VisualBlock::DrawSelection( const VisualLine& line, VisualPainter& painter,
 		selection.Add( line.Width(), line.Width() + painter.style.avgCharWidth );
 
 	selection.Draw( painter, rect );
-	selection.Swap( painter.prevSelection );
 }
 
 POINT VisualBlock::PointFromChar( size_t pos, bool advancing, TextStyle& style ) const

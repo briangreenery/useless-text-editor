@@ -20,8 +20,6 @@ public:
 private:
 	typedef std::vector<LONG> Ranges;
 
-	void DrawHighlight( VisualPainter&, LONG start, LONG end, const Ranges&, LONG y );
-
 	Ranges m_ranges;
 };
 

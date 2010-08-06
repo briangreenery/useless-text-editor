@@ -21,13 +21,10 @@ public:
 	TextSelection    selection;
 	TextStyle&       style;
 
-	VisualSelection  prevSelection;
-
 private:
 	TextSelection oldSelection;
 	POINT oldOrigin;
 	HGDIOBJ oldFont;
-	HGDIOBJ oldPen;
 	int oldBkMode;
 };
 
