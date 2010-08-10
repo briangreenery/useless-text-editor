@@ -22,7 +22,7 @@ VisualBlock::VisualBlock( size_t length, LayoutAllocator& allocator, ArrayOf<SCR
 	ArrayOf<size_t> lines = allocator.lines.Allocated();
 	m_lines.reserve( lines.size() );
 
-	TextRun* runs      = m_layout.runs;
+	TextRun* runs      = m_layout.runs.begin();
 	size_t   lastEnd   = 0;
 	size_t   textStart = 0;
 

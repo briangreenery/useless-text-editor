@@ -29,7 +29,7 @@ private:
 
 	ArrayOf<SCRIPT_ITEM> Itemize( UTF16Ref );
 
-	int ShapePlaceRun( const UTF16::Unit*, SCRIPT_ITEM*, TextRun*, int xStart );
+	bool ShapePlaceRun( const UTF16::Unit*, SCRIPT_ITEM*, TextRun*, int xStart );
 
 	size_t EstimateLineWrap( const UTF16::Unit*, SCRIPT_ITEM*, TextRun*, int lineWidth );
 

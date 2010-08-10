@@ -36,7 +36,7 @@ int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, SCRIPT_ITEM* items, Te
 	while ( true )
 	{
 		HRESULT result = ScriptShape( hdc,
-		                              &m_style.fontCache,
+		                              &m_style.fonts[run->style].fontCache,
 		                              text + run->textStart,
 		                              run->textCount,
 		                              glyphs.size(),
@@ -52,7 +52,7 @@ int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, SCRIPT_ITEM* items, Te
 		switch ( result )
 		{
 		case E_PENDING:
-			SelectObject( m_hdc, m_style.font );
+			SelectObject( m_hdc, m_style.fonts[run->style].font );
 			hdc = m_hdc;
 			break;
 
@@ -62,10 +62,7 @@ int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, SCRIPT_ITEM* items, Te
 			break;
 
 		case USP_E_SCRIPT_NOT_IN_FONT:
-			// IMLangFontLink2
-			//item->style = styles.Fallback( UTF16Ref( text + item->textStart, item->textCount ), hTargetDC );
-			//style = styles[item->style];
-			//break;
+			return false;
 
 		default:
 			W::ThrowHRESULT( result );
@@ -75,7 +72,8 @@ int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, SCRIPT_ITEM* items, Te
 	glyphs   = m_allocator.glyphs  .Shrink( glyphs,   glyphCount );
 	visAttrs = m_allocator.visAttrs.Shrink( visAttrs, glyphCount );
 
-	// FIXME: Scan for missing glyphs to support east asian text.  Use ScriptGetFontProperties to determine the index of the missing glyph.
+	if ( m_style.HasMissingGlyphs( run->style, glyphs ) )
+		return false;
 
 	ArrayOf<int>     advanceWidths = m_allocator.advanceWidths.Alloc( glyphCount );
 	ArrayOf<GOFFSET> offsets       = m_allocator.offsets      .Alloc( glyphCount );
@@ -85,7 +83,7 @@ int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, SCRIPT_ITEM* items, Te
 	while ( true )
 	{
 		HRESULT result = ScriptPlace( hdc,
-		                              &m_style.fontCache,
+		                              &m_style.fonts[run->style].fontCache,
 		                              glyphs.begin(),
 		                              glyphs.size(),
 		                              visAttrs.begin(),
@@ -100,7 +98,7 @@ int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, SCRIPT_ITEM* items, Te
 		switch ( result )
 		{
 		case E_PENDING:
-			SelectObject( m_hdc, m_style.font );
+			SelectObject( m_hdc, m_style.fonts[run->style].font );
 			hdc = m_hdc;
 			break;
 
@@ -122,7 +120,7 @@ int LayoutEngine::ShapePlaceRun( const UTF16::Unit* text, SCRIPT_ITEM* items, Te
 		run->width = abc.abcA + abc.abcB + abc.abcC;
 	}
 
-	return run->width;
+	return true;
 }
 
 ArrayOf<SCRIPT_ITEM> LayoutEngine::Itemize( UTF16Ref text )
@@ -131,13 +129,18 @@ ArrayOf<SCRIPT_ITEM> LayoutEngine::Itemize( UTF16Ref text )
 
 	int numItems = 0;
 
+	SCRIPT_CONTROL scriptControl = {};
+	SCRIPT_STATE   scriptState   = {};
+
+	scriptControl.uDefaultLanguage = LANG_USER_DEFAULT;
+
 	while ( true )
 	{
 		HRESULT result = ScriptItemize( text.begin(),
 		                                text.size(),
 		                                items.size(),
-		                                NULL,
-		                                NULL,
+		                                &scriptControl,
+		                                &scriptState,
 		                                items.begin(),
 		                                &numItems );
 
@@ -354,11 +357,16 @@ void LayoutEngine::LayoutBlocks( UTF16Ref text, bool endsWithNewline )
 	while ( runs.Unfinished() )
 	{
 		TextRun* run = runs.NextRun();
-		int runWidth = ShapePlaceRun( runs.BlockText().begin(), runs.BlockItems().begin(), run, lineWidth );
 
-		if ( lineWidth + runWidth <= m_maxWidth )
+		if ( !ShapePlaceRun( runs.BlockText().begin(), runs.BlockItems().begin(), run, lineWidth ) )
 		{
-			lineWidth += runWidth;
+			run = runs.FontFallback();
+			ShapePlaceRun( runs.BlockText().begin(), runs.BlockItems().begin(), run, lineWidth );
+		}
+
+		if ( lineWidth + run->width <= m_maxWidth )
+		{
+			lineWidth += run->width;
 		}
 		else
 		{

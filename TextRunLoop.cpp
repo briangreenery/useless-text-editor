@@ -28,6 +28,7 @@ TextRun* TextRunLoop::NextRun()
 	run->item      = m_item - m_items.begin();
 	run->textStart = m_position;
 	run->textCount = runSize;
+	run->style     = 0;
 
 	m_position += runSize;
 	m_itemUsed += runSize;
