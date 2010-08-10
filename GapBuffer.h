@@ -90,7 +90,7 @@ void GapBuffer<Unit>::GrowByAtLeast( size_t amount )
 	size_t newCapacity = m_buffer.size() + std::max( amount, m_buffer.size() );
 	SizedAutoArray<Unit> newBuffer = CreateArray<Unit>( newCapacity );
 
-	copy( newBuffer, m_size, 0 );
+	copy( newBuffer.begin(), m_size, 0 );
 
 	m_buffer = newBuffer;
 	m_gapPos = m_size;
@@ -109,7 +109,7 @@ void GapBuffer<Unit>::insert( size_t pos, const Unit* units, size_t count )
 		GrowByAtLeast( count - GapLength() );
 
 	MoveGapTo( pos );
-	std::copy( units, units + count, m_buffer + m_gapPos );
+	std::copy( units, units + count, m_buffer.begin() + m_gapPos );
 
 	m_gapPos += count;
 	m_size   += count;

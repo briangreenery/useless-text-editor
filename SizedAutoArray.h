@@ -66,7 +66,6 @@ public:
 	T* rend() const                  { return m_begin - 1; }
 
 	T& operator[] ( size_t i ) const { return m_begin[i]; }
-	operator T*()                    { return m_begin; }
 
 	void Reset()                     { if ( m_begin ) delete[] m_begin; m_begin = m_end = 0; }
 	T* Release();
