@@ -2,10 +2,6 @@
 
 #include "VisualSelection.h"
 #include "VisualPainter.h"
-#include <algorithm>
-
-#undef min
-#undef max
 
 void VisualSelection::Add( LONG xStart, LONG xEnd )
 {
@@ -18,11 +14,6 @@ void VisualSelection::Add( LONG xStart, LONG xEnd )
 	{
 		m_ranges.back() = xEnd;
 	}
-}
-
-void VisualSelection::Swap( VisualSelection& other )
-{
-	m_ranges.swap( other.m_ranges );
 }
 
 void VisualSelection::Draw( VisualPainter& painter, RECT rect )

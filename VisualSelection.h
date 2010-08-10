@@ -12,14 +12,10 @@ class VisualSelection
 {
 public:
 	void Add( LONG xStart, LONG xEnd );
-
 	void Draw( VisualPainter&, RECT rect );
-
-	void Swap( VisualSelection& );
 
 private:
 	typedef std::vector<LONG> Ranges;
-
 	Ranges m_ranges;
 };
 
