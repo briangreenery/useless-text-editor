@@ -53,6 +53,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 {
 	theInstance = hInstance;
 
+	CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
 	BufferedPaintInit();
 
 	if ( !InitApp() || !RegisterTextEdit( hInstance ) )
@@ -78,5 +79,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	}
 
 	BufferedPaintUnInit();
+	CoUninitialize();
+
 	return 0;
 }
