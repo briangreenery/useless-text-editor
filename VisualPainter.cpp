@@ -1,6 +1,7 @@
 // VisualPainter.cpp
 
 #include "VisualPainter.h"
+#include "TextStyle.h"
 
 #undef min
 #undef max
@@ -13,7 +14,9 @@ VisualPainter::VisualPainter( HDC _hdc, TextStyle& _style, TextSelection _select
 {
 	GetWindowOrgEx( hdc, &oldOrigin );
 
-	oldFont = SelectObject( hdc, style.font );
+	oldFont = SelectObject( hdc, style.fonts[0].font );
+	currentStyle = 0;
+
 	oldBkMode = SetBkMode( hdc, TRANSPARENT );
 }
 
@@ -31,4 +34,13 @@ void VisualPainter::SetOrigin( size_t textStart, LONG yStart )
 	selection.end   = oldSelection.end - std::min( oldSelection.end, textStart );
 
 	SetWindowOrgEx( hdc, oldOrigin.x, oldOrigin.y - yStart, NULL );
+}
+
+void VisualPainter::SetStyle( int textStyle )
+{
+	if ( textStyle == currentStyle )
+		return;
+
+	SelectObject( hdc, style.fonts[textStyle].font );
+	currentStyle = textStyle;
 }

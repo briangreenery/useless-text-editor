@@ -16,6 +16,7 @@ public:
 	~VisualPainter();
 
 	void SetOrigin( size_t textStart, LONG yStart );
+	void SetStyle( int style );
 
 	HDC              hdc;
 	TextSelection    selection;
@@ -26,6 +27,7 @@ private:
 	POINT oldOrigin;
 	HGDIOBJ oldFont;
 	int oldBkMode;
+	int currentStyle;
 };
 
 #endif
