@@ -376,6 +376,11 @@ std::vector<UniscribeLine> UniscribeLayoutParagraph( UTF16Ref text, TextStyle& s
 		}
 	}
 
-	allocator.lines.PushBack( allocator.runs.Allocated().size() );
+	ArrayOf<UniscribeRun> runs  = allocator.runs .Allocated();
+	ArrayOf<size_t>       lines = allocator.lines.Allocated();
+
+	if ( lines.empty() || runs.size() > lines[lines.size() - 1] )
+		allocator.lines.PushBack( runs.size() );
+
 	return MakeLines( allocator.lines.Allocated(), UniscribeDataPtr( new UniscribeData( allocator ) ) );
 }
