@@ -256,7 +256,7 @@ static UniscribeRun* DiscardRunsAfter( size_t lineEnd, UniscribeAllocator& alloc
 static size_t WrapLine( UniscribeRun* run, size_t lineStart, int lineWidth, UTF16Ref text, UniscribeAllocator& allocator, TextStyle& style, HDC hdc, int maxWidth )
 {
 	size_t lineEndEstimate = EstimateLineWrap( run, lineWidth, text, allocator, maxWidth );
-	size_t lineEnd         = std::numeric_limits<size_t>::max();
+	size_t lineEnd         = noSoftBreak;
 
 	if ( lineEndEstimate > lineStart )
 	{
@@ -286,6 +286,7 @@ static size_t WrapLine( UniscribeRun* run, size_t lineStart, int lineWidth, UTF1
 	if ( fragment )
 		LayoutRun( fragment, lineWidth, text, allocator, style, hdc );
 
+	allocator.lines.PushBack( allocator.runs.Allocated().size() );
 	return lineEnd;
 }
 
