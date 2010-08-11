@@ -49,7 +49,18 @@ static void Itemize( UTF16Ref text, UniscribeAllocator& allocator )
 	items = allocator.items.Shrink( items, numItems + 1 );
 }
 
-static bool ShapePlaceRun( UniscribeRun* run, int xStart, UTF16Ref text, UniscribeAllocator& allocator, TextStyle& style, HDC hdc )
+static bool HasMissingGlyphs( size_t font, ArrayOf<WORD> glyphs, TextStyle& style )
+{
+	const SCRIPT_FONTPROPERTIES& props = style.fonts[font].fontProps;
+
+	for ( WORD* it = glyphs.begin(); it != glyphs.end(); ++it )
+		if ( *it == props.wgDefault || *it == props.wgInvalid )
+			return true;
+
+	return false;
+}
+
+static bool ShapePlaceRun( UniscribeRun* run, int xStart, UTF16Ref text, UniscribeAllocator& allocator, TextStyle& style, HDC hdc, bool forceMissingGlyphs )
 {
 	size_t estimatedGlyphCount = allocator.EstimateGlyphCount( run->textCount );
 
@@ -90,6 +101,9 @@ static bool ShapePlaceRun( UniscribeRun* run, int xStart, UTF16Ref text, Uniscri
 			break;
 
 		case USP_E_SCRIPT_NOT_IN_FONT:
+			allocator.logClusters.DiscardFrom( logClusters.begin() );
+			allocator.glyphs     .DiscardFrom( glyphs.begin() );
+			allocator.visAttrs   .DiscardFrom( visAttrs.begin() );
 			return false;
 
 		default:
@@ -100,8 +114,13 @@ static bool ShapePlaceRun( UniscribeRun* run, int xStart, UTF16Ref text, Uniscri
 	glyphs   = allocator.glyphs  .Shrink( glyphs,   glyphCount );
 	visAttrs = allocator.visAttrs.Shrink( visAttrs, glyphCount );
 
-	if ( style.HasMissingGlyphs( run->font, glyphs ) )
+	if ( !forceMissingGlyphs && HasMissingGlyphs( run->font, glyphs, style ) )
+	{
+		allocator.logClusters.DiscardFrom( logClusters.begin() );
+		allocator.glyphs     .DiscardFrom( glyphs.begin() );
+		allocator.visAttrs   .DiscardFrom( visAttrs.begin() );
 		return false;
+	}
 
 	ArrayOf<int>     advanceWidths = allocator.advanceWidths.Alloc( glyphCount );
 	ArrayOf<GOFFSET> offsets       = allocator.offsets      .Alloc( glyphCount );
@@ -153,8 +172,22 @@ static bool ShapePlaceRun( UniscribeRun* run, int xStart, UTF16Ref text, Uniscri
 
 static void LayoutRun( UniscribeRun* run, int xStart, UTF16Ref text, UniscribeAllocator& allocator, TextStyle& style, HDC hdc )
 {
-	bool success = ShapePlaceRun( run, xStart, text, allocator, style, hdc );
-	Assert( success );
+	if ( ShapePlaceRun( run, xStart, text, allocator, style, hdc, false ) )
+		return;
+
+	run->font = 0;
+	while ( run->font < style.fonts.size() && !ShapePlaceRun( run, xStart, text, allocator, style, hdc, false ) )
+		++run->font;
+
+	if ( run->font == style.fonts.size() )
+	{
+		run->font = style.defaultFont;
+
+		ArrayOf<SCRIPT_ITEM> items = allocator.items.Allocated();
+
+		items[run->item].a.eScript = SCRIPT_UNDEFINED;
+		ShapePlaceRun( run, xStart, text, allocator, style, hdc, true );
+	}
 }
 
 static size_t EstimateLineWrap( UniscribeRun* run, int lineWidth, UTF16Ref text, UniscribeAllocator& allocator, int maxWidth )

@@ -87,6 +87,7 @@
     <ClCompile Include="SizedAutoArray.cpp" />
     <ClCompile Include="DocumentReader.cpp" />
     <ClCompile Include="GapBuffer.cpp" />
+    <ClCompile Include="TextFont.cpp" />
     <ClCompile Include="VisualPainter.cpp" />
     <ClCompile Include="TextStyle.cpp" />
     <ClCompile Include="VectorAllocator.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="Integers.h" />
     <ClInclude Include="Require.h" />
     <ClInclude Include="SizedAutoArray.h" />
+    <ClInclude Include="TextFont.h" />
     <ClInclude Include="VisualPainter.h" />
     <ClInclude Include="TextStyle.h" />
     <ClInclude Include="UString.h" />

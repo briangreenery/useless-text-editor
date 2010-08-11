@@ -3,36 +3,19 @@
 #ifndef TextStyle_h
 #define TextStyle_h
 
-#include "Integers.h"
-#include "UString.h"
-#include "ArrayOf.h"
-#include <Windows.h>
-#include <MLang.h>
-#include <usp10.h>
+#include "TextFont.h"
 #include <vector>
-
-class TextFont
-{
-public:
-	TextFont( HFONT _font, DWORD _codePages )
-		: font( _font )
-		, fontCache( 0 )
-		, codePages( _codePages )
-	{}
-
-	HFONT        font;
-	SCRIPT_CACHE fontCache;
-	DWORD        codePages;
-};
 
 class TextStyle
 {
 public:
 	TextStyle();
+	~TextStyle();
 
-	int FontFallback( HDC, int style, UTF16Ref );
-	bool HasMissingGlyphs( int style, ArrayOf<WORD> glyphs ) const;
+	size_t AddFont( LPCWSTR name );
+	void SetDefaultFont( size_t font );
 
+	int fontSize;
 	int lineHeight;
 	int avgCharWidth;
 	int tabSize;
@@ -40,10 +23,14 @@ public:
 	HBRUSH gutterBrush;
 	HBRUSH selectionBrush;
 
+	size_t defaultFont;
 	std::vector<TextFont> fonts;
 
 private:
-	IMLangFontLink2* fontLink;
+	void AddJapaneseFont();
+	void AddChineseFont();
+	void AddKoreanFont();
+	void AddFallbackFonts();
 };
 
 #endif

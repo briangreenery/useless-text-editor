@@ -36,7 +36,7 @@ void VisualPainter::SetOrigin( size_t textStart, LONG yStart )
 	SetWindowOrgEx( hdc, oldOrigin.x, oldOrigin.y - yStart, NULL );
 }
 
-void VisualPainter::SetFont( int font )
+void VisualPainter::SetFont( size_t font )
 {
 	if ( font == currentFont )
 		return;

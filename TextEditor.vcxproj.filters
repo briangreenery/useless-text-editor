@@ -22,14 +22,11 @@
     <Filter Include="TextStyle">
       <UniqueIdentifier>{9dfcb392-4b14-493f-a2e1-050ade9e56be}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TextView\Uniscribe">
-      <UniqueIdentifier>{edcf1d03-811e-43fe-9e55-62938956cd50}</UniqueIdentifier>
+    <Filter Include="TextView\Layout">
+      <UniqueIdentifier>{fed3814f-d4f6-42d9-9e80-eac207363ad6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TextView\Uniscribe\Layout">
-      <UniqueIdentifier>{8390d511-5c89-4f8d-9842-0b806af53924}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="TextView\Uniscribe\Display">
-      <UniqueIdentifier>{fc8e59fe-870e-4cd5-8b8a-811aaf717c20}</UniqueIdentifier>
+    <Filter Include="TextView\Display">
+      <UniqueIdentifier>{e7d3c358-29c2-4aca-af39-8583f9fa395a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -98,22 +95,25 @@
       <Filter>TextDocument</Filter>
     </ClCompile>
     <ClCompile Include="UniscribeAllocator.cpp">
-      <Filter>TextView\Uniscribe\Layout</Filter>
+      <Filter>TextView\Layout</Filter>
     </ClCompile>
     <ClCompile Include="UniscribeLayout.cpp">
-      <Filter>TextView\Uniscribe\Layout</Filter>
+      <Filter>TextView\Layout</Filter>
     </ClCompile>
     <ClCompile Include="UniscribeRunLoop.cpp">
-      <Filter>TextView\Uniscribe\Layout</Filter>
+      <Filter>TextView\Layout</Filter>
     </ClCompile>
     <ClCompile Include="UniscribeData.cpp">
-      <Filter>TextView\Uniscribe\Display</Filter>
+      <Filter>TextView\Display</Filter>
     </ClCompile>
     <ClCompile Include="UniscribeRun.cpp">
-      <Filter>TextView\Uniscribe\Display</Filter>
+      <Filter>TextView\Display</Filter>
     </ClCompile>
     <ClCompile Include="UniscribeLine.cpp">
-      <Filter>TextView\Uniscribe\Display</Filter>
+      <Filter>TextView\Display</Filter>
+    </ClCompile>
+    <ClCompile Include="TextFont.cpp">
+      <Filter>TextStyle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -198,23 +198,26 @@
     <ClInclude Include="DocumentCharIter.h">
       <Filter>TextDocument</Filter>
     </ClInclude>
+    <ClInclude Include="UniscribeRunLoop.h">
+      <Filter>TextView\Layout</Filter>
+    </ClInclude>
     <ClInclude Include="UniscribeAllocator.h">
-      <Filter>TextView\Uniscribe\Layout</Filter>
+      <Filter>TextView\Layout</Filter>
     </ClInclude>
     <ClInclude Include="UniscribeLayout.h">
-      <Filter>TextView\Uniscribe\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="UniscribeRunLoop.h">
-      <Filter>TextView\Uniscribe\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="UniscribeData.h">
-      <Filter>TextView\Uniscribe\Display</Filter>
-    </ClInclude>
-    <ClInclude Include="UniscribeRun.h">
-      <Filter>TextView\Uniscribe\Display</Filter>
+      <Filter>TextView\Layout</Filter>
     </ClInclude>
     <ClInclude Include="UniscribeLine.h">
-      <Filter>TextView\Uniscribe\Display</Filter>
+      <Filter>TextView\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeData.h">
+      <Filter>TextView\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeRun.h">
+      <Filter>TextView\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="TextFont.h">
+      <Filter>TextStyle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

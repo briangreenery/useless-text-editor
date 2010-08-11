@@ -16,7 +16,8 @@ struct UniscribeRun
 	size_t textCount;
 
 	int width;
-	int font;
+
+	size_t font;
 };
 
 #endif
