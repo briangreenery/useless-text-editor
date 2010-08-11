@@ -126,7 +126,7 @@ static bool ShapePlaceRun( UniscribeRun* run, int xStart, UTF16Ref text, Uniscri
 		switch ( result )
 		{
 		case E_PENDING:
-			SelectObject( shapingDC, style.fonts[run->font].font );
+			SelectObject( hdc, style.fonts[run->font].font );
 			shapingDC = hdc;
 			break;
 
