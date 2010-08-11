@@ -11,7 +11,6 @@
 class TextDocument;
 class TextSelection;
 class TextStyle;
-class LayoutEngine;
 
 class VisualDocument
 {
