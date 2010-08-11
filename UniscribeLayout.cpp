@@ -170,24 +170,75 @@ static bool ShapePlaceRun( UniscribeRun* run, int xStart, UTF16Ref text, Uniscri
 	return true;
 }
 
+struct EnumFontData
+{
+	EnumFontData( UniscribeRun* _run, int _xStart, UTF16Ref _text, UniscribeAllocator& _allocator, TextStyle& _style, HDC _hdc )
+		: run( _run )
+		, xStart( _xStart )
+		, text( _text )
+		, allocator( _allocator )
+		, style( _style )
+		, hdc( _hdc )
+		, deleteLastFont( false )
+	{}
+
+	UniscribeRun* run;
+	int xStart;
+	UTF16Ref text;
+	UniscribeAllocator& allocator;
+	TextStyle& style;
+	HDC hdc;
+	bool deleteLastFont;
+};
+
+int CALLBACK TryEveryFontProc( const LOGFONT* logFont, const TEXTMETRIC*, DWORD fontType, LPARAM lParam )
+{
+	if ( fontType != TRUETYPE_FONTTYPE )
+		return 1;
+
+	EnumFontData& data = *reinterpret_cast<EnumFontData*>( lParam );
+
+	if ( data.deleteLastFont )
+		data.style.DeleteLastFont();
+
+	data.run->font = data.style.AddFont( logFont->lfFaceName );
+	data.deleteLastFont = true;
+
+	if ( ShapePlaceRun( data.run, data.xStart, data.text, data.allocator, data.style, data.hdc, false ) )
+		return 0;
+
+	return 1;
+}
+
 static void LayoutRun( UniscribeRun* run, int xStart, UTF16Ref text, UniscribeAllocator& allocator, TextStyle& style, HDC hdc )
 {
 	if ( ShapePlaceRun( run, xStart, text, allocator, style, hdc, false ) )
 		return;
 
+	// Try to fallback with the fonts that we already have
 	run->font = 0;
 	while ( run->font < style.fonts.size() && !ShapePlaceRun( run, xStart, text, allocator, style, hdc, false ) )
 		++run->font;
 
-	if ( run->font == style.fonts.size() )
-	{
-		run->font = style.defaultFont;
+	if ( run->font < style.fonts.size() )
+		return;
 
-		ArrayOf<SCRIPT_ITEM> items = allocator.items.Allocated();
+	// Try to fallback on all fonts in the system
+	EnumFontData data( run, xStart, text, allocator, style, hdc );
+	LOGFONT logFont = {};
+	if ( EnumFontFamiliesEx( hdc, &logFont, TryEveryFontProc, reinterpret_cast<LPARAM>( &data ), 0 ) == 0 )
+		return;
 
-		items[run->item].a.eScript = SCRIPT_UNDEFINED;
-		ShapePlaceRun( run, xStart, text, allocator, style, hdc, true );
-	}
+	if ( data.deleteLastFont )
+		data.style.DeleteLastFont();
+
+	// We can't display this text with any font, just show missing glyphs
+	run->font = style.defaultFont;
+
+	ArrayOf<SCRIPT_ITEM> items = allocator.items.Allocated();
+
+	items[run->item].a.eScript = SCRIPT_UNDEFINED;
+	ShapePlaceRun( run, xStart, text, allocator, style, hdc, true );
 }
 
 static size_t EstimateLineWrap( UniscribeRun* run, int lineWidth, UTF16Ref text, UniscribeAllocator& allocator, int maxWidth )

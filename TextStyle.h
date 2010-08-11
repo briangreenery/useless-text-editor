@@ -15,6 +15,9 @@ public:
 	size_t AddFont( LPCWSTR name );
 	void SetDefaultFont( size_t font );
 
+	void SetLastFont( LPCWSTR name );
+	void DeleteLastFont();
+
 	int fontSize;
 	int lineHeight;
 	int avgCharWidth;

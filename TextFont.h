@@ -5,12 +5,14 @@
 
 #include <Windows.h>
 #include <usp10.h>
+#include <string>
 
 class TextFont
 {
 public:
-	TextFont( HFONT font, HDC hdc );
+	TextFont( LPCWSTR name, HFONT font, HDC hdc );
 
+	std::wstring          name;
 	HFONT                 font;
 	SCRIPT_CACHE          fontCache;
 	SCRIPT_FONTPROPERTIES fontProps;

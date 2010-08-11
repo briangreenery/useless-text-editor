@@ -10,7 +10,7 @@ namespace W = Windows;
 #undef max
 
 TextStyle::TextStyle()
-	: fontSize( 28 )
+	: fontSize( 10 )
 	, defaultFont( 0 )
 	, lineHeight( 0 )
 	, avgCharWidth( 0 )
@@ -55,31 +55,41 @@ void TextStyle::SetDefaultFont( size_t font )
 
 	avgCharWidth = tm.tmAveCharWidth;
 	tabSize = 4 * tm.tmAveCharWidth;
+	lineHeight = tm.tmHeight;
 }
 
 size_t TextStyle::AddFont( LPCWSTR name )
 {
+	// Returning an existing font will break the brute force fallback in UniscribeLayout.
+
 	HDC hdc = GetDC( NULL );
 
 	LOGFONT logFont = {};
 	logFont.lfHeight = -MulDiv( fontSize, GetDeviceCaps( hdc, LOGPIXELSY ), 72 );
 	wcscpy_s( logFont.lfFaceName, name );
 
-	HFONT font = CreateFontIndirect( &logFont );
-	if ( !font )
+	HFONT hfont = CreateFontIndirect( &logFont );
+	if ( !hfont )
+	{
+		ReleaseDC( NULL, hdc );
 		return defaultFont;
+	}
 
-	SelectObject( hdc, font );
-
-	TEXTMETRIC tm;
-	GetTextMetricsW( hdc, &tm );
-
-	lineHeight = std::max( lineHeight, int( tm.tmHeight ) );
-
-	fonts.push_back( TextFont( font, hdc ) );
+	SelectObject( hdc, hfont );
+	fonts.push_back( TextFont( name, hfont, hdc ) );
 	ReleaseDC( NULL, hdc );
 
 	return fonts.size() - 1;
+}
+
+void TextStyle::DeleteLastFont()
+{
+	if ( !fonts.empty() )
+	{
+		ScriptFreeCache( &fonts.back().fontCache );
+		DeleteObject( fonts.back().font );
+		fonts.pop_back();
+	}
 }
 
 void TextStyle::AddFallbackFonts()
