@@ -191,7 +191,7 @@ struct EnumFontData
 	bool deleteLastFont;
 };
 
-int CALLBACK TryEveryFontProc( const LOGFONT* logFont, const TEXTMETRIC*, DWORD fontType, LPARAM lParam )
+static int CALLBACK TryEveryFontProc( const LOGFONT* logFont, const TEXTMETRIC*, DWORD fontType, LPARAM lParam )
 {
 	if ( fontType != TRUETYPE_FONTTYPE )
 		return 1;
@@ -201,8 +201,9 @@ int CALLBACK TryEveryFontProc( const LOGFONT* logFont, const TEXTMETRIC*, DWORD 
 	if ( data.deleteLastFont )
 		data.style.DeleteLastFont();
 
+	size_t numFonts = data.style.fonts.size();
 	data.run->font = data.style.AddFont( logFont->lfFaceName );
-	data.deleteLastFont = true;
+	data.deleteLastFont = ( data.run->font == numFonts );
 
 	if ( ShapePlaceRun( data.run, data.xStart, data.text, data.allocator, data.style, data.hdc, false ) )
 		return 0;
@@ -223,7 +224,7 @@ static void LayoutRun( UniscribeRun* run, int xStart, UTF16Ref text, UniscribeAl
 	if ( run->font < style.fonts.size() )
 		return;
 
-	// Try to fallback on all fonts in the system
+	// Try to fallback on all truetype fonts in the system
 	EnumFontData data( run, xStart, text, allocator, style, hdc );
 	LOGFONT logFont = {};
 	if ( EnumFontFamiliesEx( hdc, &logFont, TryEveryFontProc, reinterpret_cast<LPARAM>( &data ), 0 ) == 0 )

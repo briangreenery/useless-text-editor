@@ -60,7 +60,9 @@ void TextStyle::SetDefaultFont( size_t font )
 
 size_t TextStyle::AddFont( LPCWSTR name )
 {
-	// Returning an existing font will break the brute force fallback in UniscribeLayout.
+	for ( size_t i = 0; i < fonts.size(); ++i )
+		if ( fonts[i].name == name )
+			return i;
 
 	HDC hdc = GetDC( NULL );
 
