@@ -1,8 +1,8 @@
-// LayoutAllocator.cpp
+// UniscribeAllocator.cpp
 
-#include "LayoutAllocator.h"
+#include "UniscribeAllocator.h"
 
-void LayoutAllocator::DiscardFrom( size_t textStart, size_t glyphStart )
+void UniscribeAllocator::DiscardFrom( size_t textStart, size_t glyphStart )
 {
 	logClusters  .DiscardFrom( textStart  );
 	glyphs       .DiscardFrom( glyphStart );
@@ -11,7 +11,7 @@ void LayoutAllocator::DiscardFrom( size_t textStart, size_t glyphStart )
 	offsets      .DiscardFrom( glyphStart );
 }
 
-void LayoutAllocator::DiscardAll()
+void UniscribeAllocator::DiscardAll()
 {
 	runs         .DiscardAll();
 	lines        .DiscardAll();

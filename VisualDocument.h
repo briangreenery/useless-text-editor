@@ -21,8 +21,8 @@ public:
 	void Draw( HDC hdc, RECT rect, TextSelection );
 
 	size_t LineCount() const;
-	size_t LineStart( LONG y ) const;
-	size_t LineEnd  ( LONG y ) const;
+	size_t LineStart( int y ) const;
+	size_t LineEnd  ( int y ) const;
 
 	int Height() const;
 
@@ -33,20 +33,19 @@ public:
 	void UpdateAll( HDC, int width );
 
 private:
-	void TextInserted( size_t start, size_t count );
-	void TextDeleted ( size_t start, size_t count );
+	void LayoutText( VisualBlockList::const_iterator, size_t start, size_t count, HDC hdc, int maxWidth );
 
 	struct BlockContaining_Result
 	{
 		size_t textStart;
-		LONG yStart;
+		int yStart;
 		VisualBlockList::const_iterator it;
 
 		const VisualBlock* operator->() const { return &*it; }
 	};
 
 	BlockContaining_Result BlockContaining( size_t pos ) const;
-	BlockContaining_Result BlockContaining( LONG y ) const;
+	BlockContaining_Result BlockContaining( int y ) const;
 
 	const TextDocument& m_doc;
 	TextStyle&          m_style;

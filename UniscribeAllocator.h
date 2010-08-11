@@ -1,15 +1,15 @@
-// LayoutAllocator.h
+// UniscribeAllocator.h
 
-#ifndef LayoutAllocator_h
-#define LayoutAllocator_h
+#ifndef UniscribeAllocator_h
+#define UniscribeAllocator_h
 
 #include "VectorAllocator.h"
 #include "VectorCache.h"
-#include "TextRun.h"
+#include "UniscribeRun.h"
 #include <windows.h>
 #include <usp10.h>
 
-class LayoutAllocator
+class UniscribeAllocator
 {
 public:
 	void DiscardFrom( size_t textStart, size_t glyphStart );
@@ -17,9 +17,9 @@ public:
 
 	static size_t EstimateGlyphCount( size_t textSize ) { return MulDiv( 3, textSize, 2 ) + 16; }
 
-	// Paragraph data
-	VectorAllocator<TextRun> runs;
-	VectorAllocator<size_t>  lines;
+	// Block data
+	VectorAllocator<UniscribeRun> runs;
+	VectorAllocator<size_t>       lines;
 
 	// ScriptItemize data
 	VectorAllocator<SCRIPT_ITEM> items;

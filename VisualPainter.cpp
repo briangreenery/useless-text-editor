@@ -15,7 +15,7 @@ VisualPainter::VisualPainter( HDC _hdc, TextStyle& _style, TextSelection _select
 	GetWindowOrgEx( hdc, &oldOrigin );
 
 	oldFont = SelectObject( hdc, style.fonts[0].font );
-	currentStyle = 0;
+	currentFont = 0;
 
 	oldBkMode = SetBkMode( hdc, TRANSPARENT );
 }
@@ -36,11 +36,11 @@ void VisualPainter::SetOrigin( size_t textStart, LONG yStart )
 	SetWindowOrgEx( hdc, oldOrigin.x, oldOrigin.y - yStart, NULL );
 }
 
-void VisualPainter::SetStyle( int textStyle )
+void VisualPainter::SetFont( int font )
 {
-	if ( textStyle == currentStyle )
+	if ( font == currentFont )
 		return;
 
-	SelectObject( hdc, style.fonts[textStyle].font );
-	currentStyle = textStyle;
+	SelectObject( hdc, style.fonts[font].font );
+	currentFont = font;
 }

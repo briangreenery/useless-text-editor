@@ -28,7 +28,6 @@ UTF16Ref DocumentReader::WeakRange( size_t textStart, size_t textCount ) const
 
 	size_t unitsRead = m_doc.Read( m_paragraphStart + textStart, textCount, buffer.begin() );
 
-	// Null termination makes it easier to look at things in the debugger
 	buffer[unitsRead] = UTF16::Unit( 0 );
 	return UTF16Ref( buffer.begin(), unitsRead );
 }

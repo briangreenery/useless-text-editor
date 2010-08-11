@@ -3,12 +3,10 @@
 #ifndef VisualBlock_h
 #define VisualBlock_h
 
-#include "LayoutData.h"
-#include "VisualLine.h"
+#include "UniscribeLine.h"
 #include <vector>
 #include <list>
 
-class LayoutAllocator;
 class VisualPainter;
 class TextStyle;
 
@@ -16,29 +14,28 @@ class VisualBlock
 {
 public:
 	VisualBlock( size_t length );
-	VisualBlock( size_t length, LayoutAllocator&, ArrayOf<SCRIPT_ITEM> );
+	VisualBlock( size_t length, std::vector<UniscribeLine>& );
 
 	void Draw( VisualPainter&, RECT ) const;
 
 	size_t LineCount() const;
 	size_t LineContaining( size_t ) const;
-	size_t LineStart( LONG y, TextStyle& ) const;
-	size_t LineEnd  ( LONG y, TextStyle& ) const;
+	size_t LineStart( int y, TextStyle& ) const;
+	size_t LineEnd  ( int y, TextStyle& ) const;
 
 	POINT PointFromChar( size_t, bool advancing, TextStyle& ) const;
 	size_t CharFromPoint( POINT*, TextStyle& ) const;
 
 	size_t Length() const;
-	LONG Height( TextStyle& ) const;
+	int Height( TextStyle& ) const;
 
 	bool EndsWithNewline() const;
 
 private:
-	void DrawSelection( const VisualLine&, VisualPainter&, RECT ) const;
+	void DrawSelection( const UniscribeLine&, VisualPainter&, RECT ) const;
 
 	size_t m_length;
-	LayoutData m_layout;
-	std::vector<VisualLine> m_lines;
+	std::vector<UniscribeLine> m_lines;
 };
 
 typedef std::list<VisualBlock> VisualBlockList;

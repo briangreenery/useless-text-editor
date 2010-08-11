@@ -19,11 +19,17 @@
     <Filter Include="Lexer">
       <UniqueIdentifier>{01e98e77-53bd-4c5a-8737-e385986223a2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Layout">
-      <UniqueIdentifier>{edcf1d03-811e-43fe-9e55-62938956cd50}</UniqueIdentifier>
-    </Filter>
     <Filter Include="TextStyle">
       <UniqueIdentifier>{9dfcb392-4b14-493f-a2e1-050ade9e56be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TextView\Uniscribe">
+      <UniqueIdentifier>{edcf1d03-811e-43fe-9e55-62938956cd50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TextView\Uniscribe\Layout">
+      <UniqueIdentifier>{8390d511-5c89-4f8d-9842-0b806af53924}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TextView\Uniscribe\Display">
+      <UniqueIdentifier>{fc8e59fe-870e-4cd5-8b8a-811aaf717c20}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -32,9 +38,6 @@
     </ClCompile>
     <ClCompile Include="SizedAutoArray.cpp">
       <Filter>Universe</Filter>
-    </ClCompile>
-    <ClCompile Include="DocumentReader.cpp">
-      <Filter>Buffer</Filter>
     </ClCompile>
     <ClCompile Include="GapBuffer.cpp">
       <Filter>Buffer</Filter>
@@ -52,9 +55,6 @@
       <Filter>TextView</Filter>
     </ClCompile>
     <ClCompile Include="TextViewMetrics.cpp">
-      <Filter>TextView</Filter>
-    </ClCompile>
-    <ClCompile Include="VisualLine.cpp">
       <Filter>TextView</Filter>
     </ClCompile>
     <ClCompile Include="TextEdit.cpp">
@@ -75,25 +75,7 @@
     <ClCompile Include="NextRelevanceToken.cpp">
       <Filter>Lexer</Filter>
     </ClCompile>
-    <ClCompile Include="LayoutAllocator.cpp">
-      <Filter>Layout</Filter>
-    </ClCompile>
-    <ClCompile Include="LayoutData.cpp">
-      <Filter>Layout</Filter>
-    </ClCompile>
-    <ClCompile Include="LayoutEngine.cpp">
-      <Filter>Layout</Filter>
-    </ClCompile>
-    <ClCompile Include="TextRun.cpp">
-      <Filter>Layout</Filter>
-    </ClCompile>
-    <ClCompile Include="TextRunLoop.cpp">
-      <Filter>Layout</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="DocumentCharIter.cpp">
-      <Filter>Buffer</Filter>
-    </ClCompile>
     <ClCompile Include="VisualBlock.cpp">
       <Filter>TextView</Filter>
     </ClCompile>
@@ -108,6 +90,30 @@
     </ClCompile>
     <ClCompile Include="VisualDocument.cpp">
       <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="DocumentCharIter.cpp">
+      <Filter>TextDocument</Filter>
+    </ClCompile>
+    <ClCompile Include="DocumentReader.cpp">
+      <Filter>TextDocument</Filter>
+    </ClCompile>
+    <ClCompile Include="UniscribeAllocator.cpp">
+      <Filter>TextView\Uniscribe\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="UniscribeLayout.cpp">
+      <Filter>TextView\Uniscribe\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="UniscribeRunLoop.cpp">
+      <Filter>TextView\Uniscribe\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="UniscribeData.cpp">
+      <Filter>TextView\Uniscribe\Display</Filter>
+    </ClCompile>
+    <ClCompile Include="UniscribeRun.cpp">
+      <Filter>TextView\Uniscribe\Display</Filter>
+    </ClCompile>
+    <ClCompile Include="UniscribeLine.cpp">
+      <Filter>TextView\Uniscribe\Display</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -135,9 +141,6 @@
     <ClInclude Include="UString.h">
       <Filter>Universe</Filter>
     </ClInclude>
-    <ClInclude Include="DocumentReader.h">
-      <Filter>Buffer</Filter>
-    </ClInclude>
     <ClInclude Include="GapBuffer.h">
       <Filter>Buffer</Filter>
     </ClInclude>
@@ -154,9 +157,6 @@
       <Filter>TextView</Filter>
     </ClInclude>
     <ClInclude Include="TextViewMetrics.h">
-      <Filter>TextView</Filter>
-    </ClInclude>
-    <ClInclude Include="VisualLine.h">
       <Filter>TextView</Filter>
     </ClInclude>
     <ClInclude Include="TextEdit.h">
@@ -177,24 +177,6 @@
     <ClInclude Include="NextRelevanceToken.h">
       <Filter>Lexer</Filter>
     </ClInclude>
-    <ClInclude Include="LayoutAllocator.h">
-      <Filter>Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="LayoutData.h">
-      <Filter>Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="LayoutEngine.h">
-      <Filter>Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="TextRun.h">
-      <Filter>Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="TextRunLoop.h">
-      <Filter>Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="DocumentCharIter.h">
-      <Filter>Buffer</Filter>
-    </ClInclude>
     <ClInclude Include="VisualBlock.h">
       <Filter>TextView</Filter>
     </ClInclude>
@@ -209,6 +191,30 @@
     </ClInclude>
     <ClInclude Include="VisualDocument.h">
       <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentReader.h">
+      <Filter>TextDocument</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentCharIter.h">
+      <Filter>TextDocument</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeAllocator.h">
+      <Filter>TextView\Uniscribe\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeLayout.h">
+      <Filter>TextView\Uniscribe\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeRunLoop.h">
+      <Filter>TextView\Uniscribe\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeData.h">
+      <Filter>TextView\Uniscribe\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeRun.h">
+      <Filter>TextView\Uniscribe\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeLine.h">
+      <Filter>TextView\Uniscribe\Display</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

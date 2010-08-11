@@ -1,24 +1,25 @@
-// LayoutData.h
+// UniscibeData.h
 
-#ifndef LayoutData_h
-#define LayoutData_h
+#ifndef UniscibeData_h
+#define UniscibeData_h
 
-#include "LayoutAllocator.h"
+#include "UniscribeAllocator.h"
+#include <memory>
 
-class LayoutData
+class UniscribeData
 {
 public:
-	void Copy( LayoutAllocator&, ArrayOf<SCRIPT_ITEM> );
-	void Reset();
+	UniscribeData( UniscribeAllocator& );
 
 	SizedAutoArray<SCRIPT_ITEM>    items;
-	SizedAutoArray<TextRun>        runs;
-
+	SizedAutoArray<UniscribeRun>   runs;
 	SizedAutoArray<WORD>           logClusters;
 	SizedAutoArray<WORD>           glyphs;
 	SizedAutoArray<SCRIPT_VISATTR> visAttrs;
 	SizedAutoArray<int>            advanceWidths;
 	SizedAutoArray<GOFFSET>        offsets;
 };
+
+typedef std::shared_ptr<UniscribeData> UniscribeDataPtr;
 
 #endif

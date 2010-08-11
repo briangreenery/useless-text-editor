@@ -96,18 +96,18 @@
     <ClCompile Include="TextSelection.cpp" />
     <ClCompile Include="TextView.cpp" />
     <ClCompile Include="TextViewMetrics.cpp" />
-    <ClCompile Include="VisualLine.cpp" />
+    <ClCompile Include="UniscribeLine.cpp" />
     <ClCompile Include="TextEdit.cpp" />
     <ClCompile Include="TextChange.cpp" />
     <ClCompile Include="TextDocument.cpp" />
     <ClCompile Include="FontCollection.cpp" />
     <ClCompile Include="LexerState.cpp" />
     <ClCompile Include="NextRelevanceToken.cpp" />
-    <ClCompile Include="LayoutAllocator.cpp" />
-    <ClCompile Include="LayoutData.cpp" />
-    <ClCompile Include="LayoutEngine.cpp" />
-    <ClCompile Include="TextRun.cpp" />
-    <ClCompile Include="TextRunLoop.cpp" />
+    <ClCompile Include="UniscribeAllocator.cpp" />
+    <ClCompile Include="UniscribeData.cpp" />
+    <ClCompile Include="UniscribeLayout.cpp" />
+    <ClCompile Include="UniscribeRun.cpp" />
+    <ClCompile Include="UniscribeRunLoop.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="VisualSelection.cpp" />
   </ItemGroup>
@@ -132,18 +132,18 @@
     <ClInclude Include="TextSelection.h" />
     <ClInclude Include="TextView.h" />
     <ClInclude Include="TextViewMetrics.h" />
-    <ClInclude Include="VisualLine.h" />
+    <ClInclude Include="UniscribeLine.h" />
     <ClInclude Include="TextEdit.h" />
     <ClInclude Include="TextChange.h" />
     <ClInclude Include="TextDocument.h" />
     <ClInclude Include="FontCollection.h" />
     <ClInclude Include="LexerState.h" />
     <ClInclude Include="NextRelevanceToken.h" />
-    <ClInclude Include="LayoutAllocator.h" />
-    <ClInclude Include="LayoutData.h" />
-    <ClInclude Include="LayoutEngine.h" />
-    <ClInclude Include="TextRun.h" />
-    <ClInclude Include="TextRunLoop.h" />
+    <ClInclude Include="UniscribeAllocator.h" />
+    <ClInclude Include="UniscribeData.h" />
+    <ClInclude Include="UniscribeLayout.h" />
+    <ClInclude Include="UniscribeRun.h" />
+    <ClInclude Include="UniscribeRunLoop.h" />
     <ClInclude Include="VisualSelection.h" />
   </ItemGroup>
   <ItemGroup>

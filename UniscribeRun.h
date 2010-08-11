@@ -1,11 +1,11 @@
-// TextRun.h
+// UniscribeRun.h
 
-#ifndef TextRun_h
-#define TextRun_h
+#ifndef UniscribeRun_h
+#define UniscribeRun_h
 
 #include "Integers.h"
 
-struct TextRun
+struct UniscribeRun
 {
 	size_t item;
 
@@ -16,7 +16,7 @@ struct TextRun
 	size_t textCount;
 
 	int width;
-	int style;
+	int font;
 };
 
 #endif

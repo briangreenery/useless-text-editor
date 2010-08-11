@@ -33,9 +33,9 @@ public:
 	int FontFallback( HDC, int style, UTF16Ref );
 	bool HasMissingGlyphs( int style, ArrayOf<WORD> glyphs ) const;
 
-	LONG lineHeight;
-	LONG avgCharWidth;
-	LONG tabSize;
+	int lineHeight;
+	int avgCharWidth;
+	int tabSize;
 
 	HBRUSH gutterBrush;
 	HBRUSH selectionBrush;
