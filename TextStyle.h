@@ -27,9 +27,6 @@ public:
 	std::vector<TextFont> fonts;
 
 private:
-	void AddJapaneseFont();
-	void AddChineseFont();
-	void AddKoreanFont();
 	void AddFallbackFonts();
 };
 

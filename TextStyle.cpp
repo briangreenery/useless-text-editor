@@ -10,7 +10,7 @@ namespace W = Windows;
 #undef max
 
 TextStyle::TextStyle()
-	: fontSize( 20 )
+	: fontSize( 28 )
 	, defaultFont( 0 )
 	, lineHeight( 0 )
 	, avgCharWidth( 0 )
@@ -82,43 +82,26 @@ size_t TextStyle::AddFont( LPCWSTR name )
 	return fonts.size() - 1;
 }
 
-void TextStyle::AddJapaneseFont()
-{
-	if ( AddFont( L"Meiryo" ) != defaultFont )
-		return;
-
-	AddFont( L"SimSun" );
-}
-
-void TextStyle::AddChineseFont()
-{
-	if ( AddFont( L"Microsoft JhengHei" ) != defaultFont
-	  || AddFont( L"Microsoft YaHei" ) != defaultFont )
-		return;
-
-	AddFont( L"SimSun" );
-}
-
-void TextStyle::AddKoreanFont()
-{
-	if ( AddFont( L"Malgun Gothic" ) != defaultFont )
-		return;
-
-	AddFont( L"Batang" );
-}
-
-#include <MLang.h>
-
 void TextStyle::AddFallbackFonts()
 {
-	IMLangFontLink2* fontLink = 0;
-	CoCreateInstance( CLSID_CMultiLanguage, NULL, CLSCTX_ALL, IID_IMLangFontLink2, reinterpret_cast<void**>( &fontLink ) );
+	// Japanese
+	AddFont( L"Meiryo" );
 
-	UINT count = 32;
-	SCRIPTFONTINFO info[32];
-	fontLink->GetScriptFontInfo( sidHan, SCRIPTCONTF_PROPORTIONAL_FONT, &count, info );
+	// Chinese
+	AddFont( L"Microsoft JhengHei" );
+	AddFont( L"Microsoft YaHei" );
 
-	AddJapaneseFont();
-	AddChineseFont();
-	AddKoreanFont();
+	// Korean
+	AddFont( L"Malgun Gothic" );
+
+	// Hebrew
+	AddFont( L"Gisha" );
+	
+	// Thai
+	AddFont( L"Leelawadee" );
+
+	// Last ditch
+	AddFont( L"SimSun" );
+	AddFont( L"Batang" );
+	AddFont( L"Arial" );
 }
