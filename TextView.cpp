@@ -315,8 +315,8 @@ void TextView::Delete( bool wholeWord )
 			return;
 
 		m_selection.end = wholeWord
-		                     ? m_doc.NextWordStop( m_selection.end + 1 )
-		                     : m_doc.NextCharStop( m_selection.end + 1 );
+		                     ? m_doc.NextWordStop( m_selection.end )
+		                     : m_doc.NextCharStop( m_selection.end );
 	}
 
 	Clear( true );
