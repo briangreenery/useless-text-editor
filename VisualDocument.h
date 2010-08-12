@@ -3,7 +3,7 @@
 #ifndef VisualDocument_h
 #define VisualDocument_h
 
-#include "VisualBlock.h"
+#include "TextBlock.h"
 #include "TextChange.h"
 #include <Windows.h>
 #include <list>
@@ -32,15 +32,15 @@ public:
 	void UpdateAll( HDC, int width );
 
 private:
-	void LayoutText( VisualBlockList::const_iterator, size_t start, size_t count, HDC hdc, int maxWidth );
+	void LayoutText( TextBlockList::const_iterator, size_t start, size_t count, HDC hdc, int maxWidth );
 
 	struct BlockContaining_Result
 	{
 		size_t textStart;
 		int yStart;
-		VisualBlockList::const_iterator it;
+		TextBlockList::const_iterator it;
 
-		const VisualBlock* operator->() const { return &*it; }
+		const TextBlock* operator->() const { return it->get(); }
 	};
 
 	BlockContaining_Result BlockContaining( size_t pos ) const;
@@ -49,7 +49,7 @@ private:
 	const TextDocument& m_doc;
 	TextStyle&          m_style;
 	size_t              m_lineCount;
-	VisualBlockList     m_blocks;
+	TextBlockList       m_blocks;
 };
 
 #endif

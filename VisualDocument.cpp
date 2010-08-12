@@ -6,6 +6,8 @@
 #include "TextSelection.h"
 #include "VisualPainter.h"
 #include "UniscribeLayout.h"
+#include "SimpleLayout.h"
+#include "EmptyTextBlock.h"
 #include "Assert.h"
 
 #undef min
@@ -16,7 +18,7 @@ VisualDocument::VisualDocument( const TextDocument& doc, TextStyle& style )
 	, m_style( style )
 	, m_lineCount( 1 )
 {
-	m_blocks.push_back( VisualBlock( 0 ) );
+	m_blocks.push_back( TextBlockPtr( new EmptyTextBlock( false, m_style ) ) );
 }
 
 void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection )
@@ -33,10 +35,10 @@ void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection )
 
 		block->Draw( painter, rect );
 
-		rect.bottom -= block->Height( m_style ) - rect.top;
+		rect.bottom -= block->Height() - rect.top;
 		rect.top = 0;
 
-		block.yStart += block->Height( m_style );
+		block.yStart += block->Height();
 		block.textStart += block->Length();
 		++block.it;
 	}
@@ -74,8 +76,11 @@ void VisualDocument::Update( HDC hdc, int maxWidth, TextChange change )
 	LayoutText( block.it, start, count, hdc, maxWidth );
 }
 
-void VisualDocument::LayoutText( VisualBlockList::const_iterator it, size_t start, size_t count, HDC hdc, int maxWidth )
+void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start, size_t count, HDC hdc, int maxWidth )
 {
+	if ( maxWidth != 0 )
+		maxWidth = std::max( maxWidth, m_style.avgCharWidth * 10 );
+
 	DocumentReader reader( m_doc );
 
 	for ( size_t end = start + count; start < end; )
@@ -89,29 +94,29 @@ void VisualDocument::LayoutText( VisualBlockList::const_iterator it, size_t star
 		if ( lineEnd == start )
 		{
 			m_lineCount++;
-			m_blocks.insert( it, VisualBlock( 1 ) );
+			m_blocks.insert( it, TextBlockPtr( new EmptyTextBlock( true, m_style ) ) );
 			start++;
 		}
 		else
 		{
 			UTF16Ref text = reader.StrictRange( start, lineEnd - start );
+			TextBlockPtr block;
 
-			std::vector<UniscribeLine> lines = UniscribeLayoutParagraph( text, m_style, hdc, maxWidth );
-			m_lineCount += lines.size();
+			//if ( ScriptIsComplex( text.begin(), text.size(), SIC_COMPLEX ) == S_OK )
+				block = UniscribeLayoutParagraph( text, m_style, hdc, maxWidth, lineEnd != end );
+			//else
+				//block = SimpleLayoutParagraph( text, m_style, hdc, maxWidth, lineEnd != end );
 
-			size_t length = lineEnd - start;
-			if ( lineEnd != end )
-				length++;
-
-			m_blocks.insert( it, VisualBlock( length, lines ) );
+			m_lineCount += block->LineCount();
+			m_blocks.insert( it, std::move( block ) );
 			start = lineEnd + 1;
 		}
 	}
 
-	if ( it == m_blocks.end() && m_blocks.empty() || m_blocks.back().EndsWithNewline() )
+	if ( it == m_blocks.end() && m_blocks.empty() || m_blocks.back()->EndsWithNewline() )
 	{
 		m_lineCount++;
-		m_blocks.push_back( VisualBlock( 0 ) );
+		m_blocks.push_back( TextBlockPtr( new EmptyTextBlock( false, m_style ) ) );
 	}
 }
 
@@ -125,7 +130,7 @@ size_t VisualDocument::LineStart( int y ) const
 	BlockContaining_Result block = BlockContaining( y );
 	Assert( block.it != m_blocks.end() );
 
-	return block.textStart + block->LineStart( y - block.yStart, m_style );
+	return block.textStart + block->LineStart( y - block.yStart );
 }
 
 size_t VisualDocument::LineEnd( int y ) const
@@ -133,7 +138,7 @@ size_t VisualDocument::LineEnd( int y ) const
 	BlockContaining_Result block = BlockContaining( y );
 	Assert( block.it != m_blocks.end() );
 
-	return block.textStart + block->LineEnd( y - block.yStart, m_style );
+	return block.textStart + block->LineEnd( y - block.yStart );
 }
 
 POINT VisualDocument::PointFromChar( size_t pos, bool advancing ) const
@@ -141,7 +146,7 @@ POINT VisualDocument::PointFromChar( size_t pos, bool advancing ) const
 	BlockContaining_Result block = BlockContaining( pos );
 	Assert( block.it != m_blocks.end() );
 
-	POINT result = block->PointFromChar( pos - block.textStart, advancing, m_style );
+	POINT result = block->PointFromChar( pos - block.textStart, advancing );
 	result.y += block.yStart;
 
 	return result;
@@ -159,11 +164,11 @@ size_t VisualDocument::CharFromPoint( POINT* point ) const
 
 		--block.it;
 		block.textStart -= block->Length();
-		block.yStart    -= block->Height( m_style );
+		block.yStart    -= block->Height();
 	}
 
 	point->y -= block.yStart;
-	size_t result = block.textStart + block->CharFromPoint( point, m_style );
+	size_t result = block.textStart + block->CharFromPoint( point );
 	point->y += block.yStart;
 
 	return result;
@@ -187,12 +192,12 @@ VisualDocument::BlockContaining_Result VisualDocument::BlockContaining( size_t p
 			return result;
 
 		result.textStart += result->Length();
-		result.yStart    += result->Height( m_style );
+		result.yStart    += result->Height();
 	}
 
 	--result.it;
 	result.textStart -= result->Length();
-	result.yStart    -= result->Height( m_style );
+	result.yStart    -= result->Height();
 
 	return result;
 }
@@ -206,11 +211,11 @@ VisualDocument::BlockContaining_Result VisualDocument::BlockContaining( int y ) 
 
 	for ( result.it = m_blocks.begin(); result.it != m_blocks.end(); ++result.it )
 	{
-		if ( y < result.yStart + result->Height( m_style ) )
+		if ( y < result.yStart + result->Height() )
 			return result;
 
 		result.textStart += result->Length();
-		result.yStart    += result->Height( m_style );
+		result.yStart    += result->Height();
 	}
 
 	return result;

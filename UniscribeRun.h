@@ -3,8 +3,6 @@
 #ifndef UniscribeRun_h
 #define UniscribeRun_h
 
-#include "Integers.h"
-
 struct UniscribeRun
 {
 	size_t item;

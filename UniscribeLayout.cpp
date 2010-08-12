@@ -2,7 +2,7 @@
 
 #include "UniscribeLayout.h"
 #include "UniscribeRunLoop.h"
-#include "UniscribeData.h"
+#include "UniscribeTextBlock.h"
 #include "TextStyle.h"
 #include "Error.h"
 
@@ -51,13 +51,8 @@ static void Itemize( UTF16Ref text, UniscribeAllocator& allocator )
 
 static bool HasMissingGlyphs( size_t font, ArrayOf<WORD> glyphs, TextStyle& style )
 {
-	const SCRIPT_FONTPROPERTIES& props = style.fonts[font].fontProps;
-
-	for ( WORD* it = glyphs.begin(); it != glyphs.end(); ++it )
-		if ( *it == props.wgDefault || *it == props.wgInvalid )
-			return true;
-
-	return false;
+	WORD missingGlyph = style.fonts[font].fontProps.wgDefault;
+	return std::find( glyphs.begin(), glyphs.end(), missingGlyph ) != glyphs.end();
 }
 
 static bool ShapePlaceRun( UniscribeRun* run, int xStart, UTF16Ref text, UniscribeAllocator& allocator, TextStyle& style, HDC hdc, bool forceMissingGlyphs )
@@ -375,32 +370,9 @@ static size_t WrapLine( UniscribeRun* run, size_t lineStart, int lineWidth, UTF1
 	return lineEnd;
 }
 
-static std::vector<UniscribeLine> MakeLines( ArrayOf<size_t> lines, const UniscribeDataPtr& data )
+TextBlockPtr UniscribeLayoutParagraph( UTF16Ref text, TextStyle& style, HDC hdc, int maxWidth, bool endsWithNewline )
 {
-	std::vector<UniscribeLine> result;
-	result.reserve( lines.size() );
-
-	UniscribeRun* runs = data->runs.begin();
-
-	size_t lastEnd = 0;
-
-	for ( size_t* it = lines.begin(); it != lines.end(); ++it )
-	{
-		UniscribeRun* runStart = runs + lastEnd;
-		UniscribeRun* runEnd   = runs + *it;
-
-		result.push_back( UniscribeLine( ArrayOf<UniscribeRun>( runStart, runEnd ), data ) );
-
-		lastEnd = *it;
-	}
-
-	return result;
-}
-
-std::vector<UniscribeLine> UniscribeLayoutParagraph( UTF16Ref text, TextStyle& style, HDC hdc, int maxWidth )
-{
-	if ( maxWidth != 0 )
-		maxWidth = std::max( maxWidth, style.avgCharWidth * 10 );
+	Assert( !text.empty() );
 
 	UniscribeAllocator allocator;
 
@@ -434,5 +406,5 @@ std::vector<UniscribeLine> UniscribeLayoutParagraph( UTF16Ref text, TextStyle& s
 	if ( lines.empty() || runs.size() > lines[lines.size() - 1] )
 		allocator.lines.PushBack( runs.size() );
 
-	return MakeLines( allocator.lines.Allocated(), UniscribeDataPtr( new UniscribeData( allocator ) ) );
+	return TextBlockPtr( new UniscribeTextBlock( allocator, style, endsWithNewline ) );
 }

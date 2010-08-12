@@ -7,6 +7,7 @@
 #include "ArrayOf.h"
 #include "Assert.h"
 #include <algorithm>
+#include <vector>
 
 template < class T >
 class VectorAllocator
@@ -17,7 +18,7 @@ public:
 	{}
 
 	void Reset( size_t );
-	SizedAutoArray<T> Finish();
+	std::vector<T> Finish();
 
 	ArrayOf<T> Allocated() const;
 
@@ -49,16 +50,14 @@ void VectorAllocator<T>::Reset( size_t initialSize )
 }
 
 template < class T >
-SizedAutoArray<T> VectorAllocator<T>::Finish()
+std::vector<T> VectorAllocator<T>::Finish()
 {
-	if ( m_freeStart == m_buffer.begin() )
-		return SizedAutoArray<T>();
+	T* start = m_buffer.begin();
+	T* end   = m_freeStart;
 
-	SizedAutoArray<T> result = CreateArray<T>( m_freeStart - m_buffer.begin() );
-	std::copy( m_buffer.begin(), m_freeStart, result.begin() );
 	m_freeStart = m_buffer.begin();
 
-	return result;
+	return std::vector<T>( start, end );
 }
 
 template < class T >
