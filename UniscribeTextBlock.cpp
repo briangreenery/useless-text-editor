@@ -142,16 +142,8 @@ POINT UniscribeTextBlock::PointFromChar( size_t pos, bool advancing ) const
 	size_t line = LineContaining( pos );
 	Assert( line < m_lines.size() );
 
-	if ( line < m_lines.size() )
-	{
-		result.x = CPtoX( LineRuns( line ), pos, trailingEdge );
-		result.y = line * m_style.lineHeight;
-	}
-	else
-	{
-		result.x = 0;
-		result.y = 0;
-	}
+	result.x = CPtoX( LineRuns( line ), pos, trailingEdge );
+	result.y = line * m_style.lineHeight;
 
 	return result;
 }
