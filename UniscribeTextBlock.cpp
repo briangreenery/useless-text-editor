@@ -206,7 +206,7 @@ ArrayOf<const UniscribeRun> UniscribeTextBlock::LineRuns( size_t line ) const
 	Assert( line < m_lines.size() );
 
 	const UniscribeRun* runStart = &m_runs.front() + ( line > 0 ? m_lines[line - 1] : 0 );
-	return ArrayOf<const UniscribeRun>( runStart, runStart + m_lines[line] );
+	return ArrayOf<const UniscribeRun>( runStart, &m_runs.front() + m_lines[line] );
 }
 
 size_t UniscribeTextBlock::TextStart( size_t line ) const
