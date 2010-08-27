@@ -13,8 +13,8 @@ class UniscribeRunLoop
 public:
 	UniscribeRunLoop( UTF16Ref, UniscribeAllocator& );
 
-	UniscribeRun* NextRun();
 	bool Unfinished() const;
+	UniscribeRun* NextRun();
 	void NewLine();
 
 private:

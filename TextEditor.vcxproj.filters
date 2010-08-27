@@ -22,11 +22,11 @@
     <Filter Include="TextStyle">
       <UniqueIdentifier>{9dfcb392-4b14-493f-a2e1-050ade9e56be}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TextView\Layout">
-      <UniqueIdentifier>{fed3814f-d4f6-42d9-9e80-eac207363ad6}</UniqueIdentifier>
+    <Filter Include="TextView\Simple">
+      <UniqueIdentifier>{442a9c44-af1c-4bdc-b9d7-8ee5b13108f5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TextView\Display">
-      <UniqueIdentifier>{e7d3c358-29c2-4aca-af39-8583f9fa395a}</UniqueIdentifier>
+    <Filter Include="TextView\Uniscribe">
+      <UniqueIdentifier>{cd860aa2-4fc4-44f3-b500-46f7271c0579}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -46,12 +46,6 @@
       <Filter>Buffer</Filter>
     </ClCompile>
     <ClCompile Include="TextSelection.cpp">
-      <Filter>TextView</Filter>
-    </ClCompile>
-    <ClCompile Include="TextView.cpp">
-      <Filter>TextView</Filter>
-    </ClCompile>
-    <ClCompile Include="TextViewMetrics.cpp">
       <Filter>TextView</Filter>
     </ClCompile>
     <ClCompile Include="TextEdit.cpp">
@@ -91,41 +85,50 @@
     <ClCompile Include="DocumentReader.cpp">
       <Filter>TextDocument</Filter>
     </ClCompile>
-    <ClCompile Include="UniscribeAllocator.cpp">
-      <Filter>TextView\Layout</Filter>
-    </ClCompile>
-    <ClCompile Include="UniscribeLayout.cpp">
-      <Filter>TextView\Layout</Filter>
-    </ClCompile>
-    <ClCompile Include="UniscribeRunLoop.cpp">
-      <Filter>TextView\Layout</Filter>
-    </ClCompile>
-    <ClCompile Include="UniscribeRun.cpp">
-      <Filter>TextView\Display</Filter>
-    </ClCompile>
     <ClCompile Include="TextFont.cpp">
       <Filter>TextStyle</Filter>
     </ClCompile>
+    <ClCompile Include="UniscribeAllocator.cpp">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClCompile>
+    <ClCompile Include="UniscribeLayout.cpp">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClCompile>
+    <ClCompile Include="UniscribeRunLoop.cpp">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClCompile>
+    <ClCompile Include="UniscribeRun.cpp">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClCompile>
     <ClCompile Include="UniscribeTextBlock.cpp">
-      <Filter>TextView\Display</Filter>
-    </ClCompile>
-    <ClCompile Include="TextBlock.cpp">
-      <Filter>TextView\Display</Filter>
-    </ClCompile>
-    <ClCompile Include="SimpleLayout.cpp">
-      <Filter>TextView\Layout</Filter>
-    </ClCompile>
-    <ClCompile Include="SimpleRun.cpp">
-      <Filter>TextView\Display</Filter>
+      <Filter>TextView\Uniscribe</Filter>
     </ClCompile>
     <ClCompile Include="SimpleTextBlock.cpp">
-      <Filter>TextView\Display</Filter>
+      <Filter>TextView\Simple</Filter>
     </ClCompile>
-    <ClCompile Include="SimpleRunLoop.cpp">
-      <Filter>TextView\Layout</Filter>
+    <ClCompile Include="SimpleLayout.cpp">
+      <Filter>TextView\Simple</Filter>
     </ClCompile>
     <ClCompile Include="EmptyTextBlock.cpp">
-      <Filter>TextView\Display</Filter>
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="TextBlock.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="TextView.cpp">
+      <Filter>TextEdit</Filter>
+    </ClCompile>
+    <ClCompile Include="TextViewMetrics.cpp">
+      <Filter>TextEdit</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleLayoutData.cpp">
+      <Filter>TextView\Simple</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleTextRun.cpp">
+      <Filter>TextView\Simple</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleTextRunLoop.cpp">
+      <Filter>TextView\Simple</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -165,12 +168,6 @@
     <ClInclude Include="TextSelection.h">
       <Filter>TextView</Filter>
     </ClInclude>
-    <ClInclude Include="TextView.h">
-      <Filter>TextView</Filter>
-    </ClInclude>
-    <ClInclude Include="TextViewMetrics.h">
-      <Filter>TextView</Filter>
-    </ClInclude>
     <ClInclude Include="TextEdit.h">
       <Filter>TextEdit</Filter>
     </ClInclude>
@@ -207,41 +204,50 @@
     <ClInclude Include="DocumentCharIter.h">
       <Filter>TextDocument</Filter>
     </ClInclude>
-    <ClInclude Include="UniscribeRunLoop.h">
-      <Filter>TextView\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="UniscribeAllocator.h">
-      <Filter>TextView\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="UniscribeLayout.h">
-      <Filter>TextView\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="UniscribeRun.h">
-      <Filter>TextView\Display</Filter>
-    </ClInclude>
     <ClInclude Include="TextFont.h">
       <Filter>TextStyle</Filter>
     </ClInclude>
+    <ClInclude Include="UniscribeRunLoop.h">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeAllocator.h">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeLayout.h">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClInclude>
     <ClInclude Include="UniscribeTextBlock.h">
-      <Filter>TextView\Display</Filter>
+      <Filter>TextView\Uniscribe</Filter>
     </ClInclude>
-    <ClInclude Include="TextBlock.h">
-      <Filter>TextView\Display</Filter>
-    </ClInclude>
-    <ClInclude Include="SimpleLayout.h">
-      <Filter>TextView\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="SimpleRun.h">
-      <Filter>TextView\Display</Filter>
+    <ClInclude Include="UniscribeRun.h">
+      <Filter>TextView\Uniscribe</Filter>
     </ClInclude>
     <ClInclude Include="SimpleTextBlock.h">
-      <Filter>TextView\Display</Filter>
+      <Filter>TextView\Simple</Filter>
     </ClInclude>
-    <ClInclude Include="SimpleRunLoop.h">
-      <Filter>TextView\Layout</Filter>
+    <ClInclude Include="SimpleLayout.h">
+      <Filter>TextView\Simple</Filter>
+    </ClInclude>
+    <ClInclude Include="TextBlock.h">
+      <Filter>TextView</Filter>
     </ClInclude>
     <ClInclude Include="EmptyTextBlock.h">
-      <Filter>TextView\Display</Filter>
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="TextView.h">
+      <Filter>TextEdit</Filter>
+    </ClInclude>
+    <ClInclude Include="TextViewMetrics.h">
+      <Filter>TextEdit</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleLayoutData.h">
+      <Filter>TextView\Simple</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleTextRun.h">
+      <Filter>TextView\Simple</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleTextRunLoop.h">
+      <Filter>TextView\Simple</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

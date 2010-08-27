@@ -370,10 +370,13 @@ static size_t WrapLine( UniscribeRun* run, size_t lineStart, int lineWidth, UTF1
 	return lineEnd;
 }
 
-TextBlockPtr UniscribeLayoutParagraph( UTF16Ref text, TextStyle& style, HDC hdc, int maxWidth, bool endsWithNewline )
+TextBlockPtr UniscribeLayoutParagraph( UTF16Ref text,
+                                       const TextDocument&,
+                                       TextStyle& style,
+                                       HDC hdc,
+                                       int maxWidth,
+                                       bool endsWithNewline )
 {
-	Assert( !text.empty() );
-
 	UniscribeAllocator allocator;
 
 	Itemize( text, allocator );

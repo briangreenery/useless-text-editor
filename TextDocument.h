@@ -25,9 +25,13 @@ public:
 	TextChange Delete( size_t pos, size_t count );
 
 	size_t NextCharStop( size_t pos ) const { return NextBreak( m_charIter, pos ); }
-	size_t NextWordStop( size_t pos ) const { return NextBreak( m_wordIter, pos ); }
 	size_t PrevCharStop( size_t pos ) const { return PrevBreak( m_charIter, pos ); }
+
+	size_t NextWordStop( size_t pos ) const { return NextBreak( m_wordIter, pos ); }
 	size_t PrevWordStop( size_t pos ) const { return PrevBreak( m_wordIter, pos ); }
+
+	size_t NextSoftBreak( size_t pos ) const { return NextBreak( m_lineIter, pos ); }
+	size_t PrevSoftBreak( size_t pos ) const { return PrevBreak( m_lineIter, pos ); }
 
 	size_t NextNonWhitespace( size_t pos ) const;
 	size_t PrevNonWhitespace( size_t pos ) const;
@@ -56,8 +60,10 @@ private:
 	mutable bool m_needIterReset;
 	UErrorCode m_charErrorStatus;
 	UErrorCode m_wordErrorStatus;
+	UErrorCode m_lineErrorStatus;
 	icu::BreakIterator* m_charIter;
 	icu::BreakIterator* m_wordIter;
+	icu::BreakIterator* m_lineIter;
 };
 
 inline size_t TextDocument::Length() const

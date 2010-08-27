@@ -3,6 +3,7 @@
 #include "VisualDocument.h"
 #include "DocumentReader.h"
 #include "TextDocument.h"
+#include "TextStyle.h"
 #include "TextSelection.h"
 #include "VisualPainter.h"
 #include "UniscribeLayout.h"
@@ -23,7 +24,7 @@ VisualDocument::VisualDocument( const TextDocument& doc, TextStyle& style )
 
 void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection )
 {
-	VisualPainter painter( hdc, m_style, selection );
+	VisualPainter painter( hdc, m_doc, m_style, selection );
 
 	BlockContaining_Result block = BlockContaining( rect.top );
 
@@ -66,7 +67,7 @@ void VisualDocument::Update( HDC hdc, int maxWidth, TextChange change )
 		count += block->Length();
 		block.it = m_blocks.erase( block.it );
 	}
-	while ( count < modifiedCount );
+	while ( count <= modifiedCount && block.it != m_blocks.end() );
 
 	if ( change.type == TextChange::insertion )
 		count += change.count;
@@ -74,6 +75,15 @@ void VisualDocument::Update( HDC hdc, int maxWidth, TextChange change )
 		count -= change.count;
 
 	LayoutText( block.it, start, count, hdc, maxWidth );
+}
+
+bool VisualDocument::IsSimpleText( UTF16Ref text ) const
+{
+	for ( const UTF16::Unit* it = text.begin(); it != text.end(); ++it )
+		if ( *it >= 128 )
+			return ScriptIsComplex( text.begin(), text.size(), SIC_COMPLEX ) != S_OK;
+
+	return true;
 }
 
 void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start, size_t count, HDC hdc, int maxWidth )
@@ -95,22 +105,20 @@ void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start,
 		{
 			m_lineCount++;
 			m_blocks.insert( it, TextBlockPtr( new EmptyTextBlock( true, m_style ) ) );
-			start++;
 		}
 		else
 		{
 			UTF16Ref text = reader.StrictRange( start, lineEnd - start );
-			TextBlockPtr block;
 
-			//if ( ScriptIsComplex( text.begin(), text.size(), SIC_COMPLEX ) == S_OK )
-				block = UniscribeLayoutParagraph( text, m_style, hdc, maxWidth, lineEnd != end );
-			//else
-				//block = SimpleLayoutParagraph( text, m_style, hdc, maxWidth, lineEnd != end );
+			TextBlockPtr block = IsSimpleText( text )
+			                        ? SimpleLayoutParagraph( text, m_doc, m_style, hdc, maxWidth, lineEnd != end )
+			                        : UniscribeLayoutParagraph( text, m_doc, m_style, hdc, maxWidth, lineEnd != end );
 
 			m_lineCount += block->LineCount();
 			m_blocks.insert( it, std::move( block ) );
-			start = lineEnd + 1;
 		}
+
+		start = lineEnd + 1;
 	}
 
 	if ( it == m_blocks.end() && m_blocks.empty() || m_blocks.back()->EndsWithNewline() )

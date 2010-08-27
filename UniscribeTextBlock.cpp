@@ -3,6 +3,8 @@
 #include "UniscribeTextBlock.h"
 #include "UniscribeAllocator.h"
 #include "VisualPainter.h"
+#include "VisualSelection.h"
+#include "TextStyle.h"
 #include "Assert.h"
 #include "Error.h"
 #include <algorithm>
@@ -55,7 +57,7 @@ void UniscribeTextBlock::DrawLineSelection( size_t line, VisualPainter& painter,
 	if ( painter.selection.Intersects( TextStart( line ), TextEnd( line ) ) )
 		selection = MakeVisualSelection( line, painter.selection );
 
-	if ( &line == &m_lines.back() && painter.selection.Intersects( TextEnd( line ), m_length ) && EndsWithNewline() )
+	if ( line == m_lines.size() - 1 && painter.selection.Intersects( TextEnd( line ), m_length ) && EndsWithNewline() )
 		selection.Add( LineWidth( line ), LineWidth( line ) + painter.style.avgCharWidth );
 
 	selection.Draw( painter, rect );
@@ -196,7 +198,6 @@ bool UniscribeTextBlock::EndsWithNewline() const
 ArrayOf<const UniscribeRun> UniscribeTextBlock::LineRuns( size_t line ) const
 {
 	Assert( line < m_lines.size() );
-
 	const UniscribeRun* runStart = &m_runs.front() + ( line > 0 ? m_lines[line - 1] : 0 );
 	return ArrayOf<const UniscribeRun>( runStart, &m_runs.front() + m_lines[line] );
 }

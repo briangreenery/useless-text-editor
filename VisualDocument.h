@@ -5,6 +5,7 @@
 
 #include "TextBlock.h"
 #include "TextChange.h"
+#include "UString.h"
 #include <Windows.h>
 #include <list>
 
@@ -32,6 +33,7 @@ public:
 	void UpdateAll( HDC, int width );
 
 private:
+	bool IsSimpleText( UTF16Ref ) const;
 	void LayoutText( TextBlockList::const_iterator, size_t start, size_t count, HDC hdc, int maxWidth );
 
 	struct BlockContaining_Result

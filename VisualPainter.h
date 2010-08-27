@@ -3,31 +3,34 @@
 #ifndef VisualPainter_h
 #define VisualPainter_h
 
-#include "TextStyle.h"
 #include "TextSelection.h"
-#include "VisualSelection.h"
 #include <Windows.h>
 #include <usp10.h>
+
+class TextStyle;
+class TextDocument;
 
 class VisualPainter
 {
 public:
-	VisualPainter( HDC, TextStyle&, TextSelection );
+	VisualPainter( HDC, const TextDocument&, TextStyle&, TextSelection );
 	~VisualPainter();
 
 	void SetOrigin( size_t textStart, LONG yStart );
 	void SetFont( size_t font );
 
-	HDC              hdc;
-	TextSelection    selection;
-	TextStyle&       style;
+	HDC                 hdc;
+	TextSelection       selection;
+	const TextDocument& doc;
+	TextStyle&          style;
+	size_t              textStart;
 
 private:
+	size_t        currentFont;
 	TextSelection oldSelection;
-	POINT oldOrigin;
-	HGDIOBJ oldFont;
-	int oldBkMode;
-	size_t currentFont;
+	POINT         oldOrigin;
+	HGDIOBJ       oldFont;
+	int           oldBkMode;
 };
 
 #endif

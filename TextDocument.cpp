@@ -13,6 +13,7 @@ TextDocument::TextDocument()
 	, m_wordErrorStatus( U_ZERO_ERROR )
 	, m_charIter( icu::BreakIterator::createCharacterInstance( icu::Locale::getUS(), m_charErrorStatus ) )
 	, m_wordIter( icu::BreakIterator::createWordInstance     ( icu::Locale::getUS(), m_wordErrorStatus ) )
+	, m_lineIter( icu::BreakIterator::createLineInstance( icu::Locale::getDefault(), m_lineErrorStatus ) )
 	, m_needIterReset( true )
 {
 }
@@ -124,6 +125,7 @@ void TextDocument::ResetIterators() const
 		m_needIterReset = false;
 		m_charIter->adoptText( new DocumentCharIter( *this ) );
 		m_wordIter->adoptText( new DocumentCharIter( *this ) );
+		m_lineIter->adoptText( new DocumentCharIter( *this ) );
 	}
 }
 

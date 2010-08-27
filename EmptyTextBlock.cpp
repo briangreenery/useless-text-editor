@@ -2,6 +2,7 @@
 
 #include "EmptyTextBlock.h"
 #include "VisualPainter.h"
+#include "VisualSelection.h"
 #include "TextStyle.h"
 
 EmptyTextBlock::EmptyTextBlock( bool endsWithNewline, TextStyle& style )

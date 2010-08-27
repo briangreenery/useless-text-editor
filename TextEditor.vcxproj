@@ -86,8 +86,9 @@
     <ClCompile Include="DocumentCharIter.cpp" />
     <ClCompile Include="EmptyTextBlock.cpp" />
     <ClCompile Include="SimpleLayout.cpp" />
-    <ClCompile Include="SimpleRun.cpp" />
-    <ClCompile Include="SimpleRunLoop.cpp" />
+    <ClCompile Include="SimpleLayoutData.cpp" />
+    <ClCompile Include="SimpleTextRun.cpp" />
+    <ClCompile Include="SimpleTextRunLoop.cpp" />
     <ClCompile Include="SimpleTextBlock.cpp" />
     <ClCompile Include="SizedAutoArray.cpp" />
     <ClCompile Include="DocumentReader.cpp" />
@@ -126,8 +127,9 @@
     <ClInclude Include="Integers.h" />
     <ClInclude Include="Require.h" />
     <ClInclude Include="SimpleLayout.h" />
-    <ClInclude Include="SimpleRun.h" />
-    <ClInclude Include="SimpleRunLoop.h" />
+    <ClInclude Include="SimpleLayoutData.h" />
+    <ClInclude Include="SimpleTextRun.h" />
+    <ClInclude Include="SimpleTextRunLoop.h" />
     <ClInclude Include="SimpleTextBlock.h" />
     <ClInclude Include="SizedAutoArray.h" />
     <ClInclude Include="TextBlock.h" />

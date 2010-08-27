@@ -2,6 +2,7 @@
 
 #include "VisualSelection.h"
 #include "VisualPainter.h"
+#include "TextStyle.h"
 
 void VisualSelection::Add( LONG xStart, LONG xEnd )
 {

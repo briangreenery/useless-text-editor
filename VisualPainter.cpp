@@ -6,11 +6,13 @@
 #undef min
 #undef max
 
-VisualPainter::VisualPainter( HDC _hdc, TextStyle& _style, TextSelection _selection )
+VisualPainter::VisualPainter( HDC _hdc, const TextDocument& _doc, TextStyle& _style, TextSelection _selection )
 	: hdc( _hdc )
 	, style( _style )
+	, doc( _doc )
 	, selection( _selection )
 	, oldSelection( _selection )
+	, textStart( 0 )
 {
 	GetWindowOrgEx( hdc, &oldOrigin );
 
@@ -28,8 +30,10 @@ VisualPainter::~VisualPainter()
 	SetWindowOrgEx( hdc, oldOrigin.x, oldOrigin.y, NULL );
 }
 
-void VisualPainter::SetOrigin( size_t textStart, LONG yStart )
+void VisualPainter::SetOrigin( size_t _textStart, LONG yStart )
 {
+	textStart = _textStart;
+
 	selection.start = oldSelection.start - std::min( oldSelection.start, textStart );
 	selection.end   = oldSelection.end - std::min( oldSelection.end, textStart );
 

@@ -18,6 +18,8 @@ UniscribeRun* UniscribeRunLoop::NextRun()
 {
 	Assert( Unfinished() );
 
+	Assert( false ); // we have to scan for '\t'.  We can't assume it will be all alone at the beginning.
+
 	size_t itemSize = m_item[1].iCharPos - m_item[0].iCharPos;
 	size_t runSize  = ( m_text[m_position] == '\t' ) ? 1 : itemSize - m_itemUsed;
 

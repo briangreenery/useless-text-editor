@@ -7,8 +7,14 @@
 #include "UString.h"
 #include <Windows.h>
 
+class TextDocument;
 class TextStyle;
 
-TextBlockPtr SimpleLayoutParagraph( UTF16Ref, TextStyle&, HDC, int maxWidth, bool endsWithNewline );
+TextBlockPtr SimpleLayoutParagraph( UTF16Ref,
+                                    const TextDocument&,
+                                    TextStyle&,
+                                    HDC,
+                                    int maxWidth,
+                                    bool endsWithNewline );
 
 #endif
