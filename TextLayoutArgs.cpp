@@ -7,6 +7,7 @@ TextLayoutArgs::TextLayoutArgs( const TextDocument& _doc,
                                 HDC _hdc,
                                 int _maxWidth )
 	: endsWithNewline( false )
+	, textStart( 0 )
 	, doc( _doc )
 	, style( _style )
 	, hdc( _hdc )

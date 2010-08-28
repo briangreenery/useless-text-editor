@@ -112,6 +112,7 @@ void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start,
 		{
 			layoutArgs.text = reader.StrictRange( start, lineEnd - start );
 			layoutArgs.endsWithNewline = lineEnd != end;
+			layoutArgs.textStart = start;
 
 			TextBlockPtr block = IsSimpleText( layoutArgs.text )
 			                        ? SimpleLayoutParagraph( layoutArgs )

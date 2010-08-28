@@ -16,9 +16,9 @@
 
 namespace W = Windows;
 
-static std::vector<SCRIPT_ITEM>&& Itemize( UTF16Ref text )
+static std::vector<SCRIPT_ITEM> Itemize( UTF16Ref text )
 {
-	std::vector<SCRIPT_ITEM> items( text.size() / 4 + 1 );
+	std::vector<SCRIPT_ITEM> items( text.size() / 4 + 2 );
 
 	int numItems = 0;
 
@@ -47,7 +47,7 @@ static std::vector<SCRIPT_ITEM>&& Itemize( UTF16Ref text )
 	}
 
 	items.resize( numItems + 1 );
-	return std::move( items );
+	return items;
 }
 
 static bool HasMissingGlyphs( size_t font, const std::vector<WORD>& glyphs, TextStyle& style )
@@ -263,15 +263,17 @@ static size_t WrapLine( UniscribeLayoutData& layoutData,
                         size_t lineStart,
                         int lineWidth )
 {
-	size_t estimate = EstimateLineWrap( layoutData, args, lineWidth );
+	size_t estimate = args.textStart + EstimateLineWrap( layoutData, args, lineWidth );
 
 	size_t lineEnd = args.doc.PrevSoftBreak( estimate + 1 );
 
-	if ( lineEnd <= lineStart )
+	if ( lineEnd <= args.textStart + lineStart )
 		lineEnd = args.doc.PrevCharStop( estimate + 1 );
 
-	if ( lineEnd <= lineStart )
+	if ( lineEnd <= args.textStart + lineStart )
 		lineEnd = estimate;
+
+	lineEnd -= args.textStart;
 
 	UniscribeTextRun fragment = layoutData.DiscardFrom( lineEnd );
 

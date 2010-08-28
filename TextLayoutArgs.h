@@ -16,6 +16,7 @@ public:
 
 	UTF16Ref text;
 	bool endsWithNewline;
+	size_t textStart;
 	const TextDocument& doc;
 	TextStyle& style;
 	HDC hdc;
