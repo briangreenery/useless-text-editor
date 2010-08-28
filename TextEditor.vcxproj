@@ -85,6 +85,7 @@
     <ClCompile Include="ArrayOf.cpp" />
     <ClCompile Include="DocumentCharIter.cpp" />
     <ClCompile Include="EmptyTextBlock.cpp" />
+    <ClCompile Include="TextLayoutArgs.cpp" />
     <ClCompile Include="SimpleLayout.cpp" />
     <ClCompile Include="SimpleLayoutData.cpp" />
     <ClCompile Include="SimpleTextRun.cpp" />
@@ -97,8 +98,6 @@
     <ClCompile Include="TextFont.cpp" />
     <ClCompile Include="VisualPainter.cpp" />
     <ClCompile Include="TextStyle.cpp" />
-    <ClCompile Include="VectorAllocator.cpp" />
-    <ClCompile Include="VectorCache.cpp" />
     <ClCompile Include="UniscribeTextBlock.cpp" />
     <ClCompile Include="VisualDocument.cpp" />
     <ClCompile Include="TextSelection.cpp" />
@@ -110,10 +109,10 @@
     <ClCompile Include="FontCollection.cpp" />
     <ClCompile Include="LexerState.cpp" />
     <ClCompile Include="NextRelevanceToken.cpp" />
-    <ClCompile Include="UniscribeAllocator.cpp" />
+    <ClCompile Include="UniscribeLayoutData.cpp" />
     <ClCompile Include="UniscribeLayout.cpp" />
-    <ClCompile Include="UniscribeRun.cpp" />
-    <ClCompile Include="UniscribeRunLoop.cpp" />
+    <ClCompile Include="UniscribeTextRun.cpp" />
+    <ClCompile Include="UniscribeTextRunLoop.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="VisualSelection.cpp" />
   </ItemGroup>
@@ -125,6 +124,7 @@
     <ClInclude Include="EmptyTextBlock.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Integers.h" />
+    <ClInclude Include="TextLayoutArgs.h" />
     <ClInclude Include="Require.h" />
     <ClInclude Include="SimpleLayout.h" />
     <ClInclude Include="SimpleLayoutData.h" />
@@ -139,8 +139,6 @@
     <ClInclude Include="UString.h" />
     <ClInclude Include="DocumentReader.h" />
     <ClInclude Include="GapBuffer.h" />
-    <ClInclude Include="VectorAllocator.h" />
-    <ClInclude Include="VectorCache.h" />
     <ClInclude Include="UniscribeTextBlock.h" />
     <ClInclude Include="VisualDocument.h" />
     <ClInclude Include="TextSelection.h" />
@@ -152,10 +150,10 @@
     <ClInclude Include="FontCollection.h" />
     <ClInclude Include="LexerState.h" />
     <ClInclude Include="NextRelevanceToken.h" />
-    <ClInclude Include="UniscribeAllocator.h" />
+    <ClInclude Include="UniscribeLayoutData.h" />
     <ClInclude Include="UniscribeLayout.h" />
-    <ClInclude Include="UniscribeRun.h" />
-    <ClInclude Include="UniscribeRunLoop.h" />
+    <ClInclude Include="UniscribeTextRun.h" />
+    <ClInclude Include="UniscribeTextRunLoop.h" />
     <ClInclude Include="VisualSelection.h" />
   </ItemGroup>
   <ItemGroup>

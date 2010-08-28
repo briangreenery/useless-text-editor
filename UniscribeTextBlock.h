@@ -4,7 +4,7 @@
 #define UniscribeTextBlock_h
 
 #include "TextBlock.h"
-#include "UniscribeRun.h"
+#include "UniscribeLayoutData.h"
 #include "ArrayOf.h"
 #include <Windows.h>
 #include <usp10.h>
@@ -19,7 +19,7 @@ class TextStyle;
 class UniscribeTextBlock : public TextBlock
 {
 public:
-	UniscribeTextBlock( UniscribeAllocator&, TextStyle&, bool endsWithNewline );
+	UniscribeTextBlock( UniscribeLayoutDataPtr, TextStyle& );
 
 	virtual void Draw( VisualPainter&, RECT ) const;
 
@@ -34,7 +34,7 @@ public:
 	virtual size_t Length() const;
 	virtual int Height() const;
 
-	bool EndsWithNewline() const;
+	virtual bool EndsWithNewline() const;
 
 private:
 	void DrawLineSelection( size_t line, VisualPainter&, RECT ) const;
@@ -42,33 +42,24 @@ private:
 
 	VisualSelection MakeVisualSelection( size_t line, TextSelection ) const;
 
-	ArrayOf<const UniscribeRun> LineRuns( size_t line ) const;
+	ArrayOf<const UniscribeTextRun> LineRuns( size_t line ) const;
 
 	size_t TextStart( size_t line ) const;
 	size_t TextEnd  ( size_t line ) const;
 	int    LineWidth( size_t line ) const;
 
-	int RunCPtoX( const UniscribeRun*, size_t cp, bool trailingEdge ) const;
+	int RunCPtoX( const UniscribeTextRun*, size_t cp, bool trailingEdge ) const;
 
-	int    CPtoX( ArrayOf<const UniscribeRun>, size_t cp, bool trailingEdge ) const;
-	size_t XtoCP( ArrayOf<const UniscribeRun>, LONG* x ) const;
+	int    CPtoX( ArrayOf<const UniscribeTextRun>, size_t cp, bool trailingEdge ) const;
+	size_t XtoCP( ArrayOf<const UniscribeTextRun>, LONG* x ) const;
 
-	std::vector<int> VisualToLogicalMapping( ArrayOf<const UniscribeRun> ) const;
+	std::vector<int> VisualToLogicalMapping( ArrayOf<const UniscribeTextRun> ) const;
 
-	const UniscribeRun* RunContaining( ArrayOf<const UniscribeRun>, size_t pos, int* xStart ) const;
-	const UniscribeRun* RunContaining( ArrayOf<const UniscribeRun>, int    x,   int* xStart ) const;
+	const UniscribeTextRun* RunContaining( ArrayOf<const UniscribeTextRun>, size_t pos, int* xStart ) const;
+	const UniscribeTextRun* RunContaining( ArrayOf<const UniscribeTextRun>, int    x,   int* xStart ) const;
 
-	size_t m_length;
+	UniscribeLayoutDataPtr m_data;
 	TextStyle& m_style;
-
-	std::vector<size_t>         m_lines;
-	std::vector<UniscribeRun>   m_runs;
-	std::vector<SCRIPT_ITEM>    m_items;
-	std::vector<WORD>           m_logClusters;
-	std::vector<WORD>           m_glyphs;
-	std::vector<SCRIPT_VISATTR> m_visAttrs;
-	std::vector<int>            m_advanceWidths;
-	std::vector<GOFFSET>        m_offsets;
 };
 
 #endif

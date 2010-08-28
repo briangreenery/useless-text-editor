@@ -4,40 +4,45 @@
 #include "SimpleLayoutData.h"
 #include "SimpleTextRunLoop.h"
 #include "SimpleTextBlock.h"
+#include "TextLayoutArgs.h"
 #include "TextDocument.h"
 #include "TextStyle.h"
 #include "Assert.h"
+#include <algorithm>
+
+#undef min
+#undef max
 
 class DebuggableException {};
 class SimpleLayoutFailed : public DebuggableException {};
 
-static bool LayoutRun( SimpleTextRun& run,
-                       int xStart,
-                       UTF16Ref text,
+static bool LayoutRun( SimpleTextRun run,
                        SimpleLayoutData& layoutData,
-                       TextStyle& style,
-                       HDC hdc,
-                       int maxWidth )
+                       const TextLayoutArgs& args,
+                       int xStart,
+                       bool forceFit )
 {
 	SIZE size;
 	INT fit;
 
+	int maxWidth = ( forceFit || args.maxWidth == 0 ) ? std::numeric_limits<int>::max() : args.maxWidth;
+
 	Assert( layoutData.xOffsets.size() == run.textStart );
 	layoutData.xOffsets.resize( layoutData.xOffsets.size() + run.textCount );
 
-	if ( run.textCount == 1 && text[run.textStart] == '\t' && style.tabSize > 0 )
+	if ( run.textCount == 1 && args.text[run.textStart] == '\t' && args.style.tabSize > 0 )
 	{
-		int tabWidth = style.tabSize - ( xStart % style.tabSize );
+		int tabWidth = args.style.tabSize - ( xStart % args.style.tabSize );
 		layoutData.xOffsets.back() = tabWidth;
 		fit = ( tabWidth < maxWidth ? 1 : 0 );
 	}
 	else
 	{
-		SelectObject( hdc, style.fonts[run.font].font );
-		if ( !GetTextExtentExPoint( hdc,
-		                            text.begin() + run.textStart,
+		SelectObject( args.hdc, args.style.fonts[run.font].font );
+		if ( !GetTextExtentExPoint( args.hdc,
+		                            args.text.begin() + run.textStart,
 		                            run.textCount,
-		                            ( maxWidth == 0 ? std::numeric_limits<int>::max() : maxWidth ),
+		                            args.maxWidth - std::min( maxWidth, xStart ),
 		                            &fit,
 		                            &layoutData.xOffsets.front() + run.textStart,
 		                            &size ) )
@@ -47,62 +52,71 @@ static bool LayoutRun( SimpleTextRun& run,
 		}
 	}
 
-	bool wrapLine = ( size_t( fit ) < run.textCount );
+	bool needsWrapping = ( size_t( fit ) < run.textCount );
 
 	run.textCount = fit;
 	layoutData.xOffsets.resize( run.textStart + fit );
 
-	return wrapLine;
+	layoutData.runs.push_back( run );
+	return !needsWrapping;
 }
 
-TextBlockPtr SimpleLayoutParagraph( UTF16Ref text,
-                                    const TextDocument& doc,
-                                    TextStyle& style,
-                                    HDC hdc,
-                                    int maxWidth,
-                                    bool endsWithNewline )
+static size_t WrapLine( SimpleLayoutData& layoutData,
+                        const TextLayoutArgs& args,
+                        size_t lineStart,
+                        int lineWidth )
 {
-	SimpleLayoutDataPtr layoutData( new SimpleLayoutData( text, endsWithNewline ) );
+	SimpleTextRun lastRun = layoutData.runs.back();
+
+	size_t estimate = lastRun.textStart + lastRun.textCount;
+
+	size_t lineEnd = args.doc.PrevSoftBreak( estimate + 1 );
+
+	if ( lineEnd <= lineStart )
+		lineEnd = args.doc.PrevCharStop( estimate + 1 );
+
+	if ( lineEnd <= lineStart )
+		lineEnd = estimate;
+
+	layoutData.DiscardFrom( lineEnd );
+
+	if ( lineStart == lineEnd )
+	{
+		lastRun.textCount = 1;
+		LayoutRun( lastRun, layoutData, args, lineWidth, true );
+		lineEnd++;
+	}
+
+	return lineEnd;
+}
+
+TextBlockPtr SimpleLayoutParagraph( const TextLayoutArgs& args )
+{
+	SimpleLayoutDataPtr layoutData( new SimpleLayoutData( args.text, args.endsWithNewline ) );
 
 	int    lineWidth = 0;
 	size_t lineStart = 0;
 
-	for ( SimpleTextRunLoop loop( text ); loop.Unfinished(); )
+	for ( SimpleTextRunLoop loop( args.text ); loop.Unfinished(); )
 	{
 		SimpleTextRun run = loop.NextRun();
 
-		bool wrapLine = LayoutRun( run, lineWidth, text, *layoutData, style, hdc, maxWidth - lineWidth );
-		layoutData->runs.push_back( run );
-
-		if ( wrapLine )
-		{
-			size_t lineEnd = run.textStart + run.textCount;
-
-			size_t softBreak = doc.PrevSoftBreak( lineEnd + 1 );
-			lineEnd = ( softBreak <= lineStart ) ? lineEnd : softBreak;
-
-			layoutData->DiscardFrom( lineEnd );
-
-			if ( lineStart == lineEnd )
-			{
-				run.textCount = 1;
-				LayoutRun( run, lineWidth, text, *layoutData, style, hdc, 0 );
-				layoutData->runs.push_back( run );
-			}
-
-			layoutData->lines.push_back( layoutData->runs.size() );
-
-			lineWidth = 0;
-			lineStart = lineEnd;
-
-			loop.NewLine( lineStart );
-		}
-		else
+		if ( LayoutRun( run, *layoutData, args, lineWidth, false ) )
 		{
 			lineWidth += layoutData->xOffsets.back();
 		}
+		else
+		{
+			lineStart = WrapLine( *layoutData, args, lineStart, lineWidth );
+			lineWidth = 0;
+
+			layoutData->lines.push_back( layoutData->runs.size() );
+			loop.NewLine( lineStart );
+		}
 	}
 
-	layoutData->lines.push_back( layoutData->runs.size() );
-	return TextBlockPtr( new SimpleTextBlock( std::move( layoutData ), style ) );
+	if ( layoutData->lines.empty() || layoutData->lines.back() != layoutData->runs.size() )
+		layoutData->lines.push_back( layoutData->runs.size() );
+
+	return TextBlockPtr( new SimpleTextBlock( std::move( layoutData ), args.style ) );
 }

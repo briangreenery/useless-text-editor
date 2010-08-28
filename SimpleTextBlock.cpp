@@ -5,6 +5,7 @@
 #include "VisualSelection.h"
 #include "DocumentReader.h"
 #include "TextStyle.h"
+#include <algorithm>
 
 SimpleTextBlock::SimpleTextBlock( SimpleLayoutDataPtr data, TextStyle& style )
 	: m_data( std::move( data ) )

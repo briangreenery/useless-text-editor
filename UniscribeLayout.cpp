@@ -1,19 +1,24 @@
 // UniscribeLayout.cpp
 
 #include "UniscribeLayout.h"
-#include "UniscribeRunLoop.h"
+#include "UniscribeLayoutData.h"
+#include "UniscribeTextRunLoop.h"
 #include "UniscribeTextBlock.h"
+#include "TextLayoutArgs.h"
+#include "TextDocument.h"
 #include "TextStyle.h"
+#include "UString.h"
 #include "Error.h"
+#include <algorithm>
 
 #undef min
 #undef max
 
 namespace W = Windows;
 
-static void Itemize( UTF16Ref text, UniscribeAllocator& allocator )
+static std::vector<SCRIPT_ITEM>&& Itemize( UTF16Ref text )
 {
-	ArrayOf<SCRIPT_ITEM> items = allocator.items.Alloc( text.size() + 1 );
+	std::vector<SCRIPT_ITEM> items( text.size() / 4 + 1 );
 
 	int numItems = 0;
 
@@ -29,55 +34,54 @@ static void Itemize( UTF16Ref text, UniscribeAllocator& allocator )
 		                                items.size(),
 		                                &scriptControl,
 		                                &scriptState,
-		                                items.begin(),
+		                                &items.front(),
 		                                &numItems );
 
 		if ( result == S_OK )
 			break;
 
-		switch ( result )
-		{
-		case E_OUTOFMEMORY:
-			items = allocator.items.Grow( items, text.size() );
-			break;
-
-		default:
+		if ( result == E_OUTOFMEMORY )
+			items.resize( items.size() * 2 );
+		else
 			W::ThrowHRESULT( result );
-		}
 	}
 
-	items = allocator.items.Shrink( items, numItems + 1 );
+	items.resize( numItems + 1 );
+	return std::move( items );
 }
 
-static bool HasMissingGlyphs( size_t font, ArrayOf<WORD> glyphs, TextStyle& style )
+static bool HasMissingGlyphs( size_t font, const std::vector<WORD>& glyphs, TextStyle& style )
 {
 	WORD missingGlyph = style.fonts[font].fontProps.wgDefault;
 	return std::find( glyphs.begin(), glyphs.end(), missingGlyph ) != glyphs.end();
 }
 
-static bool ShapePlaceRun( UniscribeRun* run, int xStart, UTF16Ref text, UniscribeAllocator& allocator, TextStyle& style, HDC hdc, bool forceMissingGlyphs )
+static bool ShapePlaceRun( UniscribeTextRun run,
+                           UniscribeLayoutData& layoutData,
+                           const TextLayoutArgs& args,
+                           int xStart,
+                           bool ignoreMissingGlyphs )
 {
-	size_t estimatedGlyphCount = allocator.EstimateGlyphCount( run->textCount );
+	size_t estimatedGlyphCount = MulDiv( 3, run.textCount, 2 ) + 16;
 
-	ArrayOf<SCRIPT_ITEM>    items       = allocator.items      .Allocated();
-	ArrayOf<WORD>           logClusters = allocator.logClusters.Alloc( run->textCount );
-	ArrayOf<WORD>           glyphs      = allocator.glyphs     .Alloc( estimatedGlyphCount );
-	ArrayOf<SCRIPT_VISATTR> visAttrs    = allocator.visAttrs   .Alloc( estimatedGlyphCount );
+	std::vector<WORD>           logClusters( run.textCount );
+	std::vector<WORD>           glyphs     ( estimatedGlyphCount );
+	std::vector<SCRIPT_VISATTR> visAttrs   ( estimatedGlyphCount );
 
-	HDC shapingDC  = 0;
+	HDC hdc = 0;
 	int glyphCount = 0;
 
 	while ( true )
 	{
-		HRESULT result = ScriptShape( shapingDC,
-		                              &style.fonts[run->font].fontCache,
-		                              text.begin() + run->textStart,
-		                              run->textCount,
+		HRESULT result = ScriptShape( hdc,
+		                              &args.style.fonts[run.font].fontCache,
+		                              args.text.begin() + run.textStart,
+		                              run.textCount,
 		                              glyphs.size(),
-		                              &items[run->item].a,
-		                              glyphs.begin(),
-		                              logClusters.begin(),
-		                              visAttrs.begin(),
+		                              &layoutData.items[run.item].a,
+		                              &glyphs.front(),
+		                              &logClusters.front(),
+		                              &visAttrs.front(),
 		                              &glyphCount );
 
 		if ( result == S_OK )
@@ -86,19 +90,16 @@ static bool ShapePlaceRun( UniscribeRun* run, int xStart, UTF16Ref text, Uniscri
 		switch ( result )
 		{
 		case E_PENDING:
-			SelectObject( hdc, style.fonts[run->font].font );
-			shapingDC = hdc;
+			SelectObject( args.hdc, args.style.fonts[run.font].font );
+			hdc = args.hdc;
 			break;
 
 		case E_OUTOFMEMORY:
-			glyphs   = allocator.glyphs  .Grow( glyphs,   run->textCount );
-			visAttrs = allocator.visAttrs.Grow( visAttrs, run->textCount );
+			glyphs  .resize( glyphs  .size() + run.textCount );
+			visAttrs.resize( visAttrs.size() + run.textCount );
 			break;
 
 		case USP_E_SCRIPT_NOT_IN_FONT:
-			allocator.logClusters.DiscardFrom( logClusters.begin() );
-			allocator.glyphs     .DiscardFrom( glyphs.begin() );
-			allocator.visAttrs   .DiscardFrom( visAttrs.begin() );
 			return false;
 
 		default:
@@ -106,83 +107,77 @@ static bool ShapePlaceRun( UniscribeRun* run, int xStart, UTF16Ref text, Uniscri
 		}
 	}
 
-	glyphs   = allocator.glyphs  .Shrink( glyphs,   glyphCount );
-	visAttrs = allocator.visAttrs.Shrink( visAttrs, glyphCount );
+	glyphs  .resize( glyphCount );
+	visAttrs.resize( glyphCount );
 
-	if ( !forceMissingGlyphs && HasMissingGlyphs( run->font, glyphs, style ) )
-	{
-		allocator.logClusters.DiscardFrom( logClusters.begin() );
-		allocator.glyphs     .DiscardFrom( glyphs.begin() );
-		allocator.visAttrs   .DiscardFrom( visAttrs.begin() );
+	if ( !ignoreMissingGlyphs && HasMissingGlyphs( run.font, glyphs, args.style ) )
 		return false;
-	}
 
-	ArrayOf<int>     advanceWidths = allocator.advanceWidths.Alloc( glyphCount );
-	ArrayOf<GOFFSET> offsets       = allocator.offsets      .Alloc( glyphCount );
+	std::vector<int>     advanceWidths( glyphCount );
+	std::vector<GOFFSET> offsets      ( glyphCount );
 
 	ABC abc;
 
 	while ( true )
 	{
-		HRESULT result = ScriptPlace( shapingDC,
-		                              &style.fonts[run->font].fontCache,
-		                              glyphs.begin(),
+		HRESULT result = ScriptPlace( hdc,
+		                              &args.style.fonts[run.font].fontCache,
+		                              &glyphs.front(),
 		                              glyphs.size(),
-		                              visAttrs.begin(),
-		                              &items[run->item].a,
-		                              advanceWidths.begin(),
-		                              offsets.begin(),
+		                              &visAttrs.front(),
+		                              &layoutData.items[run.item].a,
+		                              &advanceWidths.front(),
+		                              &offsets.front(),
 		                              &abc );
 
 		if ( result == S_OK )
 			break;
 
-		switch ( result )
+		if ( result == E_PENDING )
 		{
-		case E_PENDING:
-			SelectObject( hdc, style.fonts[run->font].font );
-			shapingDC = hdc;
-			break;
-
-		default:
+			SelectObject( args.hdc, args.style.fonts[run.font].font );
+			hdc = args.hdc;
+		}
+		else
+		{
 			W::ThrowHRESULT( result );
 		}
 	}
 
-	run->glyphStart = allocator.glyphs.MakeRelative( glyphs.begin() );
-	run->glyphCount = glyphCount;
+	run.glyphStart = layoutData.glyphs.size();
+	run.glyphCount = glyphCount;
 
-	if ( text[run->textStart] == '\t' && style.tabSize > 0 )
+	if ( run.textCount == 1 && args.text[run.textStart] == '\t' && args.style.tabSize > 0 )
 	{
-		run->width       = style.tabSize - ( xStart % style.tabSize );
-		advanceWidths[0] = run->width;
+		run.width        = args.style.tabSize - ( xStart % args.style.tabSize );
+		advanceWidths[0] = run.width;
 	}
 	else
 	{
-		run->width = abc.abcA + abc.abcB + abc.abcC;
+		run.width = abc.abcA + abc.abcB + abc.abcC;
 	}
 
+	layoutData.AddRun( run, logClusters, glyphs, visAttrs, advanceWidths, offsets );
 	return true;
 }
 
-struct EnumFontData
+struct TryEveryFontProcData
 {
-	EnumFontData( UniscribeRun* _run, int _xStart, UTF16Ref _text, UniscribeAllocator& _allocator, TextStyle& _style, HDC _hdc )
+	TryEveryFontProcData( UniscribeTextRun _run,
+	                      UniscribeLayoutData& _layoutData,
+	                      const TextLayoutArgs& _args,
+	                      int _xStart )
 		: run( _run )
+		, layoutData( _layoutData )
+		, args( _args )
 		, xStart( _xStart )
-		, text( _text )
-		, allocator( _allocator )
-		, style( _style )
-		, hdc( _hdc )
 		, deleteLastFont( false )
 	{}
 
-	UniscribeRun* run;
+	UniscribeTextRun run;
+	UniscribeLayoutData& layoutData;
+	const TextLayoutArgs& args;
 	int xStart;
-	UTF16Ref text;
-	UniscribeAllocator& allocator;
-	TextStyle& style;
-	HDC hdc;
 	bool deleteLastFont;
 };
 
@@ -191,223 +186,133 @@ static int CALLBACK TryEveryFontProc( const LOGFONT* logFont, const TEXTMETRIC*,
 	if ( fontType != TRUETYPE_FONTTYPE )
 		return 1;
 
-	EnumFontData& data = *reinterpret_cast<EnumFontData*>( lParam );
+	TryEveryFontProcData& data = *reinterpret_cast<TryEveryFontProcData*>( lParam );
 
 	if ( data.deleteLastFont )
-		data.style.DeleteLastFont();
+		data.args.style.DeleteLastFont();
 
-	size_t numFonts = data.style.fonts.size();
-	data.run->font = data.style.AddFont( logFont->lfFaceName );
-	data.deleteLastFont = ( data.run->font == numFonts );
+	size_t numFonts = data.args.style.fonts.size();
+	data.run.font = data.args.style.AddFont( logFont->lfFaceName );
+	data.deleteLastFont = ( data.run.font == numFonts );
 
-	if ( ShapePlaceRun( data.run, data.xStart, data.text, data.allocator, data.style, data.hdc, false ) )
+	if ( ShapePlaceRun( data.run, data.layoutData, data.args, data.xStart, false ) )
 		return 0;
 
 	return 1;
 }
 
-static void LayoutRun( UniscribeRun* run, int xStart, UTF16Ref text, UniscribeAllocator& allocator, TextStyle& style, HDC hdc )
+static void LayoutRun( UniscribeTextRun run,
+                       UniscribeLayoutData& layoutData,
+                       const TextLayoutArgs& args,
+                       int xStart )
 {
-	if ( ShapePlaceRun( run, xStart, text, allocator, style, hdc, false ) )
+	if ( ShapePlaceRun( run, layoutData, args, xStart, false ) )
 		return;
 
 	// Try to fallback with the fonts that we already have
-	run->font = 0;
-	while ( run->font < style.fonts.size() && !ShapePlaceRun( run, xStart, text, allocator, style, hdc, false ) )
-		++run->font;
+	run.font = 0;
+	while ( run.font < args.style.fonts.size() && !ShapePlaceRun( run, layoutData, args, xStart, false ) )
+		++run.font;
 
-	if ( run->font < style.fonts.size() )
+	if ( run.font < args.style.fonts.size() )
 		return;
 
 	// Try to fallback on all truetype fonts in the system
-	EnumFontData data( run, xStart, text, allocator, style, hdc );
+	TryEveryFontProcData data( run, layoutData, args, xStart );
 	LOGFONT logFont = {};
-	if ( EnumFontFamiliesEx( hdc, &logFont, TryEveryFontProc, reinterpret_cast<LPARAM>( &data ), 0 ) == 0 )
+	if ( EnumFontFamiliesEx( args.hdc, &logFont, TryEveryFontProc, reinterpret_cast<LPARAM>( &data ), 0 ) == 0 )
 		return;
 
 	if ( data.deleteLastFont )
-		data.style.DeleteLastFont();
+		data.args.style.DeleteLastFont();
 
 	// We can't display this text with any font, just show missing glyphs
-	run->font = style.defaultFont;
+	run.font = args.style.defaultFont;
 
-	ArrayOf<SCRIPT_ITEM> items = allocator.items.Allocated();
-
-	items[run->item].a.eScript = SCRIPT_UNDEFINED;
-	ShapePlaceRun( run, xStart, text, allocator, style, hdc, true );
+	layoutData.items[run.item].a.eScript = SCRIPT_UNDEFINED;
+	ShapePlaceRun( run, layoutData, args, xStart, true );
 }
 
-static size_t EstimateLineWrap( UniscribeRun* run, int lineWidth, UTF16Ref text, UniscribeAllocator& allocator, int maxWidth )
+static size_t EstimateLineWrap( UniscribeLayoutData& layoutData,
+                                const TextLayoutArgs& args,
+                                int lineWidth )
 {
-	ArrayOf<SCRIPT_ITEM> items     = allocator.items.Allocated();
-	ArrayOf<int>         logWidths = allocator.logWidths.TempArray( run->textCount );
+	const UniscribeTextRun& run = layoutData.runs.back();
 
-	W::ThrowHRESULT( ScriptGetLogicalWidths( &items[run->item].a,
-	                                         run->textCount,
-	                                         run->glyphCount,
-	                                         allocator.advanceWidths.MakeAbsolute( run->glyphStart ),
-	                                         allocator.logClusters  .MakeAbsolute( run->textStart ),
-	                                         allocator.visAttrs     .MakeAbsolute( run->glyphStart ),
-	                                         logWidths.begin() ) );
+	std::vector<int> logWidths( run.textCount );
+	W::ThrowHRESULT( ScriptGetLogicalWidths( &layoutData.items[run.item].a,
+	                                         run.textCount,
+	                                         run.glyphCount,
+	                                         &layoutData.advanceWidths.front() + run.glyphStart,
+	                                         &layoutData.logClusters  .front() + run.textStart,
+	                                         &layoutData.visAttrs     .front() + run.glyphStart,
+	                                         &logWidths.front() ) );
 
 	size_t estimate = 0;
-
-	for ( ; estimate < logWidths.size(); ++estimate )
+	while ( estimate < logWidths.size() && lineWidth + logWidths[estimate] <= args.maxWidth )
 	{
-		if ( lineWidth + logWidths[estimate] > maxWidth )
-			break;
-
 		lineWidth += logWidths[estimate];
+		estimate++;
 	}
 
-	return run->textStart + estimate;
+	return run.textStart + estimate;
 }
 
-static size_t ForceLineWrap( UniscribeRun* run, UTF16Ref text, UniscribeAllocator& allocator )
+static size_t WrapLine( UniscribeLayoutData& layoutData,
+                        const TextLayoutArgs& args,
+                        size_t lineStart,
+                        int lineWidth )
 {
-	ArrayOf<SCRIPT_ITEM>    items = allocator.items.Allocated();
-	ArrayOf<SCRIPT_LOGATTR> attrs = allocator.logAttr.TempArray( run->textCount );
+	size_t estimate = EstimateLineWrap( layoutData, args, lineWidth );
 
-	W::ThrowHRESULT( ScriptBreak( text.begin() + run->textStart,
-	                              run->textCount,
-	                              &items[run->item].a,
-	                              attrs.begin() ) );
+	size_t lineEnd = args.doc.PrevSoftBreak( estimate + 1 );
 
-	for ( SCRIPT_LOGATTR* it = attrs.begin(); it != attrs.end(); ++it )
-		if ( it->fCharStop || it->fWordStop || it->fWhiteSpace )
-			return ( it - attrs.begin() ) + 1;
+	if ( lineEnd <= lineStart )
+		lineEnd = args.doc.PrevCharStop( estimate + 1 );
 
-	return run->textStart + run->textCount;
-}
+	if ( lineEnd <= lineStart )
+		lineEnd = estimate;
 
-static const size_t noSoftBreak = std::numeric_limits<size_t>::max();
+	UniscribeTextRun fragment = layoutData.DiscardFrom( lineEnd );
 
-static size_t FindSoftBreak( SCRIPT_ITEM* item, size_t estimate, UTF16Ref text, UniscribeAllocator& allocator )
-{
-	size_t textStart = item[0].iCharPos;
-	size_t textSize  = item[1].iCharPos - item[0].iCharPos;
+	if ( fragment.textCount > 0 )
+		LayoutRun( fragment, layoutData, args, lineWidth );
 
-	ArrayOf<SCRIPT_LOGATTR> attrs = allocator.logAttr.TempArray( textSize );
-
-	W::ThrowHRESULT( ScriptBreak( text.begin() + textStart,
-	                              textSize,
-	                              &item->a,
-	                              attrs.begin() ) );
-
-	Assert( estimate >= textStart );
-	size_t offset = std::min( estimate - textStart + 1, textSize ) - 1;
-
-	const SCRIPT_LOGATTR* attr  = attrs.begin() + offset;
-	const UTF16::Unit*    unit  = text.begin() + textStart + offset;
-	const UTF16::Unit*    rend  = text.begin() + textStart - 1;
-
-	for ( ; unit != rend; --unit, --attr )
-	{
-		if ( attr->fSoftBreak )
-			return unit - text.begin();
-
-		if ( attr->fWhiteSpace || *unit == '\\' || *unit == '-' )
-			return unit - text.begin() + 1;
-	}
-
-	return noSoftBreak;
-}
-
-static UniscribeRun* DiscardRunsAfter( size_t lineEnd, UniscribeAllocator& allocator )
-{
-	UniscribeRun* run = allocator.runs.Allocated().end() - 1;
-
-	while ( run->textStart > lineEnd )
-		--run;
-
-	allocator.DiscardFrom( run->textStart, run->glyphStart );
-
-	if ( run->textStart == lineEnd )
-	{
-		allocator.runs.DiscardFrom( run );
-		return 0;
-	}
-
-	allocator.runs.DiscardFrom( run + 1 );
-	run->textCount = lineEnd - run->textStart;
-	return run;
-}
-
-static size_t WrapLine( UniscribeRun* run, size_t lineStart, int lineWidth, UTF16Ref text, UniscribeAllocator& allocator, TextStyle& style, HDC hdc, int maxWidth )
-{
-	size_t lineEndEstimate = EstimateLineWrap( run, lineWidth, text, allocator, maxWidth );
-	size_t lineEnd         = noSoftBreak;
-
-	if ( lineEndEstimate > lineStart )
-	{
-		ArrayOf<SCRIPT_ITEM> items = allocator.items.Allocated();
-
-		size_t estimate = lineEndEstimate;
-
-		for ( SCRIPT_ITEM* item = items.begin() + run->item; item != items.begin() - 1; --item )
-		{
-			lineEnd  = FindSoftBreak( item, estimate, text, allocator );
-			estimate = item->iCharPos;
-
-			if ( lineEnd != noSoftBreak || estimate <= lineStart )
-				break;
-		}
-
-		if ( lineEnd == noSoftBreak || lineEnd <= lineStart )
-			lineEnd = lineEndEstimate;
-	}
-	else
-	{
-		lineEnd = ForceLineWrap( run, text, allocator );
-	}
-
-	UniscribeRun* fragment = DiscardRunsAfter( lineEnd, allocator );
-
-	if ( fragment )
-		LayoutRun( fragment, lineWidth, text, allocator, style, hdc );
-
-	allocator.lines.PushBack( allocator.runs.Allocated().size() );
 	return lineEnd;
 }
 
-TextBlockPtr UniscribeLayoutParagraph( UTF16Ref text,
-                                       const TextDocument&,
-                                       TextStyle& style,
-                                       HDC hdc,
-                                       int maxWidth,
-                                       bool endsWithNewline )
+TextBlockPtr UniscribeLayoutParagraph( const TextLayoutArgs& args )
 {
-	UniscribeAllocator allocator;
+	UniscribeLayoutDataPtr layoutData( new UniscribeLayoutData( args.text, args.endsWithNewline ) );
 
-	Itemize( text, allocator );
+	layoutData->items = Itemize( args.text );
 
 	int    lineWidth = 0;
 	size_t lineStart = 0;
 
-	for ( UniscribeRunLoop loop( text, allocator ); loop.Unfinished(); )
+	for ( UniscribeTextRunLoop loop( args.text, layoutData->items ); loop.Unfinished(); )
 	{
-		UniscribeRun* run = loop.NextRun();
+		UniscribeTextRun run = loop.NextRun();
 
-		LayoutRun( run, lineWidth, text, allocator, style, hdc );
+		LayoutRun( run, *layoutData, args, lineWidth );
+		int runWidth = layoutData->runs.back().width;
 
-		if ( maxWidth == 0 || lineWidth + run->width <= maxWidth )
+		if ( args.maxWidth == 0 || lineWidth + runWidth <= args.maxWidth )
 		{
-			lineWidth += run->width;
+			lineWidth += runWidth;
 		}
 		else
 		{
-			lineStart = WrapLine( run, lineStart, lineWidth, text, allocator, style, hdc, maxWidth );
+			lineStart = WrapLine( *layoutData, args, lineStart, lineWidth );
 			lineWidth = 0;
 
-			loop.NewLine();
+			layoutData->lines.push_back( layoutData->runs.size() );
+			loop.NewLine( lineStart );
 		}
 	}
 
-	ArrayOf<UniscribeRun> runs  = allocator.runs .Allocated();
-	ArrayOf<size_t>       lines = allocator.lines.Allocated();
+	if ( layoutData->lines.empty() || layoutData->lines.back() != layoutData->runs.size() )
+		layoutData->lines.push_back( layoutData->runs.size() );
 
-	if ( lines.empty() || runs.size() > lines[lines.size() - 1] )
-		allocator.lines.PushBack( runs.size() );
-
-	return TextBlockPtr( new UniscribeTextBlock( allocator, style, endsWithNewline ) );
+	return TextBlockPtr( new UniscribeTextBlock( std::move( layoutData ), args.style ) );
 }

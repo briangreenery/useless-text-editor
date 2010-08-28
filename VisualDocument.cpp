@@ -6,6 +6,7 @@
 #include "TextStyle.h"
 #include "TextSelection.h"
 #include "VisualPainter.h"
+#include "TextLayoutArgs.h"
 #include "UniscribeLayout.h"
 #include "SimpleLayout.h"
 #include "EmptyTextBlock.h"
@@ -91,6 +92,7 @@ void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start,
 	if ( maxWidth != 0 )
 		maxWidth = std::max( maxWidth, m_style.avgCharWidth * 10 );
 
+	TextLayoutArgs layoutArgs( m_doc, m_style, hdc, maxWidth );
 	DocumentReader reader( m_doc );
 
 	for ( size_t end = start + count; start < end; )
@@ -108,11 +110,12 @@ void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start,
 		}
 		else
 		{
-			UTF16Ref text = reader.StrictRange( start, lineEnd - start );
+			layoutArgs.text = reader.StrictRange( start, lineEnd - start );
+			layoutArgs.endsWithNewline = lineEnd != end;
 
-			TextBlockPtr block = IsSimpleText( text )
-			                        ? SimpleLayoutParagraph( text, m_doc, m_style, hdc, maxWidth, lineEnd != end )
-			                        : UniscribeLayoutParagraph( text, m_doc, m_style, hdc, maxWidth, lineEnd != end );
+			TextBlockPtr block = IsSimpleText( layoutArgs.text )
+			                        ? SimpleLayoutParagraph( layoutArgs )
+			                        : UniscribeLayoutParagraph( layoutArgs );
 
 			m_lineCount += block->LineCount();
 			m_blocks.insert( it, std::move( block ) );

@@ -4,9 +4,6 @@
     <Filter Include="Universe">
       <UniqueIdentifier>{0d0accc7-2dc3-4276-9a70-40d856baa633}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Buffer">
-      <UniqueIdentifier>{8ce30050-f6b2-4e40-ab6f-bfcf645888a3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="TextView">
       <UniqueIdentifier>{e0c88b8e-b27a-4ca0-b69c-c0a8f57e5d53}</UniqueIdentifier>
     </Filter>
@@ -35,15 +32,6 @@
     </ClCompile>
     <ClCompile Include="SizedAutoArray.cpp">
       <Filter>Universe</Filter>
-    </ClCompile>
-    <ClCompile Include="GapBuffer.cpp">
-      <Filter>Buffer</Filter>
-    </ClCompile>
-    <ClCompile Include="VectorAllocator.cpp">
-      <Filter>Buffer</Filter>
-    </ClCompile>
-    <ClCompile Include="VectorCache.cpp">
-      <Filter>Buffer</Filter>
     </ClCompile>
     <ClCompile Include="TextSelection.cpp">
       <Filter>TextView</Filter>
@@ -88,21 +76,6 @@
     <ClCompile Include="TextFont.cpp">
       <Filter>TextStyle</Filter>
     </ClCompile>
-    <ClCompile Include="UniscribeAllocator.cpp">
-      <Filter>TextView\Uniscribe</Filter>
-    </ClCompile>
-    <ClCompile Include="UniscribeLayout.cpp">
-      <Filter>TextView\Uniscribe</Filter>
-    </ClCompile>
-    <ClCompile Include="UniscribeRunLoop.cpp">
-      <Filter>TextView\Uniscribe</Filter>
-    </ClCompile>
-    <ClCompile Include="UniscribeRun.cpp">
-      <Filter>TextView\Uniscribe</Filter>
-    </ClCompile>
-    <ClCompile Include="UniscribeTextBlock.cpp">
-      <Filter>TextView\Uniscribe</Filter>
-    </ClCompile>
     <ClCompile Include="SimpleTextBlock.cpp">
       <Filter>TextView\Simple</Filter>
     </ClCompile>
@@ -130,6 +103,27 @@
     <ClCompile Include="SimpleTextRunLoop.cpp">
       <Filter>TextView\Simple</Filter>
     </ClCompile>
+    <ClCompile Include="UniscribeLayout.cpp">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClCompile>
+    <ClCompile Include="UniscribeLayoutData.cpp">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClCompile>
+    <ClCompile Include="UniscribeTextBlock.cpp">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClCompile>
+    <ClCompile Include="UniscribeTextRun.cpp">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClCompile>
+    <ClCompile Include="UniscribeTextRunLoop.cpp">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClCompile>
+    <ClCompile Include="TextLayoutArgs.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="GapBuffer.cpp">
+      <Filter>TextDocument</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayOf.h">
@@ -155,15 +149,6 @@
     </ClInclude>
     <ClInclude Include="UString.h">
       <Filter>Universe</Filter>
-    </ClInclude>
-    <ClInclude Include="GapBuffer.h">
-      <Filter>Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="VectorAllocator.h">
-      <Filter>Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="VectorCache.h">
-      <Filter>Buffer</Filter>
     </ClInclude>
     <ClInclude Include="TextSelection.h">
       <Filter>TextView</Filter>
@@ -207,21 +192,6 @@
     <ClInclude Include="TextFont.h">
       <Filter>TextStyle</Filter>
     </ClInclude>
-    <ClInclude Include="UniscribeRunLoop.h">
-      <Filter>TextView\Uniscribe</Filter>
-    </ClInclude>
-    <ClInclude Include="UniscribeAllocator.h">
-      <Filter>TextView\Uniscribe</Filter>
-    </ClInclude>
-    <ClInclude Include="UniscribeLayout.h">
-      <Filter>TextView\Uniscribe</Filter>
-    </ClInclude>
-    <ClInclude Include="UniscribeTextBlock.h">
-      <Filter>TextView\Uniscribe</Filter>
-    </ClInclude>
-    <ClInclude Include="UniscribeRun.h">
-      <Filter>TextView\Uniscribe</Filter>
-    </ClInclude>
     <ClInclude Include="SimpleTextBlock.h">
       <Filter>TextView\Simple</Filter>
     </ClInclude>
@@ -248,6 +218,27 @@
     </ClInclude>
     <ClInclude Include="SimpleTextRunLoop.h">
       <Filter>TextView\Simple</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeTextRunLoop.h">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeLayout.h">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeLayoutData.h">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeTextBlock.h">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClInclude>
+    <ClInclude Include="UniscribeTextRun.h">
+      <Filter>TextView\Uniscribe</Filter>
+    </ClInclude>
+    <ClInclude Include="TextLayoutArgs.h">
+      <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="GapBuffer.h">
+      <Filter>TextDocument</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,9 @@
-// UniscribeRun.h
+// UniscribeTextRun.h
 
-#ifndef UniscribeRun_h
-#define UniscribeRun_h
+#ifndef UniscribeTextRun_h
+#define UniscribeTextRun_h
 
-struct UniscribeRun
+struct UniscribeTextRun
 {
 	size_t item;
 
