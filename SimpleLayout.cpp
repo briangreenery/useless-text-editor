@@ -68,6 +68,7 @@ static size_t WrapLine( SimpleLayoutData& layoutData,
 {
 	SimpleTextRun lastRun = layoutData.runs.back();
 
+	// 'lastRun' can have a textCount of 0
 	size_t estimate = args.textStart + lastRun.textStart + lastRun.textCount;
 
 	size_t lineEnd = args.doc.PrevSoftBreak( estimate + 1 );

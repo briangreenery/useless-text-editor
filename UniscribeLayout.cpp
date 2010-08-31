@@ -270,9 +270,7 @@ static size_t WrapLine( UniscribeLayoutData& layoutData,
 	if ( lineEnd <= args.textStart + lineStart )
 		lineEnd = args.doc.PrevCharStop( estimate + 1 );
 
-	if ( lineEnd <= args.textStart + lineStart )
-		lineEnd = estimate;
-
+	lineEnd = std::max( estimate, args.textStart + lineStart + 1 );
 	lineEnd -= args.textStart;
 
 	UniscribeTextRun fragment = layoutData.DiscardFrom( lineEnd );
