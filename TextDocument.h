@@ -4,7 +4,7 @@
 #define TextDocument_h
 
 #include "TextChange.h"
-#include "GapBuffer.h"
+#include "TextBuffer.h"
 #include "UString.h"
 #include <unicode/brkiter.h>
 #include <utility>
@@ -55,7 +55,7 @@ private:
 	size_t NextBreak( icu::BreakIterator*, size_t ) const;
 	size_t PrevBreak( icu::BreakIterator*, size_t ) const;
 
-	GapBuffer<UTF16::Unit> m_buffer;
+	TextBuffer m_buffer;
 
 	mutable bool m_needIterReset;
 	UErrorCode m_charErrorStatus;
