@@ -38,10 +38,12 @@ static bool LayoutRun( SimpleTextRun run,
 	}
 	else
 	{
+		size_t textCount = (std::min<size_t>)( run.textCount, 1024 );
+		
 		SelectObject( args.hdc, args.style.fonts[run.font].font );
 		if ( !GetTextExtentExPoint( args.hdc,
 		                            args.text.begin() + run.textStart,
-		                            run.textCount,
+		                            textCount,
 		                            args.maxWidth - std::min( maxWidth, xStart ),
 		                            &fit,
 		                            &layoutData.xOffsets.front() + run.textStart,
