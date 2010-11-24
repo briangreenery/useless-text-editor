@@ -25,6 +25,12 @@
     <Filter Include="TextView\Uniscribe">
       <UniqueIdentifier>{cd860aa2-4fc4-44f3-b500-46f7271c0579}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TextView\Annotator">
+      <UniqueIdentifier>{8a2ecfae-f3f0-4cdf-a72e-90bc245ae2ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{2dd1b87f-2fbf-4c3d-9da7-f1ee81a0c4f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ArrayOf.cpp">
@@ -121,8 +127,14 @@
     <ClCompile Include="TextLayoutArgs.cpp">
       <Filter>TextView</Filter>
     </ClCompile>
-    <ClCompile Include="GapBuffer.cpp">
+    <ClCompile Include="TextAnnotator.cpp">
+      <Filter>TextView\Annotator</Filter>
+    </ClCompile>
+    <ClCompile Include="TextBuffer.cpp">
       <Filter>TextDocument</Filter>
+    </ClCompile>
+    <ClCompile Include="TextChangeTest.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -237,8 +249,14 @@
     <ClInclude Include="TextLayoutArgs.h">
       <Filter>TextView</Filter>
     </ClInclude>
-    <ClInclude Include="GapBuffer.h">
+    <ClInclude Include="TextAnnotator.h">
+      <Filter>TextView\Annotator</Filter>
+    </ClInclude>
+    <ClInclude Include="TextBuffer.h">
       <Filter>TextDocument</Filter>
+    </ClInclude>
+    <ClInclude Include="TextChangeTest.h">
+      <Filter>Tests</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

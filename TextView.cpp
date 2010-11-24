@@ -15,6 +15,7 @@ TextView::TextView( HWND hwnd )
 	, m_isCaretVisible( false )
 	, m_mouseWheelRemainder( 0 )
 	, m_lineUpCount( 0 )
+	, m_annotator( 0 )
 {
 	m_metrics.gutterWidth = 25;
 	m_metrics.marginWidth = 5;
@@ -324,13 +325,13 @@ void TextView::Delete( bool wholeWord )
 
 void TextView::Insert( UTF16Ref text )
 {
-	Clear( false );
-	Assert( m_selection.IsEmpty() );
-
-	TextChange change = m_doc.Insert( m_selection.end, text );
+	TextChange change;
+	change.AddChange( m_doc.Delete( m_selection.Min(), m_selection.Size() ) );
+	change.AddChange( m_doc.Insert( m_selection.Min(), text ) );
 	UpdateLayout( change );
 
-	m_selection.start = m_selection.end = m_selection.end + change.count;
+	m_selection.end   = m_selection.Max() + change.delta;
+	m_selection.start = m_selection.end;
 	MoveCaret( m_selection.end, true );
 }
 
@@ -453,11 +454,13 @@ void TextView::Redo()
 
 void TextView::UpdateLayout( TextChange change )
 {
-	HDC hdc = GetDC( m_hwnd );
+	//if ( m_annotator )
+	//	change.AddChange( change, m_annotator->Update( change ) );
 
 	RECT rect = m_metrics.TextRect( m_hwnd );
-	m_blocks.Update( hdc, rect.right - rect.left, change );
 
+	HDC hdc = GetDC( m_hwnd );
+	m_blocks.Update( hdc, rect.right - rect.left, change );
 	ReleaseDC( m_hwnd, hdc );
 
 	InvalidateRect( m_hwnd, NULL, FALSE );
@@ -466,15 +469,7 @@ void TextView::UpdateLayout( TextChange change )
 
 void TextView::UpdateLayout()
 {
-	HDC hdc = GetDC( m_hwnd );
-
-	RECT rect = m_metrics.TextRect( m_hwnd );
-	m_blocks.UpdateAll( hdc, rect.right - rect.left );
-
-	ReleaseDC( m_hwnd, hdc );
-
-	InvalidateRect( m_hwnd, NULL, FALSE );
-	ScrollDelta( 0, 0 );
+	UpdateLayout( TextChange( 0, m_doc.Length(), TextChange::modification ) );
 }
 
 void TextView::MoveCaret( size_t pos, bool advancing )

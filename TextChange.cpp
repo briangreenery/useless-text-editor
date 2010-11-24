@@ -1,27 +1,53 @@
 // TextChange.cpp
 
 #include "TextChange.h"
+#include "Assert.h"
+#include <algorithm>
 
-TextChange TextChange::NoChange()
+TextChange::TextChange()
+	: start( 0 )
+	, end( 0 )
+	, delta( 0 )
 {
-	TextChange change = { 0, 0, noChange };
-	return change;
 }
 
-TextChange TextChange::Insertion( size_t pos, size_t count )
+TextChange::TextChange( size_t pos, size_t count, Type type )
+	: start( pos )
+	, end( pos )
+	, delta( 0 )
 {
-	TextChange change = { pos, count, insertion };
-	return change;
+	if ( type == insertion )
+	{
+		delta = int( count );
+	}
+	else if ( type == deletion )
+	{
+		end = start + count;
+		delta = -int( count );
+	}
+	else
+	{
+		end = start + count;
+	}
 }
 
-TextChange TextChange::Deletion( size_t pos, size_t count )
+void TextChange::AddChange( TextChange change )
 {
-	TextChange change = { pos, count, deletion };
-	return change;
-}
+	if ( start == end && delta == 0 )
+	{
+		start = change.start;
+		end = change.end;
+	}
+	else
+	{
+		if ( change.start > start )
+			change.start -= std::min<int>( change.start - start, delta );
+		if ( change.end > start )
+			change.end -= std::min<int>( change.end - start, delta );
 
-TextChange TextChange::Modification( size_t pos, size_t count )
-{
-	TextChange change = { pos, count, modification };
-	return change;
+		start = std::min( start, change.start );
+		end = std::max( end, change.end );
+	}
+
+	delta += change.delta;
 }

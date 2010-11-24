@@ -30,7 +30,6 @@ public:
 	size_t CharFromPoint( POINT* ) const;
 
 	void Update( HDC, int width, TextChange );
-	void UpdateAll( HDC, int width );
 
 private:
 	bool IsSimpleText( UTF16Ref ) const;

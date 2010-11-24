@@ -49,9 +49,18 @@ bool InitApp()
 	return RegisterClassEx( &wcx ) ? true : false;
 }
 
+#include "TextChangeTest.h"
+
+static void RunTests()
+{
+	TextChangeTest();
+}
+
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd )
 {
 	theInstance = hInstance;
+
+	RunTests();
 
 	CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
 	BufferedPaintInit();

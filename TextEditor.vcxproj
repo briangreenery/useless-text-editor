@@ -85,6 +85,8 @@
     <ClCompile Include="ArrayOf.cpp" />
     <ClCompile Include="DocumentCharIter.cpp" />
     <ClCompile Include="EmptyTextBlock.cpp" />
+    <ClCompile Include="TextAnnotator.cpp" />
+    <ClCompile Include="TextChangeTest.cpp" />
     <ClCompile Include="TextLayoutArgs.cpp" />
     <ClCompile Include="SimpleLayout.cpp" />
     <ClCompile Include="SimpleLayoutData.cpp" />
@@ -93,7 +95,7 @@
     <ClCompile Include="SimpleTextBlock.cpp" />
     <ClCompile Include="SizedAutoArray.cpp" />
     <ClCompile Include="DocumentReader.cpp" />
-    <ClCompile Include="GapBuffer.cpp" />
+    <ClCompile Include="TextBuffer.cpp" />
     <ClCompile Include="TextBlock.cpp" />
     <ClCompile Include="TextFont.cpp" />
     <ClCompile Include="VisualPainter.cpp" />
@@ -124,6 +126,8 @@
     <ClInclude Include="EmptyTextBlock.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Integers.h" />
+    <ClInclude Include="TextAnnotator.h" />
+    <ClInclude Include="TextChangeTest.h" />
     <ClInclude Include="TextLayoutArgs.h" />
     <ClInclude Include="Require.h" />
     <ClInclude Include="SimpleLayout.h" />
@@ -138,7 +142,7 @@
     <ClInclude Include="TextStyle.h" />
     <ClInclude Include="UString.h" />
     <ClInclude Include="DocumentReader.h" />
-    <ClInclude Include="GapBuffer.h" />
+    <ClInclude Include="TextBuffer.h" />
     <ClInclude Include="UniscribeTextBlock.h" />
     <ClInclude Include="VisualDocument.h" />
     <ClInclude Include="TextSelection.h" />

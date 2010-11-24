@@ -77,7 +77,7 @@ static const UTF16::Unit* SkipLineBreak( const UTF16::Unit* lineBreak, const UTF
 TextChange TextDocument::Insert( size_t pos, UTF16Ref text )
 {
 	if ( text.empty() )
-		return TextChange::NoChange();
+		return TextChange();
 
 	// TODO: validate unicode (?)
 
@@ -105,17 +105,17 @@ TextChange TextDocument::Insert( size_t pos, UTF16Ref text )
 	}
 
 	m_needIterReset = true;
-	return TextChange::Insertion( pos, count );
+	return TextChange( pos, count, TextChange::insertion );
 }
 
 TextChange TextDocument::Delete( size_t pos, size_t count )
 {
 	if ( count == 0 )
-		return TextChange::NoChange();
+		return TextChange();
 
 	m_buffer.erase( pos, count );
 	m_needIterReset = true;
-	return TextChange::Deletion( pos, count );
+	return TextChange( pos, count, TextChange::deletion );
 }
 
 void TextDocument::ResetIterators() const

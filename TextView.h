@@ -8,6 +8,7 @@
 #include "TextViewMetrics.h"
 #include "TextStyle.h"
 #include "VisualDocument.h"
+#include "TextAnnotator.h"
 
 class TextView
 {
@@ -84,6 +85,8 @@ private:
 	TextSelection   m_selection;
 	TextViewMetrics m_metrics;
 	VisualDocument  m_blocks;
+
+	TextAnnotator* m_annotator;
 
 	bool m_isDoingMouseSel;
 	bool m_isCaretVisible;

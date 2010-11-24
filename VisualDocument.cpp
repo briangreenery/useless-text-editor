@@ -46,21 +46,13 @@ void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection )
 	}
 }
 
-void VisualDocument::UpdateAll( HDC hdc, int maxWidth )
-{
-	Update( hdc, maxWidth, TextChange::Modification( 0, m_doc.Length() ) );
-}
-
 void VisualDocument::Update( HDC hdc, int maxWidth, TextChange change )
 {
-	BlockContaining_Result block = BlockContaining( change.pos );
+	BlockContaining_Result block = BlockContaining( change.start );
 
 	size_t start = block.textStart;
 	size_t count = 0;
-
-	size_t modifiedCount = 0;
-	if ( change.type != TextChange::insertion )
-		modifiedCount = change.count + ( change.pos - block.textStart );
+	size_t modifiedCount = change.end + block.textStart;
 
 	do
 	{
@@ -70,12 +62,7 @@ void VisualDocument::Update( HDC hdc, int maxWidth, TextChange change )
 	}
 	while ( count <= modifiedCount && block.it != m_blocks.end() );
 
-	if ( change.type == TextChange::insertion )
-		count += change.count;
-	else if ( change.type == TextChange::deletion )
-		count -= change.count;
-
-	LayoutText( block.it, start, count, hdc, maxWidth );
+	LayoutText( block.it, start, count + change.delta, hdc, maxWidth );
 }
 
 bool VisualDocument::IsSimpleText( UTF16Ref text ) const
