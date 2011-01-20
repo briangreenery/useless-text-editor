@@ -21,7 +21,8 @@ class UniscribeTextBlock : public TextBlock
 public:
 	UniscribeTextBlock( UniscribeLayoutDataPtr, const TextStyleRegistry& );
 
-	virtual void Draw( VisualPainter&, RECT ) const;
+	virtual void DrawBackground( VisualPainter&, RECT ) const;
+	virtual void DrawText      ( VisualPainter&, RECT ) const;
 
 	virtual size_t LineCount() const;
 	virtual size_t LineContaining( size_t ) const;

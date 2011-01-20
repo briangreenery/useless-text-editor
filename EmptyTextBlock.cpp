@@ -11,7 +11,7 @@ EmptyTextBlock::EmptyTextBlock( bool endsWithNewline, TextStyleRegistry& styleRe
 {
 }
 
-void EmptyTextBlock::Draw( VisualPainter& painter, RECT rect ) const
+void EmptyTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) const
 {
 	if ( painter.selection.Intersects( 0, Length() ) )
 	{
@@ -22,6 +22,10 @@ void EmptyTextBlock::Draw( VisualPainter& painter, RECT rect ) const
 
 		painter.DrawRect( drawRect, m_styleRegistry.selectionColor );
 	}
+}
+
+void EmptyTextBlock::DrawText( VisualPainter& painter, RECT rect ) const
+{
 }
 
 size_t EmptyTextBlock::LineCount() const

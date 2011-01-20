@@ -18,7 +18,7 @@ class VisualDocument
 public:
 	VisualDocument( const TextDocument&, TextStyleRegistry& );
 
-	void Draw( HDC hdc, RECT rect, TextSelection );
+	void Draw( HDC hdc, RECT rect, TextSelection ) const;
 
 	size_t LineCount() const;
 	size_t LineStart( int y ) const;
@@ -46,6 +46,9 @@ private:
 
 	BlockContaining_Result BlockContaining( size_t pos ) const;
 	BlockContaining_Result BlockContaining( int y ) const;
+
+	virtual void DrawBackground( BlockContaining_Result, VisualPainter&, RECT ) const;
+	virtual void DrawText      ( BlockContaining_Result, VisualPainter&, RECT ) const;
 
 	const TextDocument& m_doc;
 	TextStyleRegistry&  m_styleRegistry;

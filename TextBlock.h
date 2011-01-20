@@ -15,7 +15,8 @@ class TextBlock
 public:
 	TextBlock() {}
 
-	virtual void Draw( VisualPainter&, RECT ) const = 0;
+	virtual void DrawBackground( VisualPainter&, RECT ) const = 0;
+	virtual void DrawText      ( VisualPainter&, RECT ) const = 0;
 
 	virtual size_t LineCount() const = 0;
 	virtual size_t LineContaining( size_t ) const = 0;

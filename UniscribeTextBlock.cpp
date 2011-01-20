@@ -18,24 +18,28 @@ UniscribeTextBlock::UniscribeTextBlock( UniscribeLayoutDataPtr data, const TextS
 {
 }
 
-void UniscribeTextBlock::Draw( VisualPainter& painter, RECT rect ) const
+void UniscribeTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) const
 {
 	size_t firstLine = rect.top / m_styleRegistry.lineHeight;
 	rect.top = firstLine * m_styleRegistry.lineHeight;
 
-	RECT clipRect = rect;
-	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &clipRect ); ++line )
+	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &rect ); ++line )
 	{
-		DrawLineBackground( line, painter, clipRect );
-		DrawLineSelection ( line, painter, clipRect );
-		clipRect.top += m_styleRegistry.lineHeight;
+		DrawLineBackground( line, painter, rect );
+		DrawLineSelection ( line, painter, rect );
+		rect.top += m_styleRegistry.lineHeight;
 	}
+}
 
-	clipRect = rect;
-	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &clipRect ); ++line )
+void UniscribeTextBlock::DrawText( VisualPainter& painter, RECT rect ) const
+{
+	size_t firstLine = rect.top / m_styleRegistry.lineHeight;
+	rect.top = firstLine * m_styleRegistry.lineHeight;
+
+	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &rect ); ++line )
 	{
-		DrawLineText( line, painter, clipRect );
-		clipRect.top += m_styleRegistry.lineHeight;
+		DrawLineText( line, painter, rect );
+		rect.top += m_styleRegistry.lineHeight;
 	}
 }
 

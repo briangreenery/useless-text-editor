@@ -24,7 +24,7 @@ VisualDocument::VisualDocument( const TextDocument& doc, TextStyleRegistry& styl
 	m_blocks.push_back( TextBlockPtr( new EmptyTextBlock( false, m_styleRegistry ) ) );
 }
 
-void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection )
+void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection ) const
 {
 	VisualPainter painter( hdc, m_doc, m_styleRegistry, selection );
 
@@ -32,11 +32,34 @@ void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection )
 
 	OffsetRect( &rect, 0, -block.yStart );
 
+	DrawBackground( block, painter, rect );
+	DrawText      ( block, painter, rect );
+}
+
+void VisualDocument::DrawBackground( BlockContaining_Result block, VisualPainter& painter, RECT rect ) const
+{
 	while ( block.it != m_blocks.end() && !IsRectEmpty( &rect ) )
 	{
 		painter.SetOrigin( block.textStart, block.yStart );
 
-		block->Draw( painter, rect );
+		block->DrawBackground( painter, rect );
+
+		rect.bottom -= block->Height() - rect.top;
+		rect.top = 0;
+
+		block.yStart += block->Height();
+		block.textStart += block->Length();
+		++block.it;
+	}
+}
+
+void VisualDocument::DrawText( BlockContaining_Result block, VisualPainter& painter, RECT rect ) const
+{
+	while ( block.it != m_blocks.end() && !IsRectEmpty( &rect ) )
+	{
+		painter.SetOrigin( block.textStart, block.yStart );
+
+		block->DrawText( painter, rect );
 
 		rect.bottom -= block->Height() - rect.top;
 		rect.top = 0;
