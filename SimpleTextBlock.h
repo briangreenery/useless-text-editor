@@ -4,16 +4,18 @@
 #define SimpleTextBlock_h
 
 #include "SimpleLayoutData.h"
+#include "TextStyleRun.h"
 #include "TextBlock.h"
 #include "ArrayOf.h"
+#include "Integers.h"
 #include <vector>
 
-class TextStyle;
+class TextStyleRegistry;
 
 class SimpleTextBlock : public TextBlock
 {
 public:
-	SimpleTextBlock( SimpleLayoutDataPtr, TextStyle& );
+	SimpleTextBlock( SimpleLayoutDataPtr, const TextStyleRegistry& );
 
 	virtual void Draw( VisualPainter&, RECT ) const;
 
@@ -31,8 +33,11 @@ public:
 	virtual bool EndsWithNewline() const;
 
 private:
-	void DrawLineSelection( size_t line, VisualPainter&, RECT ) const;
-	void DrawLineText     ( size_t line, VisualPainter&, RECT ) const;
+	void DrawLineBackground( size_t line, VisualPainter&, RECT ) const;
+	void DrawLineSelection ( size_t line, VisualPainter&, RECT ) const;
+	void DrawLineText      ( size_t line, VisualPainter&, RECT ) const;
+
+	void DrawLineRect( VisualPainter&, RECT, int start, int end, uint32 color ) const;
 
 	size_t TextStart( size_t line ) const;
 	size_t TextEnd  ( size_t line ) const;
@@ -45,7 +50,7 @@ private:
 	size_t XtoCP( size_t line, LONG* x ) const;
 
 	SimpleLayoutDataPtr m_data;
-	TextStyle&          m_style;
+	const TextStyleRegistry&  m_styleRegistry;
 };
 
 #endif

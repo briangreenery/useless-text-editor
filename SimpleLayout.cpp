@@ -6,7 +6,7 @@
 #include "SimpleTextBlock.h"
 #include "TextLayoutArgs.h"
 #include "TextDocument.h"
-#include "TextStyle.h"
+#include "TextStyleRegistry.h"
 #include "Assert.h"
 #include <algorithm>
 
@@ -30,17 +30,17 @@ static bool LayoutRun( SimpleTextRun run,
 	Assert( layoutData.xOffsets.size() == run.textStart );
 	layoutData.xOffsets.resize( layoutData.xOffsets.size() + run.textCount );
 
-	if ( run.textCount == 1 && args.text[run.textStart] == '\t' && args.style.tabSize > 0 )
+	if ( run.textCount == 1 && args.text[run.textStart] == '\t' && args.styleRegistry.tabSize > 0 )
 	{
-		int tabWidth = args.style.tabSize - ( xStart % args.style.tabSize );
+		int tabWidth = args.styleRegistry.tabSize - ( xStart % args.styleRegistry.tabSize );
 		layoutData.xOffsets.back() = tabWidth;
 		fit = ( tabWidth < maxWidth ? 1 : 0 );
 	}
 	else
 	{
-		size_t textCount = (std::min<size_t>)( run.textCount, 1024 );
+		size_t textCount = std::min<size_t>( run.textCount, 1024 );
 		
-		SelectObject( args.hdc, args.style.fonts[run.font].font );
+		SelectObject( args.hdc, args.styleRegistry.Font( run.fontid ).hfont );
 		if ( !GetTextExtentExPoint( args.hdc,
 		                            args.text.begin() + run.textStart,
 		                            textCount,
@@ -102,7 +102,7 @@ TextBlockPtr SimpleLayoutParagraph( const TextLayoutArgs& args )
 	int    lineWidth = 0;
 	size_t lineStart = 0;
 
-	for ( SimpleTextRunLoop loop( args.text ); loop.Unfinished(); )
+	for ( SimpleTextRunLoop loop( args.text, args.fonts ); loop.Unfinished(); )
 	{
 		SimpleTextRun run = loop.NextRun();
 
@@ -123,5 +123,5 @@ TextBlockPtr SimpleLayoutParagraph( const TextLayoutArgs& args )
 	if ( layoutData->lines.empty() || layoutData->lines.back() != layoutData->runs.size() )
 		layoutData->lines.push_back( layoutData->runs.size() );
 
-	return TextBlockPtr( new SimpleTextBlock( std::move( layoutData ), args.style ) );
+	return TextBlockPtr( new SimpleTextBlock( std::move( layoutData ), args.styleRegistry ) );
 }

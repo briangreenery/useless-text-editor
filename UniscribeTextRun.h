@@ -3,8 +3,14 @@
 #ifndef UniscribeTextRun_h
 #define UniscribeTextRun_h
 
-struct UniscribeTextRun
+#include "Integers.h"
+
+class UniscribeTextRun
 {
+public:
+	UniscribeTextRun() {}
+	UniscribeTextRun( size_t item, size_t textStart, size_t textCount, uint32 fontid );
+
 	size_t item;
 
 	size_t glyphStart;
@@ -12,10 +18,9 @@ struct UniscribeTextRun
 
 	size_t textStart;
 	size_t textCount;
+	uint32 fontid;
 
 	int width;
-
-	size_t font;
 };
 
 #endif

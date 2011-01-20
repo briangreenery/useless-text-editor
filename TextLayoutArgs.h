@@ -4,21 +4,24 @@
 #define TextLayoutArgs_h
 
 #include "UString.h"
+#include "ArrayOf.h"
 #include <Windows.h>
 
 class TextDocument;
-class TextStyle;
+class TextStyleRegistry;
+class TextFontRun;
 
 class TextLayoutArgs
 {
 public:
-	TextLayoutArgs( const TextDocument&, TextStyle&, HDC, int maxWidth );
+	TextLayoutArgs( const TextDocument&, TextStyleRegistry&, HDC, int maxWidth );
 
 	UTF16Ref text;
+	ArrayOf<const TextFontRun> fonts;
 	bool endsWithNewline;
 	size_t textStart;
 	const TextDocument& doc;
-	TextStyle& style;
+	TextStyleRegistry& styleRegistry;
 	HDC hdc;
 	int maxWidth;
 };

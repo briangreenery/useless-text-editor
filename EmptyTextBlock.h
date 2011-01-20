@@ -5,12 +5,12 @@
 
 #include "TextBlock.h"
 
-class TextStyle;
+class TextStyleRegistry;
 
 class EmptyTextBlock : public TextBlock
 {
 public:
-	EmptyTextBlock( bool endsWithNewline, TextStyle& );
+	EmptyTextBlock( bool endsWithNewline, TextStyleRegistry& );
 
 	virtual void Draw( VisualPainter&, RECT ) const;
 
@@ -29,7 +29,7 @@ public:
 
 private:
 	bool m_endsWithNewline;
-	TextStyle& m_style;
+	TextStyleRegistry& m_styleRegistry;
 };
 
 #endif

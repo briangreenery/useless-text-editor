@@ -6,13 +6,14 @@
 #include "UniscribeLayoutData.h"
 #include "ArrayOf.h"
 #include "UString.h"
+#include "TextFontRun.h"
 #include <windows.h>
 #include <usp10.h>
 
 class UniscribeTextRunLoop
 {
 public:
-	UniscribeTextRunLoop( UTF16Ref, const std::vector<SCRIPT_ITEM>& );
+	UniscribeTextRunLoop( UTF16Ref, const std::vector<SCRIPT_ITEM>&, ArrayOf<const TextFontRun> fonts );
 
 	bool Unfinished() const;
 	UniscribeTextRun NextRun();
@@ -20,16 +21,16 @@ public:
 
 private:
 	UTF16Ref m_text;
-	size_t   m_position;
 
-	ArrayOf<const SCRIPT_ITEM> m_items;
-	const SCRIPT_ITEM*         m_item;
-	size_t                     m_itemUsed;
+	size_t m_position;
+	size_t m_nextTab;
+
+	const std::vector<SCRIPT_ITEM>           m_items;
+	std::vector<SCRIPT_ITEM>::const_iterator m_item;
+
+	ArrayOf<const TextFontRun> m_fonts;
+	const TextFontRun*         m_font;
+	size_t                     m_fontStart;
 };
-
-inline bool UniscribeTextRunLoop::Unfinished() const
-{
-	return m_item != m_items.end() - 1;
-}
 
 #endif

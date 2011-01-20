@@ -6,9 +6,8 @@
 #include "TextDocument.h"
 #include "TextSelection.h"
 #include "TextViewMetrics.h"
-#include "TextStyle.h"
+#include "TextStyleRegistry.h"
 #include "VisualDocument.h"
-#include "TextAnnotator.h"
 
 class TextView
 {
@@ -80,11 +79,11 @@ private:
 
 	HWND m_hwnd;
 
-	TextDocument    m_doc;
-	TextStyle       m_style;
-	TextSelection   m_selection;
-	TextViewMetrics m_metrics;
-	VisualDocument  m_blocks;
+	TextDocument      m_doc;
+	TextStyleRegistry m_styleRegistry;
+	TextSelection     m_selection;
+	TextViewMetrics   m_metrics;
+	VisualDocument    m_blocks;
 
 	TextAnnotator* m_annotator;
 

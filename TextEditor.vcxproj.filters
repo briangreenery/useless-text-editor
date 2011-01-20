@@ -13,9 +13,6 @@
     <Filter Include="TextDocument">
       <UniqueIdentifier>{3e23faf4-05a2-44fd-9346-1ad100ab3ac1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Lexer">
-      <UniqueIdentifier>{01e98e77-53bd-4c5a-8737-e385986223a2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="TextStyle">
       <UniqueIdentifier>{9dfcb392-4b14-493f-a2e1-050ade9e56be}</UniqueIdentifier>
     </Filter>
@@ -25,11 +22,11 @@
     <Filter Include="TextView\Uniscribe">
       <UniqueIdentifier>{cd860aa2-4fc4-44f3-b500-46f7271c0579}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TextView\Annotator">
-      <UniqueIdentifier>{8a2ecfae-f3f0-4cdf-a72e-90bc245ae2ca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Tests">
       <UniqueIdentifier>{2dd1b87f-2fbf-4c3d-9da7-f1ee81a0c4f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Relevance">
+      <UniqueIdentifier>{01e98e77-53bd-4c5a-8737-e385986223a2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -51,21 +48,9 @@
     <ClCompile Include="TextDocument.cpp">
       <Filter>TextDocument</Filter>
     </ClCompile>
-    <ClCompile Include="FontCollection.cpp">
-      <Filter>TextStyle</Filter>
-    </ClCompile>
-    <ClCompile Include="LexerState.cpp">
-      <Filter>Lexer</Filter>
-    </ClCompile>
-    <ClCompile Include="NextRelevanceToken.cpp">
-      <Filter>Lexer</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TextStyle.cpp">
       <Filter>TextStyle</Filter>
-    </ClCompile>
-    <ClCompile Include="VisualSelection.cpp">
-      <Filter>TextView</Filter>
     </ClCompile>
     <ClCompile Include="VisualPainter.cpp">
       <Filter>TextView</Filter>
@@ -74,9 +59,6 @@
       <Filter>TextView</Filter>
     </ClCompile>
     <ClCompile Include="DocumentCharIter.cpp">
-      <Filter>TextDocument</Filter>
-    </ClCompile>
-    <ClCompile Include="DocumentReader.cpp">
       <Filter>TextDocument</Filter>
     </ClCompile>
     <ClCompile Include="TextFont.cpp">
@@ -127,14 +109,29 @@
     <ClCompile Include="TextLayoutArgs.cpp">
       <Filter>TextView</Filter>
     </ClCompile>
-    <ClCompile Include="TextAnnotator.cpp">
-      <Filter>TextView\Annotator</Filter>
-    </ClCompile>
     <ClCompile Include="TextBuffer.cpp">
       <Filter>TextDocument</Filter>
     </ClCompile>
     <ClCompile Include="TextChangeTest.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TextAnnotator.cpp">
+      <Filter>TextStyle</Filter>
+    </ClCompile>
+    <ClCompile Include="TextStyleRun.cpp">
+      <Filter>TextStyle</Filter>
+    </ClCompile>
+    <ClCompile Include="TextFontRun.cpp">
+      <Filter>TextStyle</Filter>
+    </ClCompile>
+    <ClCompile Include="TextStyleRegistry.cpp">
+      <Filter>TextStyle</Filter>
+    </ClCompile>
+    <ClCompile Include="TextDocumentReader.cpp">
+      <Filter>TextDocument</Filter>
+    </ClCompile>
+    <ClCompile Include="TextStyleReader.cpp">
+      <Filter>TextStyle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -174,29 +171,14 @@
     <ClInclude Include="TextDocument.h">
       <Filter>TextDocument</Filter>
     </ClInclude>
-    <ClInclude Include="FontCollection.h">
-      <Filter>TextStyle</Filter>
-    </ClInclude>
-    <ClInclude Include="LexerState.h">
-      <Filter>Lexer</Filter>
-    </ClInclude>
-    <ClInclude Include="NextRelevanceToken.h">
-      <Filter>Lexer</Filter>
-    </ClInclude>
     <ClInclude Include="TextStyle.h">
       <Filter>TextStyle</Filter>
-    </ClInclude>
-    <ClInclude Include="VisualSelection.h">
-      <Filter>TextView</Filter>
     </ClInclude>
     <ClInclude Include="VisualPainter.h">
       <Filter>TextView</Filter>
     </ClInclude>
     <ClInclude Include="VisualDocument.h">
       <Filter>TextView</Filter>
-    </ClInclude>
-    <ClInclude Include="DocumentReader.h">
-      <Filter>TextDocument</Filter>
     </ClInclude>
     <ClInclude Include="DocumentCharIter.h">
       <Filter>TextDocument</Filter>
@@ -249,19 +231,29 @@
     <ClInclude Include="TextLayoutArgs.h">
       <Filter>TextView</Filter>
     </ClInclude>
-    <ClInclude Include="TextAnnotator.h">
-      <Filter>TextView\Annotator</Filter>
-    </ClInclude>
     <ClInclude Include="TextBuffer.h">
       <Filter>TextDocument</Filter>
     </ClInclude>
     <ClInclude Include="TextChangeTest.h">
       <Filter>Tests</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="NextRelevanceToken.re2c">
-      <Filter>Lexer</Filter>
-    </None>
+    <ClInclude Include="TextStyleRun.h">
+      <Filter>TextStyle</Filter>
+    </ClInclude>
+    <ClInclude Include="TextAnnotator.h">
+      <Filter>TextStyle</Filter>
+    </ClInclude>
+    <ClInclude Include="TextFontRun.h">
+      <Filter>TextStyle</Filter>
+    </ClInclude>
+    <ClInclude Include="TextStyleRegistry.h">
+      <Filter>TextStyle</Filter>
+    </ClInclude>
+    <ClInclude Include="TextDocumentReader.h">
+      <Filter>TextDocument</Filter>
+    </ClInclude>
+    <ClInclude Include="TextStyleReader.h">
+      <Filter>TextStyle</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

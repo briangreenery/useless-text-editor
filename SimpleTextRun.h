@@ -3,12 +3,17 @@
 #ifndef SimpleTextRun_h
 #define SimpleTextRun_h
 
-struct SimpleTextRun
+#include "Integers.h"
+
+class SimpleTextRun
 {
+public:
+	SimpleTextRun() {}
+	SimpleTextRun( size_t textStart, size_t textCount, size_t font );
+	
 	size_t textStart;
 	size_t textCount;
-
-	size_t font;
+	uint32 fontid;
 };
 
 #endif

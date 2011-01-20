@@ -18,12 +18,12 @@ TextChange::TextChange( size_t pos, size_t count, Type type )
 {
 	if ( type == insertion )
 	{
-		delta = int( count );
+		delta = static_cast<int>( count );
 	}
 	else if ( type == deletion )
 	{
 		end = start + count;
-		delta = -int( count );
+		delta = -static_cast<int>( count );
 	}
 	else
 	{

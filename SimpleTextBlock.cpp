@@ -2,75 +2,111 @@
 
 #include "SimpleTextBlock.h"
 #include "VisualPainter.h"
-#include "VisualSelection.h"
-#include "DocumentReader.h"
-#include "TextStyle.h"
+#include "TextStyleRegistry.h"
+#include "TextDocumentReader.h"
+#include "TextStyleReader.h"
 #include <algorithm>
 
-SimpleTextBlock::SimpleTextBlock( SimpleLayoutDataPtr data, TextStyle& style )
+SimpleTextBlock::SimpleTextBlock( SimpleLayoutDataPtr data, const TextStyleRegistry& styleRegistry )
 	: m_data( std::move( data ) )
-	, m_style( style )
+	, m_styleRegistry( styleRegistry )
 {
 }
 
 void SimpleTextBlock::Draw( VisualPainter& painter, RECT rect ) const
 {
-	size_t line = rect.top / m_style.lineHeight;
-	rect.top = line * m_style.lineHeight;
+	size_t firstLine = rect.top / m_styleRegistry.lineHeight;
+	rect.top = firstLine * m_styleRegistry.lineHeight;
 
-	for ( ; line < m_data->lines.size() && !IsRectEmpty( &rect ); ++line )
+	RECT clipRect = rect;
+	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &clipRect ); ++line )
 	{
-		DrawLineSelection( line, painter, rect );
-		DrawLineText     ( line, painter, rect );
+		DrawLineBackground( line, painter, clipRect );
+		DrawLineSelection ( line, painter, clipRect );
+		clipRect.top += m_styleRegistry.lineHeight;
+	}
 
-		rect.top += m_style.lineHeight;
+	clipRect = rect;
+	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &clipRect ); ++line )
+	{
+		DrawLineText( line, painter, clipRect );
+		clipRect.top += m_styleRegistry.lineHeight;
+	}
+}
+
+void SimpleTextBlock::DrawLineBackground( size_t line, VisualPainter& painter, RECT rect ) const
+{
+	size_t pos = TextStart( line );
+	int xStart = 0;
+
+	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( pos, TextEnd( line ) - pos );
+	for ( const TextStyleRun* it = styles.begin(); it != styles.end() && xStart < rect.right; ++it )
+	{
+		int xEnd = CPtoX( line, pos + it->count - 1, true );
+
+		DrawLineRect( painter, rect, xStart, xEnd, m_styleRegistry.Style( it->styleid ).bkColor );
+
+		pos += it->count;
+		xStart = xEnd;
 	}
 }
 
 void SimpleTextBlock::DrawLineSelection( size_t line, VisualPainter& painter, RECT rect ) const
 {
-	VisualSelection selection;
-
 	if ( painter.selection.Intersects( TextStart( line ), TextEnd( line ) ) )
 	{
 		size_t start = std::max( painter.selection.Min(), TextStart( line ) );
 		size_t end   = std::min( painter.selection.Max(), TextEnd  ( line ) );
 
 		if ( start < end )
-			selection.Add( CPtoX( line, start, false ), CPtoX( line, end - 1, true ) );
+		{
+			int xStart = CPtoX( line, start, false );
+			int xEnd   = CPtoX( line, end - 1, true );
+
+			DrawLineRect( painter, rect, xStart, xEnd, m_styleRegistry.selectionColor );
+		}
 	}
 
 	if ( line == m_data->lines.size() - 1
 	  && painter.selection.Intersects( TextEnd( line ), m_data->length )
 	  && m_data->endsWithNewline )
 	{
-		selection.Add( LineWidth( line ), LineWidth( line ) + painter.style.avgCharWidth );
-	}
+		int xStart = LineWidth( line );
+		int xEnd   = LineWidth( line ) + m_styleRegistry.avgCharWidth;
 
-	selection.Draw( painter, rect );
+		DrawLineRect( painter, rect, xStart, xEnd, m_styleRegistry.selectionColor );
+	}
 }
 
 void SimpleTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT rect ) const
 {
-	ArrayOf<const SimpleTextRun> runs = LineRuns( line );
+	size_t pos = TextStart( line );
+	int xStart = 0;
 
-	DocumentReader reader( painter.doc );
-
-	for ( const SimpleTextRun* run = runs.begin(); run != runs.end() && !IsRectEmpty( &rect ); ++run )
+	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( pos, TextEnd( line ) - pos );
+	for ( const TextStyleRun* it = styles.begin(); it != styles.end() && xStart < rect.right; ++it )
 	{
-		painter.SetFont( run->font );
+		const TextStyle& style = m_styleRegistry.Style( it->styleid );
+		SelectObject( painter.hdc, m_styleRegistry.Font( style.fontid ).hfont );
+		SetTextColor( painter.hdc, style.textColor );
 
-		ExtTextOutW( painter.hdc,
-		             rect.left,
-		             rect.top,
-		             ETO_CLIPPED,
-		             &rect,
-		             reader.StrictRange( painter.textStart + run->textStart, run->textCount ).begin(),
-		             run->textCount,
-		             NULL );
+		UTF16Ref text = painter.docReader.StrictRange( painter.textStart + pos, it->count );
+		ExtTextOutW( painter.hdc, xStart, rect.top, ETO_CLIPPED, &rect, text.begin(), it->count, NULL );
 
-		rect.left += RunWidth( run );
+		pos += it->count;
+		xStart = CPtoX( line, pos - 1, true );
 	}
+}
+
+void SimpleTextBlock::DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, uint32 color ) const
+{
+	RECT drawRect = { std::max<int>( xStart, rect.left ),
+	                  rect.top,
+	                  std::min<int>( xEnd, rect.right ),
+	                  rect.top + m_styleRegistry.lineHeight };
+
+	if ( !IsRectEmpty( &drawRect ) )
+		painter.DrawRect( drawRect, color );
 }
 
 size_t SimpleTextBlock::LineCount() const
@@ -88,14 +124,14 @@ size_t SimpleTextBlock::LineContaining( size_t pos ) const
 
 size_t SimpleTextBlock::LineStart( int y ) const
 {
-	int line = y / m_style.lineHeight;
+	int line = y / m_styleRegistry.lineHeight;
 	Assert( line >= 0 && size_t( line ) < m_data->lines.size() );
 	return TextStart( line );
 }
 
 size_t SimpleTextBlock::LineEnd( int y ) const
 {
-	int line = y / m_style.lineHeight;
+	int line = y / m_styleRegistry.lineHeight;
 	Assert( line >= 0 && size_t( line ) < m_data->lines.size() );
 	return TextEnd( line );
 }
@@ -117,19 +153,19 @@ POINT SimpleTextBlock::PointFromChar( size_t pos, bool advancing ) const
 	Assert( line < m_data->lines.size() );
 
 	result.x = CPtoX( line, pos, trailingEdge );
-	result.y = line * m_style.lineHeight;
+	result.y = line * m_styleRegistry.lineHeight;
 
 	return result;
 }
 
 size_t SimpleTextBlock::CharFromPoint( POINT* point ) const
 {
-	int line = point->y / m_style.lineHeight;
+	int line = point->y / m_styleRegistry.lineHeight;
 
 	if ( line < 0 || size_t( line ) >= m_data->lines.size() )
 		line = m_data->lines.size() - 1;
 
-	point->y = line * m_style.lineHeight;
+	point->y = line * m_styleRegistry.lineHeight;
 	return XtoCP( line, &point->x );
 }
 
@@ -140,7 +176,7 @@ size_t SimpleTextBlock::Length() const
 
 int SimpleTextBlock::Height() const
 {
-	return m_data->lines.size() * m_style.lineHeight;
+	return m_data->lines.size() * m_styleRegistry.lineHeight;
 }
 
 bool SimpleTextBlock::EndsWithNewline() const

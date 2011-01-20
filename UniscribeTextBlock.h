@@ -5,6 +5,7 @@
 
 #include "TextBlock.h"
 #include "UniscribeLayoutData.h"
+#include "TextStyleRun.h"
 #include "ArrayOf.h"
 #include <Windows.h>
 #include <usp10.h>
@@ -12,14 +13,13 @@
 
 class UniscribeAllocator;
 class VisualPainter;
-class VisualSelection;
 class TextSelection;
-class TextStyle;
+class TextStyleRegistry;
 
 class UniscribeTextBlock : public TextBlock
 {
 public:
-	UniscribeTextBlock( UniscribeLayoutDataPtr, TextStyle& );
+	UniscribeTextBlock( UniscribeLayoutDataPtr, const TextStyleRegistry& );
 
 	virtual void Draw( VisualPainter&, RECT ) const;
 
@@ -37,21 +37,25 @@ public:
 	virtual bool EndsWithNewline() const;
 
 private:
-	void DrawLineSelection( size_t line, VisualPainter&, RECT ) const;
-	void DrawLineText     ( size_t line, VisualPainter&, RECT ) const;
+	void DrawLineBackground( size_t line, VisualPainter&, RECT ) const;
+	void DrawLineSelection ( size_t line, VisualPainter&, RECT ) const;
+	void DrawLineText      ( size_t line, VisualPainter&, RECT ) const;
 
-	VisualSelection MakeVisualSelection( size_t line, TextSelection ) const;
+	void DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, uint32 color ) const;
 
 	ArrayOf<const UniscribeTextRun> LineRuns( size_t line ) const;
+
+	ArrayOf<const TextStyleRun> RunStyles( const UniscribeTextRun&, ArrayOf<const TextStyleRun> ) const;
 
 	size_t TextStart( size_t line ) const;
 	size_t TextEnd  ( size_t line ) const;
 	int    LineWidth( size_t line ) const;
 
-	int RunCPtoX( const UniscribeTextRun*, size_t cp, bool trailingEdge ) const;
+	int RunCPtoX( const UniscribeTextRun&, size_t cp, bool trailingEdge ) const;
+	std::pair<int,int> RunCPtoXRange( const UniscribeTextRun&, size_t start, size_t end ) const;
 
-	int    CPtoX( ArrayOf<const UniscribeTextRun>, size_t cp, bool trailingEdge ) const;
-	size_t XtoCP( ArrayOf<const UniscribeTextRun>, LONG* x ) const;
+	int    CPtoX( size_t line, size_t cp, bool trailingEdge ) const;
+	size_t XtoCP( size_t line, LONG* x ) const;
 
 	std::vector<int> VisualToLogicalMapping( ArrayOf<const UniscribeTextRun> ) const;
 
@@ -59,7 +63,7 @@ private:
 	const UniscribeTextRun* RunContaining( ArrayOf<const UniscribeTextRun>, int    x,   int* xStart ) const;
 
 	UniscribeLayoutDataPtr m_data;
-	TextStyle& m_style;
+	const TextStyleRegistry& m_styleRegistry;
 };
 
 #endif

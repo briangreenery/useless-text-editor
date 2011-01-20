@@ -87,6 +87,7 @@
     <ClCompile Include="EmptyTextBlock.cpp" />
     <ClCompile Include="TextAnnotator.cpp" />
     <ClCompile Include="TextChangeTest.cpp" />
+    <ClCompile Include="TextFontRun.cpp" />
     <ClCompile Include="TextLayoutArgs.cpp" />
     <ClCompile Include="SimpleLayout.cpp" />
     <ClCompile Include="SimpleLayoutData.cpp" />
@@ -94,10 +95,13 @@
     <ClCompile Include="SimpleTextRunLoop.cpp" />
     <ClCompile Include="SimpleTextBlock.cpp" />
     <ClCompile Include="SizedAutoArray.cpp" />
-    <ClCompile Include="DocumentReader.cpp" />
+    <ClCompile Include="TextDocumentReader.cpp" />
     <ClCompile Include="TextBuffer.cpp" />
     <ClCompile Include="TextBlock.cpp" />
     <ClCompile Include="TextFont.cpp" />
+    <ClCompile Include="TextStyleReader.cpp" />
+    <ClCompile Include="TextStyleRegistry.cpp" />
+    <ClCompile Include="TextStyleRun.cpp" />
     <ClCompile Include="VisualPainter.cpp" />
     <ClCompile Include="TextStyle.cpp" />
     <ClCompile Include="UniscribeTextBlock.cpp" />
@@ -108,15 +112,11 @@
     <ClCompile Include="TextEdit.cpp" />
     <ClCompile Include="TextChange.cpp" />
     <ClCompile Include="TextDocument.cpp" />
-    <ClCompile Include="FontCollection.cpp" />
-    <ClCompile Include="LexerState.cpp" />
-    <ClCompile Include="NextRelevanceToken.cpp" />
     <ClCompile Include="UniscribeLayoutData.cpp" />
     <ClCompile Include="UniscribeLayout.cpp" />
     <ClCompile Include="UniscribeTextRun.cpp" />
     <ClCompile Include="UniscribeTextRunLoop.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="VisualSelection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayOf.h" />
@@ -128,6 +128,7 @@
     <ClInclude Include="Integers.h" />
     <ClInclude Include="TextAnnotator.h" />
     <ClInclude Include="TextChangeTest.h" />
+    <ClInclude Include="TextFontRun.h" />
     <ClInclude Include="TextLayoutArgs.h" />
     <ClInclude Include="Require.h" />
     <ClInclude Include="SimpleLayout.h" />
@@ -138,10 +139,13 @@
     <ClInclude Include="SizedAutoArray.h" />
     <ClInclude Include="TextBlock.h" />
     <ClInclude Include="TextFont.h" />
+    <ClInclude Include="TextStyleReader.h" />
+    <ClInclude Include="TextStyleRegistry.h" />
+    <ClInclude Include="TextStyleRun.h" />
     <ClInclude Include="VisualPainter.h" />
     <ClInclude Include="TextStyle.h" />
     <ClInclude Include="UString.h" />
-    <ClInclude Include="DocumentReader.h" />
+    <ClInclude Include="TextDocumentReader.h" />
     <ClInclude Include="TextBuffer.h" />
     <ClInclude Include="UniscribeTextBlock.h" />
     <ClInclude Include="VisualDocument.h" />
@@ -151,17 +155,10 @@
     <ClInclude Include="TextEdit.h" />
     <ClInclude Include="TextChange.h" />
     <ClInclude Include="TextDocument.h" />
-    <ClInclude Include="FontCollection.h" />
-    <ClInclude Include="LexerState.h" />
-    <ClInclude Include="NextRelevanceToken.h" />
     <ClInclude Include="UniscribeLayoutData.h" />
     <ClInclude Include="UniscribeLayout.h" />
     <ClInclude Include="UniscribeTextRun.h" />
     <ClInclude Include="UniscribeTextRunLoop.h" />
-    <ClInclude Include="VisualSelection.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="NextRelevanceToken.re2c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

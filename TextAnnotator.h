@@ -8,9 +8,11 @@
 class TextAnnotator
 {
 public:
-	virtual TextChange Update( TextChange ) = 0;
+	virtual void TextChanged( TextChange ) = 0;
+	virtual void SelectionChanged( size_t start, size_t end ) = 0;
 
-	virtual size_t ReadStyles( size_t* styles, size_t length ) = 0;
+	virtual void GetFonts ( TextFontRuns&,  size_t start, size_t count ) = 0;
+	virtual void GetStyles( TextStyleRuns&, size_t start, size_t count ) = 0;
 };
 
 #endif

@@ -1,10 +1,7 @@
-// NextRelevanceToken.h
+// RelevanceToken.h
 
-#ifndef NextRelevanceToken_h
-#define NextRelevanceToken_h
-
-#include "UString.h"
-#include "LexerState.h"
+#ifndef RelevanceToken_h
+#define RelevanceToken_h
 
 class RelevanceToken
 {
@@ -24,6 +21,7 @@ public:
 		t_endsWith,
 		t_equal,
 		t_exists,
+		t_false,
 		t_greater,
 		t_greaterOrEqual,
 		t_if,
@@ -49,6 +47,8 @@ public:
 		t_of,
 		t_openParen,
 		t_or,
+		t_phraseItem,
+		t_phraseItems,
 		t_plus,
 		t_semiColon,
 		t_slash,
@@ -56,6 +56,7 @@ public:
 		t_startsWith,
 		t_string,
 		t_then,
+		t_true,
 		t_whitespace,
 		t_whose,
 		t_word,
@@ -69,7 +70,5 @@ public:
 private:
 	Token m_token;
 };
-
-RelevanceToken NextRelevanceToken( LexerState& scanner );
 
 #endif

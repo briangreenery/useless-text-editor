@@ -3,13 +3,13 @@
 #include "TextLayoutArgs.h"
 
 TextLayoutArgs::TextLayoutArgs( const TextDocument& _doc,
-                                TextStyle& _style,
+                                TextStyleRegistry& _styleRegistry,
                                 HDC _hdc,
                                 int _maxWidth )
 	: endsWithNewline( false )
 	, textStart( 0 )
 	, doc( _doc )
-	, style( _style )
+	, styleRegistry( _styleRegistry )
 	, hdc( _hdc )
 	, maxWidth( _maxWidth )
 {

@@ -2,8 +2,7 @@
 
 #include "UniscribeTextBlock.h"
 #include "VisualPainter.h"
-#include "VisualSelection.h"
-#include "TextStyle.h"
+#include "TextStyleRegistry.h"
 #include "Assert.h"
 #include "Error.h"
 #include <algorithm>
@@ -13,106 +12,172 @@ namespace W = Windows;
 #undef min
 #undef max
 
-UniscribeTextBlock::UniscribeTextBlock( UniscribeLayoutDataPtr data, TextStyle& style )
+UniscribeTextBlock::UniscribeTextBlock( UniscribeLayoutDataPtr data, const TextStyleRegistry& styleRegistry )
 	: m_data( std::move( data ) )
-	, m_style( style )
+	, m_styleRegistry( styleRegistry )
 {
 }
 
 void UniscribeTextBlock::Draw( VisualPainter& painter, RECT rect ) const
 {
-	size_t line = rect.top / m_style.lineHeight;
-	rect.top = line * m_style.lineHeight;
+	size_t firstLine = rect.top / m_styleRegistry.lineHeight;
+	rect.top = firstLine * m_styleRegistry.lineHeight;
 
-	for ( ; line < m_data->lines.size() && !IsRectEmpty( &rect ); ++line )
+	RECT clipRect = rect;
+	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &clipRect ); ++line )
 	{
-		DrawLineSelection( line, painter, rect );
-		DrawLineText     ( line, painter, rect );
+		DrawLineBackground( line, painter, clipRect );
+		DrawLineSelection ( line, painter, clipRect );
+		clipRect.top += m_styleRegistry.lineHeight;
+	}
 
-		rect.top += m_style.lineHeight;
+	clipRect = rect;
+	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &clipRect ); ++line )
+	{
+		DrawLineText( line, painter, clipRect );
+		clipRect.top += m_styleRegistry.lineHeight;
+	}
+}
+
+void UniscribeTextBlock::DrawLineBackground( size_t line, VisualPainter& painter, RECT rect ) const
+{
+	size_t lineStart = TextStart( line );
+	size_t lineEnd = TextEnd( line );
+
+	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
+	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
+	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( lineStart, lineEnd - lineStart );
+
+	int xStart = 0;
+	for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
+	{
+		const UniscribeTextRun& run = runs[visualToLogical[i]];
+
+		ArrayOf<const TextStyleRun> runStyles = RunStyles( run, styles );
+		for ( const TextStyleRun* style = runStyles.begin(); style != runStyles.end(); ++style )
+		{
+			std::pair<int,int> range = RunCPtoXRange( run, style->start, style->start + style->count );
+
+			DrawLineRect( painter,
+			              rect,
+			              xStart + range.first,
+			              xStart + range.second,
+			              m_styleRegistry.Style( style->styleid ).bkColor );
+		}
+
+		xStart += run.width;
 	}
 }
 
 void UniscribeTextBlock::DrawLineSelection( size_t line, VisualPainter& painter, RECT rect ) const
 {
-	VisualSelection selection;
+	std::vector<int> visualToLogical = VisualToLogicalMapping( LineRuns( line ) );
 
 	if ( painter.selection.Intersects( TextStart( line ), TextEnd( line ) ) )
-		selection = MakeVisualSelection( line, painter.selection );
+	{
+		ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
+
+		int xStart = 0;
+		for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
+		{
+			const UniscribeTextRun& run = runs[visualToLogical[i]];
+
+			std::pair<int,int> range = RunCPtoXRange( run, painter.selection.Min(), painter.selection.Max() );
+
+			DrawLineRect( painter,
+			              rect,
+			              xStart + range.first,
+			              xStart + range.second,
+			              m_styleRegistry.selectionColor );
+
+			xStart += run.width;
+		}
+	}
 
 	if ( line == m_data->lines.size() - 1
 	  && painter.selection.Intersects( TextEnd( line ), m_data->length )
 	  && m_data->endsWithNewline )
 	{
-		selection.Add( LineWidth( line ), LineWidth( line ) + painter.style.avgCharWidth );
+		DrawLineRect( painter,
+		              rect,
+		              LineWidth( line ),
+		              LineWidth( line ) + m_styleRegistry.avgCharWidth,
+		              m_styleRegistry.selectionColor );
 	}
-
-	selection.Draw( painter, rect );
 }
 
 void UniscribeTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT rect ) const
 {
+	size_t lineStart = TextStart( line );
+	size_t lineEnd = TextEnd( line );
+
 	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
-
 	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
+	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( lineStart, lineEnd - lineStart );
 
-	for ( size_t i = 0; i < visualToLogical.size() && !IsRectEmpty( &rect ); ++i )
+	int xStart = 0;
+	for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
 	{
-		const UniscribeTextRun* run = runs.begin() + visualToLogical[i];
+		const UniscribeTextRun& run = runs[visualToLogical[i]];
 
-		painter.SetFont( run->font );
-		W::ThrowHRESULT( ScriptTextOut( painter.hdc,
-		                                &painter.style.fonts[run->font].fontCache,
-		                                rect.left,
-		                                rect.top,
-		                                0,
-		                                &rect,
-		                                &m_data->items[run->item].a,
-		                                0,
-		                                0,
-		                                &m_data->glyphs.front() + run->glyphStart,
-		                                run->glyphCount,
-		                                &m_data->advanceWidths.front() + run->glyphStart,
-		                                NULL,
-		                                &m_data->offsets.front() + run->glyphStart ) );
-		rect.left += run->width;
+		const TextFont& font = m_styleRegistry.Font( run.fontid );
+		SelectObject( painter.hdc, font.hfont );
+
+		ArrayOf<const TextStyleRun> runStyles = RunStyles( run, styles );
+		for ( const TextStyleRun* style = runStyles.begin(); style != runStyles.end(); ++style )
+		{
+			std::pair<int,int> range = RunCPtoXRange( run, style->start, style->start + style->count );
+
+			// textRect has an extra 'lineHeight' in each direction to show overhangs and underhangs without clipping.
+			RECT textRect = { std::max<int>( rect.left, xStart + range.first ),
+			                  rect.top - m_styleRegistry.lineHeight,
+			                  std::min<int>( rect.right, xStart + range.second ),
+			                  rect.top + 2*m_styleRegistry.lineHeight };
+
+			SetTextColor( painter.hdc, m_styleRegistry.Style( style->styleid ).textColor );
+			W::ThrowHRESULT( ScriptTextOut( painter.hdc,
+			                                &font.fontCache,
+			                                xStart,
+			                                rect.top,
+			                                ETO_CLIPPED,
+			                                &textRect,
+			                                &m_data->items[run.item].a,
+			                                0,
+			                                0,
+			                                &m_data->glyphs[run.glyphStart],
+			                                run.glyphCount,
+			                                &m_data->advanceWidths[run.glyphStart],
+			                                NULL,
+			                                &m_data->offsets[run.glyphStart] ) );
+		}
+
+		xStart += run.width;
 	}
 }
 
-VisualSelection UniscribeTextBlock::MakeVisualSelection( size_t line, TextSelection selection ) const
+void UniscribeTextBlock::DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, uint32 color ) const
 {
-	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
+	RECT drawRect = { std::max<int>( xStart, rect.left ),
+	                  rect.top,
+	                  std::min<int>( xEnd, rect.right ),
+	                  rect.top + m_styleRegistry.lineHeight };
 
-	VisualSelection visualSelection;
+	if ( !IsRectEmpty( &drawRect ) )
+		painter.DrawRect( drawRect, color );
+}
 
-	int    xRunStart = 0;
-	size_t selStart  = selection.Min();
-	size_t selEnd    = selection.Max();
-
-	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
-
-	for ( size_t i = 0; i < visualToLogical.size(); ++i )
+ArrayOf<const TextStyleRun> UniscribeTextBlock::RunStyles( const UniscribeTextRun& run, ArrayOf<const TextStyleRun> styles ) const
+{
+	struct StyleRunEqual
 	{
-		const UniscribeTextRun* run = runs.begin() + visualToLogical[i];
+		bool operator()( const TextStyleRun&     a, const TextStyleRun&     b ) const { return a.start + a.count < b.start; }
+		bool operator()( const TextStyleRun&     a, const UniscribeTextRun& b ) const { return a.start + a.count <= b.textStart; }
+		bool operator()( const UniscribeTextRun& a, const TextStyleRun&     b ) const { return a.textStart + a.textCount <= b.start; }
+	};
 
-		size_t overlapStart = std::max( selStart, run->textStart );
-		size_t overlapEnd   = std::min( selEnd,   run->textStart + run->textCount );
+	std::pair<const TextStyleRun*, const TextStyleRun*> range = std::equal_range( styles.begin(), styles.end(), run, StyleRunEqual() );
 
-		if ( overlapStart < overlapEnd )
-		{
-			int xStart = xRunStart + RunCPtoX( run, overlapStart - run->textStart,   false );
-			int xEnd   = xRunStart + RunCPtoX( run, overlapEnd - 1 - run->textStart, true  );
-
-			if ( xEnd < xStart )
-				std::swap( xStart, xEnd );
-
-			visualSelection.Add( xStart, xEnd );
-		}
-
-		xRunStart += run->width;
-	}
-
-	return visualSelection;
+	return ArrayOf<const TextStyleRun>( range.first, range.second );
 }
 
 POINT UniscribeTextBlock::PointFromChar( size_t pos, bool advancing ) const
@@ -131,33 +196,33 @@ POINT UniscribeTextBlock::PointFromChar( size_t pos, bool advancing ) const
 	size_t line = LineContaining( pos );
 	Assert( line < m_data->lines.size() );
 
-	result.x = CPtoX( LineRuns( line ), pos, trailingEdge );
-	result.y = line * m_style.lineHeight;
+	result.x = CPtoX( line, pos, trailingEdge );
+	result.y = line * m_styleRegistry.lineHeight;
 
 	return result;
 }
 
 size_t UniscribeTextBlock::CharFromPoint( POINT* point ) const
 {
-	int line = point->y / m_style.lineHeight;
+	int line = point->y / m_styleRegistry.lineHeight;
 
 	if ( line < 0 || size_t( line ) >= m_data->lines.size() )
 		line = m_data->lines.size() - 1;
 
-	point->y = line * m_style.lineHeight;
-	return XtoCP( LineRuns( line ), &point->x );
+	point->y = line * m_styleRegistry.lineHeight;
+	return XtoCP( line, &point->x );
 }
 
 size_t UniscribeTextBlock::LineStart( int y ) const
 {
-	int line = y / m_style.lineHeight;
+	int line = y / m_styleRegistry.lineHeight;
 	Assert( line >= 0 && size_t( line ) < m_data->lines.size() );
 	return TextStart( line );
 }
 
 size_t UniscribeTextBlock::LineEnd( int y ) const
 {
-	int line = y / m_style.lineHeight;
+	int line = y / m_styleRegistry.lineHeight;
 	Assert( line >= 0 && size_t( line ) < m_data->lines.size() );
 	return TextEnd( line );
 }
@@ -174,7 +239,7 @@ size_t UniscribeTextBlock::Length() const
 
 int UniscribeTextBlock::Height() const
 {
-	return m_data->lines.size() * m_style.lineHeight;
+	return m_data->lines.size() * m_styleRegistry.lineHeight;
 }
 
 bool UniscribeTextBlock::EndsWithNewline() const
@@ -213,32 +278,52 @@ int UniscribeTextBlock::LineWidth( size_t line ) const
 	return width;
 }
 
-int UniscribeTextBlock::RunCPtoX( const UniscribeTextRun* run, size_t cp, bool trailingEdge ) const
+int UniscribeTextBlock::RunCPtoX( const UniscribeTextRun& run, size_t cp, bool trailingEdge ) const
 {
 	int x;
 	W::ThrowHRESULT( ScriptCPtoX( cp,
 	                              trailingEdge,
-	                              run->textCount,
-	                              run->glyphCount,
-	                              &m_data->logClusters.front()   + run->textStart,
-	                              &m_data->visAttrs.front()      + run->glyphStart,
-	                              &m_data->advanceWidths.front() + run->glyphStart,
-	                              &m_data->items[run->item].a,
+	                              run.textCount,
+	                              run.glyphCount,
+	                              &m_data->logClusters[run.textStart],
+	                              &m_data->visAttrs[run.glyphStart],
+	                              &m_data->advanceWidths[run.glyphStart],
+	                              &m_data->items[run.item].a,
 	                              &x ) );
 	return x;
 }
 
-int UniscribeTextBlock::CPtoX( ArrayOf<const UniscribeTextRun> runs, size_t cp, bool trailingEdge ) const
+std::pair<int,int> UniscribeTextBlock::RunCPtoXRange( const UniscribeTextRun& run, size_t start, size_t end ) const
 {
+	size_t overlapStart = std::max( start, run.textStart );
+	size_t overlapEnd   = std::min( end,   run.textStart + run.textCount );
+
+	if ( overlapStart >= overlapEnd )
+		return std::make_pair( 0, 0 );
+
+	int xStart = RunCPtoX( run, overlapStart - run.textStart,   false );
+	int xEnd   = RunCPtoX( run, overlapEnd - run.textStart - 1, true  );
+
+	if ( xEnd < xStart )
+		std::swap( xStart, xEnd );
+
+	return std::make_pair( xStart, xEnd );
+}
+
+int UniscribeTextBlock::CPtoX( size_t line, size_t cp, bool trailingEdge ) const
+{
+	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
+
 	int xStart;
 	const UniscribeTextRun* run = RunContaining( runs, cp, &xStart );
 	Assert( run != runs.end() );
 
-	return xStart + RunCPtoX( run, cp - run->textStart, trailingEdge );
+	return xStart + RunCPtoX( *run, cp - run->textStart, trailingEdge );
 }
 
-size_t UniscribeTextBlock::XtoCP( ArrayOf<const UniscribeTextRun> runs, LONG* x ) const
+size_t UniscribeTextBlock::XtoCP( size_t line, LONG* x ) const
 {
+	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
 	Assert( !runs.empty() );
 
 	int xStart;
@@ -246,8 +331,8 @@ size_t UniscribeTextBlock::XtoCP( ArrayOf<const UniscribeTextRun> runs, LONG* x 
 
 	if ( run == runs.end() )
 	{
-		size_t textEnd = runs[runs.size() - 1].textStart + runs[runs.size() - 1].textCount;
-		*x = CPtoX( runs, textEnd - 1, true );
+		size_t textEnd = TextEnd( line );
+		*x = CPtoX( line, textEnd - 1, true );
 		return textEnd;
 	}
 
@@ -256,14 +341,14 @@ size_t UniscribeTextBlock::XtoCP( ArrayOf<const UniscribeTextRun> runs, LONG* x 
 	W::ThrowHRESULT( ScriptXtoCP( *x - xStart,
 	                              run->textCount,
 	                              run->glyphCount,
-	                              &m_data->logClusters.front()   + run->textStart,
-	                              &m_data->visAttrs.front()      + run->glyphStart,
-	                              &m_data->advanceWidths.front() + run->glyphStart,
+	                              &m_data->logClusters[run->textStart],
+	                              &m_data->visAttrs[run->glyphStart],
+	                              &m_data->advanceWidths[run->glyphStart],
 	                              &m_data->items[run->item].a,
 	                              &cp,
 	                              &trailing ) );
 
-	*x = xStart + RunCPtoX( run, cp, trailing ? true : false );
+	*x = xStart + RunCPtoX( *run, cp, trailing ? true : false );
 	return run->textStart + cp + trailing;
 }
 
@@ -302,7 +387,7 @@ const UniscribeTextRun* UniscribeTextBlock::RunContaining( ArrayOf<const Uniscri
 
 	for ( size_t i = 0; i < visualToLogical.size(); ++i )
 	{
-		const UniscribeTextRun* run = runs.begin() + visualToLogical[i];
+		const UniscribeTextRun* run = &runs[visualToLogical[i]];
 
 		if ( run == result )
 			break;
@@ -321,7 +406,7 @@ const UniscribeTextRun* UniscribeTextBlock::RunContaining( ArrayOf<const Uniscri
 
 	for ( size_t i = 0; i < visualToLogical.size(); ++i )
 	{
-		const UniscribeTextRun* run = runs.begin() + visualToLogical[i];
+		const UniscribeTextRun* run = &runs[visualToLogical[i]];
 
 		if ( x < *xStart + run->width )
 			return run;

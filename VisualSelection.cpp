@@ -2,7 +2,7 @@
 
 #include "VisualSelection.h"
 #include "VisualPainter.h"
-#include "TextStyle.h"
+#include "TextStyleRegistry.h"
 
 void VisualSelection::Add( LONG xStart, LONG xEnd )
 {
@@ -29,8 +29,8 @@ void VisualSelection::Draw( VisualPainter& painter, RECT rect )
 		selectionRect.left   = start;
 		selectionRect.top    = rect.top;
 		selectionRect.right  = end;
-		selectionRect.bottom = rect.top + painter.style.lineHeight;
+		selectionRect.bottom = rect.top + painter.styleRegistry.lineHeight;
 
-		FillRect( painter.hdc, &selectionRect, painter.style.selectionBrush );
+		FillRect( painter.hdc, &selectionRect, painter.styleRegistry.selectionBrush );
 	}
 }

@@ -6,7 +6,7 @@
 #include "UniscribeTextBlock.h"
 #include "TextLayoutArgs.h"
 #include "TextDocument.h"
-#include "TextStyle.h"
+#include "TextStyleRegistry.h"
 #include "UString.h"
 #include "Error.h"
 #include <algorithm>
@@ -50,9 +50,9 @@ static std::vector<SCRIPT_ITEM> Itemize( UTF16Ref text )
 	return items;
 }
 
-static bool HasMissingGlyphs( size_t font, const std::vector<WORD>& glyphs, TextStyle& style )
+static bool HasMissingGlyphs( uint32 fontid, const std::vector<WORD>& glyphs, TextStyleRegistry& styleRegistry )
 {
-	WORD missingGlyph = style.fonts[font].fontProps.wgDefault;
+	WORD missingGlyph = styleRegistry.Font( fontid ).fontProps.wgDefault;
 	return std::find( glyphs.begin(), glyphs.end(), missingGlyph ) != glyphs.end();
 }
 
@@ -74,7 +74,7 @@ static bool ShapePlaceRun( UniscribeTextRun run,
 	while ( true )
 	{
 		HRESULT result = ScriptShape( hdc,
-		                              &args.style.fonts[run.font].fontCache,
+		                              &args.styleRegistry.Font( run.fontid ).fontCache,
 		                              args.text.begin() + run.textStart,
 		                              run.textCount,
 		                              glyphs.size(),
@@ -90,7 +90,7 @@ static bool ShapePlaceRun( UniscribeTextRun run,
 		switch ( result )
 		{
 		case E_PENDING:
-			SelectObject( args.hdc, args.style.fonts[run.font].font );
+			SelectObject( args.hdc, args.styleRegistry.Font( run.fontid ).hfont );
 			hdc = args.hdc;
 			break;
 
@@ -110,7 +110,7 @@ static bool ShapePlaceRun( UniscribeTextRun run,
 	glyphs  .resize( glyphCount );
 	visAttrs.resize( glyphCount );
 
-	if ( !ignoreMissingGlyphs && HasMissingGlyphs( run.font, glyphs, args.style ) )
+	if ( !ignoreMissingGlyphs && HasMissingGlyphs( run.fontid, glyphs, args.styleRegistry ) )
 		return false;
 
 	std::vector<int>     advanceWidths( glyphCount );
@@ -121,7 +121,7 @@ static bool ShapePlaceRun( UniscribeTextRun run,
 	while ( true )
 	{
 		HRESULT result = ScriptPlace( hdc,
-		                              &args.style.fonts[run.font].fontCache,
+		                              &args.styleRegistry.Font( run.fontid ).fontCache,
 		                              &glyphs.front(),
 		                              glyphs.size(),
 		                              &visAttrs.front(),
@@ -135,7 +135,7 @@ static bool ShapePlaceRun( UniscribeTextRun run,
 
 		if ( result == E_PENDING )
 		{
-			SelectObject( args.hdc, args.style.fonts[run.font].font );
+			SelectObject( args.hdc, args.styleRegistry.Font( run.fontid ).hfont );
 			hdc = args.hdc;
 		}
 		else
@@ -147,9 +147,9 @@ static bool ShapePlaceRun( UniscribeTextRun run,
 	run.glyphStart = layoutData.glyphs.size();
 	run.glyphCount = glyphCount;
 
-	if ( run.textCount == 1 && args.text[run.textStart] == '\t' && args.style.tabSize > 0 )
+	if ( run.textCount == 1 && args.text[run.textStart] == '\t' && args.styleRegistry.tabSize > 0 )
 	{
-		run.width        = args.style.tabSize - ( xStart % args.style.tabSize );
+		run.width        = args.styleRegistry.tabSize - ( xStart % args.styleRegistry.tabSize );
 		advanceWidths[0] = run.width;
 	}
 	else
@@ -171,14 +171,12 @@ struct TryEveryFontProcData
 		, layoutData( _layoutData )
 		, args( _args )
 		, xStart( _xStart )
-		, deleteLastFont( false )
 	{}
 
 	UniscribeTextRun run;
 	UniscribeLayoutData& layoutData;
 	const TextLayoutArgs& args;
 	int xStart;
-	bool deleteLastFont;
 };
 
 static int CALLBACK TryEveryFontProc( const LOGFONT* logFont, const TEXTMETRIC*, DWORD fontType, LPARAM lParam )
@@ -188,16 +186,12 @@ static int CALLBACK TryEveryFontProc( const LOGFONT* logFont, const TEXTMETRIC*,
 
 	TryEveryFontProcData& data = *reinterpret_cast<TryEveryFontProcData*>( lParam );
 
-	if ( data.deleteLastFont )
-		data.args.style.DeleteLastFont();
-
-	size_t numFonts = data.args.style.fonts.size();
-	data.run.font = data.args.style.AddFont( logFont->lfFaceName );
-	data.deleteLastFont = ( data.run.font == numFonts );
+	data.run.fontid = data.args.styleRegistry.AddFont( logFont->lfFaceName );
 
 	if ( ShapePlaceRun( data.run, data.layoutData, data.args, data.xStart, false ) )
 		return 0;
 
+	data.args.styleRegistry.RemoveFont( data.run.fontid );
 	return 1;
 }
 
@@ -210,25 +204,21 @@ static void LayoutRun( UniscribeTextRun run,
 		return;
 
 	// Try to fallback with the fonts that we already have
-	run.font = 0;
-	while ( run.font < args.style.fonts.size() && !ShapePlaceRun( run, layoutData, args, xStart, false ) )
-		++run.font;
+	for ( auto it = args.styleRegistry.fonts.begin(); it != args.styleRegistry.fonts.end(); ++it )
+	{
+		run.fontid = it->first;
+		if ( ShapePlaceRun( run, layoutData, args, xStart, false ) )
+			return;
+	}
 
-	if ( run.font < args.style.fonts.size() )
-		return;
-
-	// Try to fallback on all truetype fonts in the system
+	// Try to fallback on all fonts in the system
 	TryEveryFontProcData data( run, layoutData, args, xStart );
 	LOGFONT logFont = {};
 	if ( EnumFontFamiliesEx( args.hdc, &logFont, TryEveryFontProc, reinterpret_cast<LPARAM>( &data ), 0 ) == 0 )
 		return;
 
-	if ( data.deleteLastFont )
-		data.args.style.DeleteLastFont();
-
 	// We can't display this text with any font, just show missing glyphs
-	run.font = args.style.defaultFont;
-
+	run.fontid = args.styleRegistry.defaultFontid;
 	layoutData.items[run.item].a.eScript = SCRIPT_UNDEFINED;
 	ShapePlaceRun( run, layoutData, args, xStart, true );
 }
@@ -290,7 +280,7 @@ TextBlockPtr UniscribeLayoutParagraph( const TextLayoutArgs& args )
 	int    lineWidth = 0;
 	size_t lineStart = 0;
 
-	for ( UniscribeTextRunLoop loop( args.text, layoutData->items ); loop.Unfinished(); )
+	for ( UniscribeTextRunLoop loop( args.text, layoutData->items, args.fonts ); loop.Unfinished(); )
 	{
 		UniscribeTextRun run = loop.NextRun();
 
@@ -314,5 +304,5 @@ TextBlockPtr UniscribeLayoutParagraph( const TextLayoutArgs& args )
 	if ( layoutData->lines.empty() || layoutData->lines.back() != layoutData->runs.size() )
 		layoutData->lines.push_back( layoutData->runs.size() );
 
-	return TextBlockPtr( new UniscribeTextBlock( std::move( layoutData ), args.style ) );
+	return TextBlockPtr( new UniscribeTextBlock( std::move( layoutData ), args.styleRegistry ) );
 }

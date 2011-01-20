@@ -1,9 +1,10 @@
 // VisualDocument.cpp
 
 #include "VisualDocument.h"
-#include "DocumentReader.h"
+#include "TextDocumentReader.h"
+#include "TextStyleReader.h"
 #include "TextDocument.h"
-#include "TextStyle.h"
+#include "TextStyleRegistry.h"
 #include "TextSelection.h"
 #include "VisualPainter.h"
 #include "TextLayoutArgs.h"
@@ -15,17 +16,17 @@
 #undef min
 #undef max
 
-VisualDocument::VisualDocument( const TextDocument& doc, TextStyle& style )
+VisualDocument::VisualDocument( const TextDocument& doc, TextStyleRegistry& styleRegistry )
 	: m_doc( doc )
-	, m_style( style )
+	, m_styleRegistry( styleRegistry )
 	, m_lineCount( 1 )
 {
-	m_blocks.push_back( TextBlockPtr( new EmptyTextBlock( false, m_style ) ) );
+	m_blocks.push_back( TextBlockPtr( new EmptyTextBlock( false, m_styleRegistry ) ) );
 }
 
 void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection )
 {
-	VisualPainter painter( hdc, m_doc, m_style, selection );
+	VisualPainter painter( hdc, m_doc, m_styleRegistry, selection );
 
 	BlockContaining_Result block = BlockContaining( rect.top );
 
@@ -77,10 +78,12 @@ bool VisualDocument::IsSimpleText( UTF16Ref text ) const
 void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start, size_t count, HDC hdc, int maxWidth )
 {
 	if ( maxWidth != 0 )
-		maxWidth = std::max( maxWidth, m_style.avgCharWidth * 10 );
+		maxWidth = std::max( maxWidth, m_styleRegistry.avgCharWidth * 10 );
 
-	TextLayoutArgs layoutArgs( m_doc, m_style, hdc, maxWidth );
-	DocumentReader reader( m_doc );
+	TextLayoutArgs layoutArgs( m_doc, m_styleRegistry, hdc, maxWidth );
+
+	TextDocumentReader docReader( m_doc );
+	TextStyleReader styleReader( m_styleRegistry, m_styleRegistry.annotator );
 
 	for ( size_t end = start + count; start < end; )
 	{
@@ -93,11 +96,12 @@ void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start,
 		if ( lineEnd == start )
 		{
 			m_lineCount++;
-			m_blocks.insert( it, TextBlockPtr( new EmptyTextBlock( true, m_style ) ) );
+			m_blocks.insert( it, TextBlockPtr( new EmptyTextBlock( true, m_styleRegistry ) ) );
 		}
 		else
 		{
-			layoutArgs.text = reader.StrictRange( start, lineEnd - start );
+			layoutArgs.text = docReader.StrictRange( start, lineEnd - start );
+			layoutArgs.fonts = styleReader.Fonts( start, lineEnd - start );
 			layoutArgs.endsWithNewline = lineEnd != end;
 			layoutArgs.textStart = start;
 
@@ -112,10 +116,10 @@ void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start,
 		start = lineEnd + 1;
 	}
 
-	if ( it == m_blocks.end() && m_blocks.empty() || m_blocks.back()->EndsWithNewline() )
+	if ( m_blocks.empty() || m_blocks.back()->EndsWithNewline() )
 	{
 		m_lineCount++;
-		m_blocks.push_back( TextBlockPtr( new EmptyTextBlock( false, m_style ) ) );
+		m_blocks.push_back( TextBlockPtr( new EmptyTextBlock( false, m_styleRegistry ) ) );
 	}
 }
 
@@ -175,7 +179,7 @@ size_t VisualDocument::CharFromPoint( POINT* point ) const
 
 int VisualDocument::Height() const
 {
-	return m_lineCount * m_style.lineHeight;
+	return m_lineCount * m_styleRegistry.lineHeight;
 }
 
 VisualDocument::BlockContaining_Result VisualDocument::BlockContaining( size_t pos ) const

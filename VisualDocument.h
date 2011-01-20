@@ -11,12 +11,12 @@
 
 class TextDocument;
 class TextSelection;
-class TextStyle;
+class TextStyleRegistry;
 
 class VisualDocument
 {
 public:
-	VisualDocument( const TextDocument&, TextStyle& );
+	VisualDocument( const TextDocument&, TextStyleRegistry& );
 
 	void Draw( HDC hdc, RECT rect, TextSelection );
 
@@ -48,7 +48,7 @@ private:
 	BlockContaining_Result BlockContaining( int y ) const;
 
 	const TextDocument& m_doc;
-	TextStyle&          m_style;
+	TextStyleRegistry&  m_styleRegistry;
 	size_t              m_lineCount;
 	TextBlockList       m_blocks;
 };

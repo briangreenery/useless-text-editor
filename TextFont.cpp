@@ -2,11 +2,17 @@
 
 #include "TextFont.h"
 
-TextFont::TextFont( LPCWSTR _name, HFONT _font, HDC hdc )
+TextFont::TextFont( LPCWSTR _name, HFONT _hfont, HDC hdc )
 	: name( _name )
-	, font( _font )
+	, hfont( _hfont )
 	, fontCache( 0 )
 {
 	ZeroMemory( &fontProps, sizeof( fontProps ) );
 	ScriptGetFontProperties( hdc, &fontCache, &fontProps );
+}
+
+TextFont::~TextFont()
+{
+	ScriptFreeCache( &fontCache );
+	DeleteObject( hfont );
 }

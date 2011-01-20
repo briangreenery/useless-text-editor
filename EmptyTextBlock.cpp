@@ -3,11 +3,11 @@
 #include "EmptyTextBlock.h"
 #include "VisualPainter.h"
 #include "VisualSelection.h"
-#include "TextStyle.h"
+#include "TextStyleRegistry.h"
 
-EmptyTextBlock::EmptyTextBlock( bool endsWithNewline, TextStyle& style )
+EmptyTextBlock::EmptyTextBlock( bool endsWithNewline, TextStyleRegistry& styleRegistry )
 	: m_endsWithNewline( endsWithNewline )
-	, m_style( style )
+	, m_styleRegistry( styleRegistry )
 {
 }
 
@@ -15,9 +15,12 @@ void EmptyTextBlock::Draw( VisualPainter& painter, RECT rect ) const
 {
 	if ( painter.selection.Intersects( 0, Length() ) )
 	{
-		VisualSelection selection;
-		selection.Add( 0, m_style.avgCharWidth );
-		selection.Draw( painter, rect );
+		RECT drawRect = { 0,
+		                  rect.top,
+		                  m_styleRegistry.avgCharWidth,
+		                  rect.top + m_styleRegistry.lineHeight };
+
+		painter.DrawRect( drawRect, m_styleRegistry.selectionColor );
 	}
 }
 
@@ -61,7 +64,7 @@ size_t EmptyTextBlock::Length() const
 
 int EmptyTextBlock::Height() const
 {
-	return m_style.lineHeight;
+	return m_styleRegistry.lineHeight;
 }
 
 bool EmptyTextBlock::EndsWithNewline() const

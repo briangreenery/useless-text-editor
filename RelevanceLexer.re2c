@@ -1,22 +1,30 @@
 
-// To generate this file run: re2c -b -i -w NextRelevanceToken.re2c > NextRelevanceToken.cpp
+// To generate this file run: re2c -b -i -w RelevanceLexer.re2c > RelevanceLexer.cpp
 
-#include "NextRelevanceToken.h"
+#include "RelevanceLexer.h"
 
-RelevanceToken NextRelevanceToken( LexerState& scanner )
+RelevanceLexer::RelevanceLexer()
+	: start( 0 )
+	, end( 0 )
+	, cursor( 0 )
+	, marker( 0 )
+	, ctxmarker( 0 )
 {
-	scanner.marker    = scanner.cursor;
-	scanner.ctxmarker = scanner.cursor;
+}
+
+RelevanceToken RelevanceLexer::NextToken()
+{
+	marker    = cursor;
+	ctxmarker = cursor;
 
 /*!re2c
-
 	re2c:define:YYCTYPE      = UTF16::Unit;
-	re2c:define:YYCURSOR     = scanner.cursor;
-	re2c:define:YYLIMIT      = scanner.end;
-	re2c:define:YYMARKER     = scanner.marker;
-	re2c:define:YYCTXMARKER  = scanner.ctxmarker;
+	re2c:define:YYCURSOR     = cursor;
+	re2c:define:YYLIMIT      = end;
+	re2c:define:YYMARKER     = marker;
+	re2c:define:YYCTXMARKER  = ctxmarker;
 	re2c:define:YYFILL:naked = 1;
-	re2c:define:YYFILL       = "{ scanner.Fill(); }";
+	re2c:define:YYFILL       = "{ Fill(); }";
 
 	ws           = '\t' | '\r' | '\n' | ' ';
 	ignored      = 'a' | 'an' | 'the';
@@ -68,7 +76,7 @@ RelevanceToken NextRelevanceToken( LexerState& scanner )
 	'exist' ks 'no'                                                 /nw { return RelevanceToken::t_notExists; }
 	'exists'                                                        /nw { return RelevanceToken::t_exists; }
 	'exists' ks 'no'                                                /nw { return RelevanceToken::t_notExists; }
-	'false'                                                         /nw { return RelevanceToken::t_word; }
+	'false'                                                         /nw { return RelevanceToken::t_false; }
 	'if'                                                            /nw { return RelevanceToken::t_if; }
 	'is'                                                            /nw { return RelevanceToken::t_equal; }
 	'is' ks 'contained' ks 'by'                                     /nw { return RelevanceToken::t_containedBy; }
@@ -85,15 +93,11 @@ RelevanceToken NextRelevanceToken( LexerState& scanner )
 	'is' ks 'not' ks 'less' ks 'than'                               /nw { return RelevanceToken::t_notLess; }
 	'is' ks 'not' ks 'less' ks 'than' ks 'or' ks 'equal' ks 'to'    /nw { return RelevanceToken::t_notLessOrEqual; }
 	'it'                                                            /nw { return RelevanceToken::t_it; }
-	'item'                                                          /nw { return RelevanceToken::t_word; }
-	'items'                                                         /nw { return RelevanceToken::t_word; }
+	'item'                                                          /nw { return RelevanceToken::t_phraseItem; }
+	'items'                                                         /nw { return RelevanceToken::t_phraseItems; }
 	'mod'                                                           /nw { return RelevanceToken::t_mod; }
-	'nil'                                                           /nw { return RelevanceToken::t_word; }
 	'not'                                                           /nw { return RelevanceToken::t_not; }
-	'nothing'                                                       /nw { return RelevanceToken::t_word; }
-	'nothings'                                                      /nw { return RelevanceToken::t_word; }
-	'null'                                                          /nw { return RelevanceToken::t_word; }
-	'number'                                                        /nw { return RelevanceToken::t_word; }
+	'number'                                                        /nw { return RelevanceToken::t_phraseNumber; }
 	'of'                                                            /nw { return RelevanceToken::t_of; }
 	'or'                                                            /nw { return RelevanceToken::t_or; }
 	'starts' ks 'with'                                              /nw { return RelevanceToken::t_startsWith; }
@@ -104,7 +108,7 @@ RelevanceToken NextRelevanceToken( LexerState& scanner )
 	'there' ks 'exist' ks 'no'                                      /nw { return RelevanceToken::t_notExists; }
 	'there' ks 'exists'                                             /nw { return RelevanceToken::t_exists; }
 	'there' ks 'exists' ks 'no'                                     /nw { return RelevanceToken::t_notExists; }
-	'true'                                                          /nw { return RelevanceToken::t_word; }
+	'true'                                                          /nw { return RelevanceToken::t_true; }
 	'whose'                                                         /nw { return RelevanceToken::t_whose; }
 
 	'\000' { return RelevanceToken::t_endOfInput; }
