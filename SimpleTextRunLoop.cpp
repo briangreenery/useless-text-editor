@@ -5,6 +5,7 @@
 
 SimpleTextRunLoop::SimpleTextRunLoop( UTF16Ref text, ArrayOf<const TextFontRun> fonts )
 	: m_position( 0 )
+	, m_nextTab( 0 )
 	, m_text( text )
 	, m_fonts( fonts )
 	, m_font( m_fonts.begin() )
@@ -22,7 +23,7 @@ SimpleTextRun SimpleTextRunLoop::NextRun()
 	size_t fontRunSize = m_font->count - ( m_position - m_fontStart );
 
 	if ( m_nextTab <= m_position )
-		m_nextTab = std::find( m_text.begin() + m_position, m_text.end(), UTF16::Unit( '\t' ) ) - ( m_text.begin() + m_position );
+		m_nextTab = std::find( m_text.begin() + m_position, m_text.end(), UTF16::Unit( '\t' ) ) - m_text.begin();
 
 	SimpleTextRun run( m_position, std::min( fontRunSize, m_nextTab - m_position ), m_font->fontid );
 

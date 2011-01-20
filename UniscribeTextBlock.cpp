@@ -159,17 +159,6 @@ void UniscribeTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT
 	}
 }
 
-void UniscribeTextBlock::DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, uint32 color ) const
-{
-	RECT drawRect = { std::max<int>( xStart, rect.left ),
-	                  rect.top,
-	                  std::min<int>( xEnd, rect.right ),
-	                  rect.top + m_styleRegistry.lineHeight };
-
-	if ( !IsRectEmpty( &drawRect ) )
-		painter.DrawRect( drawRect, color );
-}
-
 ArrayOf<const TextStyleRun> UniscribeTextBlock::RunStyles( const UniscribeTextRun& run, ArrayOf<const TextStyleRun> styles ) const
 {
 	struct StyleRunEqual
@@ -182,6 +171,17 @@ ArrayOf<const TextStyleRun> UniscribeTextBlock::RunStyles( const UniscribeTextRu
 	std::pair<const TextStyleRun*, const TextStyleRun*> range = std::equal_range( styles.begin(), styles.end(), run, StyleRunEqual() );
 
 	return ArrayOf<const TextStyleRun>( range.first, range.second );
+}
+
+void UniscribeTextBlock::DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, uint32 color ) const
+{
+	RECT drawRect = { std::max<int>( xStart, rect.left ),
+	                  rect.top,
+	                  std::min<int>( xEnd, rect.right ),
+	                  rect.top + m_styleRegistry.lineHeight };
+
+	if ( !IsRectEmpty( &drawRect ) )
+		painter.DrawRect( drawRect, color );
 }
 
 POINT UniscribeTextBlock::PointFromChar( size_t pos, bool advancing ) const
@@ -254,7 +254,7 @@ bool UniscribeTextBlock::EndsWithNewline() const
 ArrayOf<const UniscribeTextRun> UniscribeTextBlock::LineRuns( size_t line ) const
 {
 	Assert( line < m_data->lines.size() );
-	const UniscribeTextRun* runStart = &m_data->runs.front() + ( line > 0 ? m_data->lines[line - 1] : 0 );
+	const UniscribeTextRun* runStart = &m_data->runs[line == 0 ? 0 : m_data->lines[line - 1]];
 	return ArrayOf<const UniscribeTextRun>( runStart, &m_data->runs.front() + m_data->lines[line] );
 }
 

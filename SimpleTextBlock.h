@@ -40,6 +40,8 @@ private:
 
 	void DrawLineRect( VisualPainter&, RECT, int start, int end, uint32 color ) const;
 
+	ArrayOf<const TextStyleRun> RunStyles( const SimpleTextRun&, ArrayOf<const TextStyleRun> ) const;
+
 	size_t TextStart( size_t line ) const;
 	size_t TextEnd  ( size_t line ) const;
 	int    LineWidth( size_t line ) const;
@@ -49,6 +51,8 @@ private:
 
 	int    CPtoX( size_t line, size_t cp, bool trailingEdge ) const;
 	size_t XtoCP( size_t line, LONG* x ) const;
+
+	int RunCPtoX( const SimpleTextRun&, size_t cp, bool trailingEdge ) const;
 
 	SimpleLayoutDataPtr m_data;
 	const TextStyleRegistry&  m_styleRegistry;
