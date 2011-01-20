@@ -76,6 +76,9 @@ static size_t WrapLine( SimpleLayoutData& layoutData,
 	size_t lineEnd = args.doc.PrevSoftBreak( estimate + 1 );
 
 	if ( lineEnd <= args.textStart + lineStart )
+		lineEnd = args.doc.PrevWordStop( estimate + 1 );
+
+	if ( lineEnd <= args.textStart + lineStart )
 		lineEnd = args.doc.PrevCharStop( estimate + 1 );
 
 	if ( lineEnd <= args.textStart + lineStart )
