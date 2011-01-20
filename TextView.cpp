@@ -19,9 +19,6 @@ TextView::TextView( HWND hwnd )
 {
 	m_metrics.gutterWidth = 25;
 	m_metrics.marginWidth = 5;
-
-	uint32 fontid = m_styleRegistry.AddFont( L"Arial" );
-	uint32 styleid = m_styleRegistry.AddStyle( TextStyle( m_styleRegistry.defaultFontid, RGB(255,0,0), RGB(0,255,0) ) );
 }
 
 int TextView::OnCreate( LPCREATESTRUCT )

@@ -20,9 +20,6 @@ ArrayOf<const TextFontRun> TextStyleReader::Fonts( size_t start, size_t count )
 	}
 	else
 	{
-		//for ( size_t i = 0; i < count; ++i )
-		//	m_fonts.push_back( TextFontRun( ( i / 3 ) % 2, 1 ) );
-
 		m_fonts.push_back( TextFontRun( m_styleRegistry.defaultFontid, count ) );
 	}
 
@@ -39,10 +36,7 @@ ArrayOf<const TextStyleRun> TextStyleReader::Styles( size_t start, size_t count 
 	}
 	else
 	{
-		for ( size_t i = 0; i < count; ++i )
-			m_styles.push_back( TextStyleRun( ( i / 3 ) % 2, start + i, 1 ) );
-		
-		//m_styles.push_back( TextStyleRun( m_styleRegistry.defaultStyleid, start, count ) );
+		m_styles.push_back( TextStyleRun( m_styleRegistry.defaultStyleid, start, count ) );
 	}
 
 	return ArrayOf<const TextStyleRun>( &m_styles.front(), &m_styles.back() + 1 );
