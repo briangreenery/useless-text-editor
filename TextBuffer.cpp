@@ -114,7 +114,7 @@ size_t TextBuffer::copy( UTF16::Unit* buffer, size_t num, size_t pos ) const
 
 	if ( numCopied < num )
 	{
-		size_t numToCopy = std::min( m_size - m_gapPos, num - numCopied );
+		size_t numToCopy = std::min( m_size - ( pos + numCopied ), num - numCopied );
 
 		const UTF16::Unit* start = m_buffer.begin() + pos + numCopied + GapLength();
 		std::copy( start, start + numToCopy, buffer + numCopied );
