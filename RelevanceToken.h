@@ -58,6 +58,7 @@ public:
 		t_string,
 		t_then,
 		t_true,
+		t_unterminatedString,
 		t_whitespace,
 		t_whose,
 		t_word,

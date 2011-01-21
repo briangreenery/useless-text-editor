@@ -40,28 +40,29 @@ RelevanceToken RelevanceLexer::NextToken()
 	word         = [a-zA-Z_][0-9a-zA-Z_']*;
 	any          = [\000-\377];
 
-	ws+         { return RelevanceToken::t_whitespace; }
-	[0-9]+      { return RelevanceToken::t_number; }
-	["][^"]*["] { return RelevanceToken::t_string; }
+	ws+                { return RelevanceToken::t_whitespace; }
+	[0-9]+             { return RelevanceToken::t_number; }
+	["][^"\000]*["]    { return RelevanceToken::t_string; }
+	["][^"\000]*[\000] { return RelevanceToken::t_unterminatedString; }
 
-	word        { return RelevanceToken::t_word; }
-
-	"("         { return RelevanceToken::t_openParen; }
-	")"         { return RelevanceToken::t_closeParen; }
-
-	"!="        { return RelevanceToken::t_notEqual; }
-	"&"         { return RelevanceToken::t_concat; }
-	"*"         { return RelevanceToken::t_star; }
-	"+"         { return RelevanceToken::t_plus; }
-	","         { return RelevanceToken::t_comma; }
-	"-"         { return RelevanceToken::t_minus; }
-	"/"         { return RelevanceToken::t_slash; }
-	";"         { return RelevanceToken::t_semiColon; }
-	"<"         { return RelevanceToken::t_less; }
-	"<="        { return RelevanceToken::t_lessOrEqual; }
-	"="         { return RelevanceToken::t_equal; }
-	">"         { return RelevanceToken::t_greater; }
-	">="        { return RelevanceToken::t_greaterOrEqual; }
+	word               { return RelevanceToken::t_word; }
+	
+	"("                { return RelevanceToken::t_openParen; }
+	")"                { return RelevanceToken::t_closeParen; }
+	
+	"!="               { return RelevanceToken::t_notEqual; }
+	"&"                { return RelevanceToken::t_concat; }
+	"*"                { return RelevanceToken::t_star; }
+	"+"                { return RelevanceToken::t_plus; }
+	","                { return RelevanceToken::t_comma; }
+	"-"                { return RelevanceToken::t_minus; }
+	"/"                { return RelevanceToken::t_slash; }
+	";"                { return RelevanceToken::t_semiColon; }
+	"<"                { return RelevanceToken::t_less; }
+	"<="               { return RelevanceToken::t_lessOrEqual; }
+	"="                { return RelevanceToken::t_equal; }
+	">"                { return RelevanceToken::t_greater; }
+	">="               { return RelevanceToken::t_greaterOrEqual; }
 
 	'a'                                                             /nw { return RelevanceToken::t_ignored; }
 	'an'                                                            /nw { return RelevanceToken::t_ignored; }
