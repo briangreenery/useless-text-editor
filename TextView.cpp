@@ -1,6 +1,8 @@
 // TextView.cpp
 
 #include "TextView.h"
+#include "TextAnnotator.h"
+#include "RelevanceAnnotator.h"
 #include <Windows.h>
 #include <Windowsx.h>
 #include <uxtheme.h>
@@ -15,10 +17,11 @@ TextView::TextView( HWND hwnd )
 	, m_isCaretVisible( false )
 	, m_mouseWheelRemainder( 0 )
 	, m_lineUpCount( 0 )
-	, m_annotator( 0 )
 {
 	m_metrics.gutterWidth = 25;
 	m_metrics.marginWidth = 5;
+
+	m_styleRegistry.annotator = new RelevanceAnnotator( m_doc, m_styleRegistry );
 }
 
 int TextView::OnCreate( LPCREATESTRUCT )
@@ -457,8 +460,8 @@ void TextView::Redo()
 
 void TextView::UpdateLayout( TextChange change )
 {
-	//if ( m_annotator )
-	//	m_annotator->TextChanged( change );
+	if ( m_styleRegistry.annotator )
+		m_styleRegistry.annotator->TextChanged( change );
 
 	RECT rect = m_metrics.TextRect( m_hwnd );
 

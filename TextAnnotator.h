@@ -4,6 +4,8 @@
 #define TextAnnotator_h
 
 #include "TextChange.h"
+#include "TextFontRun.h"
+#include "TextStyleRun.h"
 
 class TextAnnotator
 {

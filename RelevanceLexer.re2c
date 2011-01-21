@@ -4,25 +4,30 @@
 #include "RelevanceLexer.h"
 
 RelevanceLexer::RelevanceLexer()
-	: start( 0 )
-	, end( 0 )
-	, cursor( 0 )
-	, marker( 0 )
-	, ctxmarker( 0 )
 {
+	Reset();
+}
+
+void RelevanceLexer::Reset()
+{
+	m_start = 0;
+	m_end = 0;
+	m_cursor = 0;
+	m_marker = 0;
+	m_ctxmarker = 0;
 }
 
 RelevanceToken RelevanceLexer::NextToken()
 {
-	marker    = cursor;
-	ctxmarker = cursor;
+	m_marker    = m_cursor;
+	m_ctxmarker = m_cursor;
 
 /*!re2c
 	re2c:define:YYCTYPE      = UTF16::Unit;
-	re2c:define:YYCURSOR     = cursor;
-	re2c:define:YYLIMIT      = end;
-	re2c:define:YYMARKER     = marker;
-	re2c:define:YYCTXMARKER  = ctxmarker;
+	re2c:define:YYCURSOR     = m_cursor;
+	re2c:define:YYLIMIT      = m_end;
+	re2c:define:YYMARKER     = m_marker;
+	re2c:define:YYCTXMARKER  = m_ctxmarker;
 	re2c:define:YYFILL:naked = 1;
 	re2c:define:YYFILL       = "{ Fill(); }";
 

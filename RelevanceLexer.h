@@ -11,15 +11,17 @@ class RelevanceLexer
 public:
 	RelevanceLexer();
 
+	void Reset();
 	RelevanceToken NextToken();
 
 	virtual void Fill() = 0;
 
-	const UTF16::Unit* start;
-	const UTF16::Unit* end;
-	const UTF16::Unit* cursor;
-	const UTF16::Unit* marker;
-	const UTF16::Unit* ctxmarker;
+protected:
+	const UTF16::Unit* m_start;
+	const UTF16::Unit* m_end;
+	const UTF16::Unit* m_cursor;
+	const UTF16::Unit* m_marker;
+	const UTF16::Unit* m_ctxmarker;
 };
 
 #endif

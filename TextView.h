@@ -85,8 +85,6 @@ private:
 	TextViewMetrics   m_metrics;
 	VisualDocument    m_blocks;
 
-	TextAnnotator* m_annotator;
-
 	bool m_isDoingMouseSel;
 	bool m_isCaretVisible;
 	int  m_mouseWheelRemainder;

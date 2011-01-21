@@ -49,6 +49,7 @@ public:
 		t_or,
 		t_phraseItem,
 		t_phraseItems,
+		t_phraseNumber,
 		t_plus,
 		t_semiColon,
 		t_slash,

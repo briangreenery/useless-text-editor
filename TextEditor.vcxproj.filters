@@ -133,6 +133,18 @@
     <ClCompile Include="TextStyleReader.cpp">
       <Filter>TextStyle</Filter>
     </ClCompile>
+    <ClCompile Include="RelevanceToken.cpp">
+      <Filter>Relevance</Filter>
+    </ClCompile>
+    <ClCompile Include="RelevanceLexer.cpp">
+      <Filter>Relevance</Filter>
+    </ClCompile>
+    <ClCompile Include="RelevanceAnnotator.cpp">
+      <Filter>Relevance</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditRelevanceLexer.cpp">
+      <Filter>Relevance</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayOf.h">
@@ -255,5 +267,22 @@
     <ClInclude Include="TextStyleReader.h">
       <Filter>TextStyle</Filter>
     </ClInclude>
+    <ClInclude Include="RelevanceToken.h">
+      <Filter>Relevance</Filter>
+    </ClInclude>
+    <ClInclude Include="RelevanceLexer.h">
+      <Filter>Relevance</Filter>
+    </ClInclude>
+    <ClInclude Include="RelevanceAnnotator.h">
+      <Filter>Relevance</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditRelevanceLexer.h">
+      <Filter>Relevance</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="RelevanceLexer.re2c">
+      <Filter>Relevance</Filter>
+    </None>
   </ItemGroup>
 </Project>
