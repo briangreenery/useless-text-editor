@@ -11,6 +11,8 @@ class TextEditRelevanceLexer : public RelevanceLexer
 public:
 	TextEditRelevanceLexer( const TextDocument& doc );
 
+	size_t Position() const { return m_offset + ( m_cursor - m_start ); }
+
 	void Reset();
 	virtual void Fill();
 

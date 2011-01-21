@@ -4,9 +4,8 @@
 #include "TextAnnotator.h"
 #include "TextStyleRegistry.h"
 
-TextStyleReader::TextStyleReader( const TextStyleRegistry& styleRegistry, TextAnnotator* annotator )
+TextStyleReader::TextStyleReader( const TextStyleRegistry& styleRegistry )
 	: m_styleRegistry( styleRegistry )
-	, m_annotator( annotator )
 {
 }
 
@@ -14,9 +13,9 @@ ArrayOf<const TextFontRun> TextStyleReader::Fonts( size_t start, size_t count )
 {
 	m_fonts.clear();
 
-	if ( m_annotator )
+	if ( m_styleRegistry.annotator )
 	{
-		m_annotator->GetFonts( m_fonts, start, count );
+		m_styleRegistry.annotator->GetFonts( m_fonts, start, count );
 	}
 	else
 	{
@@ -30,9 +29,9 @@ ArrayOf<const TextStyleRun> TextStyleReader::Styles( size_t start, size_t count 
 {
 	m_styles.clear();
 
-	if ( m_annotator )
+	if ( m_styleRegistry.annotator )
 	{
-		m_annotator->GetStyles( m_styles, start, count );
+		m_styleRegistry.annotator->GetStyles( m_styles, start, count );
 	}
 	else
 	{

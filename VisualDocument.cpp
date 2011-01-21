@@ -106,7 +106,7 @@ void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start,
 	TextLayoutArgs layoutArgs( m_doc, m_styleRegistry, hdc, maxWidth );
 
 	TextDocumentReader docReader( m_doc );
-	TextStyleReader styleReader( m_styleRegistry, m_styleRegistry.annotator );
+	TextStyleReader styleReader( m_styleRegistry );
 
 	for ( size_t end = start + count; start < end; )
 	{

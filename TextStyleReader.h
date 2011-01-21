@@ -13,14 +13,13 @@ class TextAnnotator;
 class TextStyleReader
 {
 public:
-	TextStyleReader( const TextStyleRegistry& styleRegistry, TextAnnotator* );
+	TextStyleReader( const TextStyleRegistry& styleRegistry );
 
 	ArrayOf<const TextFontRun>  Fonts ( size_t start, size_t count );
 	ArrayOf<const TextStyleRun> Styles( size_t start, size_t count );
 
 private:
 	const TextStyleRegistry& m_styleRegistry;
-	TextAnnotator* m_annotator;
 	TextFontRuns m_fonts;
 	TextStyleRuns m_styles;
 };

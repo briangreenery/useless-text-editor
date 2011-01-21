@@ -15,7 +15,7 @@ VisualPainter::VisualPainter( HDC _hdc, const TextDocument& _doc, TextStyleRegis
 	, oldSelection( _selection )
 	, textStart( 0 )
 	, docReader( _doc )
-	, styleReader( _styleRegistry, 0 )
+	, styleReader( _styleRegistry )
 {
 	GetWindowOrgEx( hdc, &oldOrigin );
 

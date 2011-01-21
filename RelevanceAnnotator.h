@@ -5,6 +5,7 @@
 
 #include "TextAnnotator.h"
 #include "TextEditRelevanceLexer.h"
+#include "TextStyleRun.h"
 
 class TextDocument;
 class TextStyleRegistry;
@@ -21,9 +22,16 @@ public:
 	virtual void GetStyles( TextStyleRuns&, size_t start, size_t count );
 
 private:
+	uint32 TokenStyle( RelevanceToken ) const;
+
 	TextStyleRegistry& m_styleRegistry;
 	TextEditRelevanceLexer m_relevanceLexer;
-	std::vector<RelevanceToken> m_tokens;
+
+	uint32 m_keyword;
+	uint32 m_string;
+	uint32 m_constant;
+
+	std::vector<TextStyleRun> m_styles;
 };
 
 #endif
