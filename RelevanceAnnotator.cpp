@@ -119,17 +119,18 @@ void RelevanceAnnotator::GetFonts( TextFontRuns& fonts, size_t start, size_t cou
 
 void RelevanceAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t count )
 {
-	typedef std::pair<size_t,size_t> Range;
+	typedef std::pair<size_t,size_t> TextRange;
+	typedef std::pair<TextStyleRuns::const_iterator, TextStyleRuns::const_iterator> StyleRange;
 
 	struct StyleRunEqual
 	{
 		bool operator()( const TextStyleRun& a, const TextStyleRun&  b ) const { return a.start + a.count < b.start; }
-		bool operator()( const TextStyleRun& a, const Range&         b ) const { return a.start + a.count <= b.first; }
-		bool operator()( const Range&        a, const TextStyleRun&  b ) const { return a.first + a.second <= b.start; }
+		bool operator()( const TextStyleRun& a, const TextRange&     b ) const { return a.start + a.count <= b.first; }
+		bool operator()( const TextRange&    a, const TextStyleRun&  b ) const { return a.first + a.second <= b.start; }
 	};
 
-	Range textRange( start, count );
-	std::pair<TextStyleRuns::const_iterator, TextStyleRuns::const_iterator> range = std::equal_range( m_styles.begin(), m_styles.end(), textRange, StyleRunEqual() );
+	TextRange textRange( start, count );
+	StyleRange range = std::equal_range( m_styles.begin(), m_styles.end(), textRange, StyleRunEqual() );
 
 	for ( TextStyleRuns::const_iterator it = range.first; it != range.second; ++it )
 	{
