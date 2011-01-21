@@ -50,17 +50,20 @@ void UniscribeTextBlock::DrawLineBackground( size_t line, VisualPainter& painter
 
 	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
 	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
-	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( lineStart, lineEnd - lineStart );
+	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + lineStart, lineEnd - lineStart );
 
 	int xStart = 0;
 	for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
 	{
 		const UniscribeTextRun& run = runs[visualToLogical[i]];
 
-		ArrayOf<const TextStyleRun> runStyles = RunStyles( run, styles );
+		ArrayOf<const TextStyleRun> runStyles = RunStyles( painter.textStart, run, styles );
 		for ( const TextStyleRun* style = runStyles.begin(); style != runStyles.end(); ++style )
 		{
-			std::pair<int,int> range = RunCPtoXRange( run, style->start, style->start + style->count );
+			size_t styleStart = style->start - painter.textStart;
+			size_t styleEnd   = style->start - painter.textStart + style->count;
+
+			std::pair<int,int> range = RunCPtoXRange( run, styleStart, styleEnd );
 
 			DrawLineRect( painter,
 			              rect,
@@ -116,8 +119,9 @@ void UniscribeTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT
 	size_t lineEnd = TextEnd( line );
 
 	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
+	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + lineStart, lineEnd - lineStart );
+
 	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
-	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( lineStart, lineEnd - lineStart );
 
 	int xStart = 0;
 	for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
@@ -127,10 +131,13 @@ void UniscribeTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT
 		const TextFont& font = m_styleRegistry.Font( run.fontid );
 		SelectObject( painter.hdc, font.hfont );
 
-		ArrayOf<const TextStyleRun> runStyles = RunStyles( run, styles );
+		ArrayOf<const TextStyleRun> runStyles = RunStyles( painter.textStart, run, styles );
 		for ( const TextStyleRun* style = runStyles.begin(); style != runStyles.end(); ++style )
 		{
-			std::pair<int,int> range = RunCPtoXRange( run, style->start, style->start + style->count );
+			size_t styleStart = style->start - painter.textStart;
+			size_t styleEnd   = style->start - painter.textStart + style->count;
+
+			std::pair<int,int> range = RunCPtoXRange( run, styleStart, styleEnd );
 
 			// textRect has an extra 'lineHeight' in each direction to show overhangs and underhangs without clipping.
 			RECT textRect = { std::max<int>( rect.left, xStart + range.first ),
@@ -159,16 +166,18 @@ void UniscribeTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT
 	}
 }
 
-ArrayOf<const TextStyleRun> UniscribeTextBlock::RunStyles( const UniscribeTextRun& run, ArrayOf<const TextStyleRun> styles ) const
+ArrayOf<const TextStyleRun> UniscribeTextBlock::RunStyles( size_t blockStart, const UniscribeTextRun& run, ArrayOf<const TextStyleRun> styles ) const
 {
 	struct StyleRunEqual
 	{
+		StyleRunEqual( size_t blockStart ) : m_blockStart( blockStart ) {}
 		bool operator()( const TextStyleRun&     a, const TextStyleRun&     b ) const { return a.start + a.count < b.start; }
-		bool operator()( const TextStyleRun&     a, const UniscribeTextRun& b ) const { return a.start + a.count <= b.textStart; }
-		bool operator()( const UniscribeTextRun& a, const TextStyleRun&     b ) const { return a.textStart + a.textCount <= b.start; }
+		bool operator()( const TextStyleRun&     a, const UniscribeTextRun& b ) const { return a.start + a.count <= m_blockStart + b.textStart; }
+		bool operator()( const UniscribeTextRun& a, const TextStyleRun&     b ) const { return m_blockStart + a.textStart + a.textCount <= b.start; }
+		size_t m_blockStart;
 	};
 
-	std::pair<const TextStyleRun*, const TextStyleRun*> range = std::equal_range( styles.begin(), styles.end(), run, StyleRunEqual() );
+	std::pair<const TextStyleRun*, const TextStyleRun*> range = std::equal_range( styles.begin(), styles.end(), run, StyleRunEqual( blockStart ) );
 
 	return ArrayOf<const TextStyleRun>( range.first, range.second );
 }

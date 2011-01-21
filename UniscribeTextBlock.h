@@ -46,7 +46,7 @@ private:
 
 	ArrayOf<const UniscribeTextRun> LineRuns( size_t line ) const;
 
-	ArrayOf<const TextStyleRun> RunStyles( const UniscribeTextRun&, ArrayOf<const TextStyleRun> ) const;
+	ArrayOf<const TextStyleRun> RunStyles( size_t blockStart, const UniscribeTextRun&, ArrayOf<const TextStyleRun> ) const;
 
 	size_t TextStart( size_t line ) const;
 	size_t TextEnd  ( size_t line ) const;

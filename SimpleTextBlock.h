@@ -40,7 +40,7 @@ private:
 
 	void DrawLineRect( VisualPainter&, RECT, int start, int end, uint32 color ) const;
 
-	ArrayOf<const TextStyleRun> RunStyles( const SimpleTextRun&, ArrayOf<const TextStyleRun> ) const;
+	ArrayOf<const TextStyleRun> RunStyles( size_t blockStart, const SimpleTextRun&, ArrayOf<const TextStyleRun> ) const;
 
 	size_t TextStart( size_t line ) const;
 	size_t TextEnd  ( size_t line ) const;

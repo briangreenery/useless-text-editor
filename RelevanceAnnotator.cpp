@@ -65,6 +65,7 @@ uint32 RelevanceAnnotator::TokenStyle( RelevanceToken token ) const
 		return m_keyword;
 
 	case RelevanceToken::t_string:
+	case RelevanceToken::t_unterminatedString:
 		return m_string;
 
 	case RelevanceToken::t_number:
@@ -135,6 +136,6 @@ void RelevanceAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t 
 		size_t overlapStart = std::max( start, it->start );
 		size_t overlapEnd   = std::min( start + count, it->start + it->count );
 
-		styles.push_back( TextStyleRun( it->styleid, overlapStart - start, overlapEnd - overlapStart ) );
+		styles.push_back( TextStyleRun( it->styleid, overlapStart, overlapEnd - overlapStart ) );
 	}
 }
