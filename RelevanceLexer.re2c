@@ -39,7 +39,7 @@ RelevanceToken RelevanceLexer::NextToken()
 	nonword      = [^0-9a-zA-Z_'] | null;
 	nw           = nonword;
 	word         = [a-zA-Z_][0-9a-zA-Z_']*;
-	any          = [\000-\377];
+	any          = [^\000];
 
 	ws+                { return RelevanceToken::t_whitespace; }
 	[0-9]+             { return RelevanceToken::t_number; }
