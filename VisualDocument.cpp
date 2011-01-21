@@ -76,7 +76,7 @@ void VisualDocument::Update( HDC hdc, int maxWidth, TextChange change )
 
 	size_t start = block.textStart;
 	size_t count = 0;
-	size_t modifiedCount = change.end + block.textStart;
+	size_t modifiedCount = change.end - block.textStart;
 
 	do
 	{
