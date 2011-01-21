@@ -35,7 +35,8 @@ RelevanceToken RelevanceLexer::NextToken()
 	ignored      = 'a' | 'an' | 'the';
 	keywordspace = ws+ ( ignored ws+ )*;
 	ks           = keywordspace;
-	nonword      = [^0-9a-zA-Z_'] | [\000];
+	null         = [\000];
+	nonword      = [^0-9a-zA-Z_'] | null;
 	nw           = nonword;
 	word         = [a-zA-Z_][0-9a-zA-Z_']*;
 	any          = [\000-\377];
@@ -43,7 +44,7 @@ RelevanceToken RelevanceLexer::NextToken()
 	ws+                { return RelevanceToken::t_whitespace; }
 	[0-9]+             { return RelevanceToken::t_number; }
 	["][^"\000]*["]    { return RelevanceToken::t_string; }
-	["][^"\000]*[\000] { return RelevanceToken::t_unterminatedString; }
+	["][^"\000]* /null { return RelevanceToken::t_unterminatedString; }
 
 	word               { return RelevanceToken::t_word; }
 	
@@ -117,7 +118,7 @@ RelevanceToken RelevanceLexer::NextToken()
 	'true'                                                          /nw { return RelevanceToken::t_true; }
 	'whose'                                                         /nw { return RelevanceToken::t_whose; }
 
-	'\000' { return RelevanceToken::t_endOfInput; }
-	any    { return RelevanceToken::t_illegal; }
+	null { return RelevanceToken::t_endOfInput; }
+	any  { return RelevanceToken::t_illegal; }
 */
 }

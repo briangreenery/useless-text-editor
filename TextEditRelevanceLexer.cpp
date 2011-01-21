@@ -29,8 +29,7 @@ void TextEditRelevanceLexer::Fill()
 	size_t ctxmarkerOffset = m_ctxmarker - rangeStart;
 	size_t cursorOffset    = m_cursor    - rangeStart;
 
-	if ( rangeEnd - rangeStart < minFillSize )
-		rangeEnd = rangeStart + minFillSize;
+	rangeEnd = rangeStart + ( rangeEnd - rangeStart ) + minFillSize;
 
 	m_offset += rangeStart - m_start;
 	UTF16Ref text = m_reader.WeakRange( m_offset, rangeEnd - rangeStart );
