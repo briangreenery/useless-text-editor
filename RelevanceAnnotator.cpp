@@ -50,7 +50,6 @@ uint32 RelevanceAnnotator::TokenStyle( RelevanceToken token ) const
 	case RelevanceToken::t_notLess:
 	case RelevanceToken::t_notLessOrEqual:
 	case RelevanceToken::t_notStartsWith:
-	case RelevanceToken::t_number:
 	case RelevanceToken::t_of:
 	case RelevanceToken::t_or:
 	case RelevanceToken::t_phraseItem:
@@ -68,6 +67,7 @@ uint32 RelevanceAnnotator::TokenStyle( RelevanceToken token ) const
 	case RelevanceToken::t_string:
 		return m_string;
 
+	case RelevanceToken::t_number:
 	case RelevanceToken::t_false:
 	case RelevanceToken::t_true:
 		return m_constant;
