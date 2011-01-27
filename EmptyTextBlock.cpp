@@ -20,7 +20,7 @@ void EmptyTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) const
 		                  m_styleRegistry.avgCharWidth,
 		                  rect.top + m_styleRegistry.lineHeight };
 
-		painter.DrawRect( drawRect, m_styleRegistry.selectionColor );
+		painter.FillRect( drawRect, m_styleRegistry.selectionColor );
 	}
 }
 

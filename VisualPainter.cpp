@@ -23,7 +23,7 @@ VisualPainter::VisualPainter( HDC _hdc, const TextDocument& _doc, TextStyleRegis
 	const TextFont& defaultFont = styleRegistry.Font( defaultStyle.fontid );
 
 	oldFont = SelectObject( hdc, defaultFont.hfont );
-	oldTextColor = SetTextColor( hdc, defaultStyle.textColor );
+	oldTextColor = ::SetTextColor( hdc, defaultStyle.textColor );
 	oldBkColor = SetBkColor( hdc, defaultStyle.bkColor );
 	oldBkMode = SetBkMode( hdc, TRANSPARENT );
 }
@@ -32,7 +32,7 @@ VisualPainter::~VisualPainter()
 {
 	SetBkMode( hdc, oldBkMode );
 	SetBkColor( hdc, oldBkColor );
-	SetTextColor( hdc, oldTextColor );
+	::SetTextColor( hdc, oldTextColor );
 	SelectObject( hdc, oldFont );
 
 	SetWindowOrgEx( hdc, oldOrigin.x, oldOrigin.y, NULL );
@@ -48,8 +48,16 @@ void VisualPainter::SetOrigin( size_t _textStart, LONG yStart )
 	SetWindowOrgEx( hdc, oldOrigin.x, oldOrigin.y - yStart, NULL );
 }
 
-void VisualPainter::DrawRect( RECT rect, uint32 color )
+void VisualPainter::FillRect( RECT rect, COLORREF color )
 {
 	SetBkColor( hdc, color );
 	ExtTextOutW( hdc, rect.left, rect.top, ETO_OPAQUE|ETO_CLIPPED, &rect, L"", 0, NULL );
+}
+
+void VisualPainter::SetTextColor( COLORREF color )
+{
+	if ( color == TextStyle::useDefault )
+		::SetTextColor( hdc, styleRegistry.defaultTextColor );
+	else
+		::SetTextColor( hdc, color );
 }

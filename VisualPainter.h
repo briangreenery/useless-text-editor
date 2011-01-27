@@ -20,7 +20,8 @@ public:
 	~VisualPainter();
 
 	void SetOrigin( size_t textStart, LONG yStart );
-	void DrawRect( RECT rect, uint32 color );
+	void SetTextColor( COLORREF );
+	void FillRect( RECT rect, COLORREF color );
 
 	HDC                 hdc;
 	TextSelection       selection;

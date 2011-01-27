@@ -12,9 +12,10 @@ RelevanceAnnotator::RelevanceAnnotator( const TextDocument& doc, TextStyleRegist
 	: m_relevanceLexer( doc )
 	, m_styleRegistry( styleRegistry )
 {
-	m_keyword  = styleRegistry.AddStyle( TextStyle( styleRegistry.defaultFontid, RGB(0,0,255), RGB(255,255,255) ) );
-	m_constant = styleRegistry.AddStyle( TextStyle( styleRegistry.defaultFontid, RGB(128,0,128), RGB(255,255,255) ) );
-	m_string   = styleRegistry.AddStyle( TextStyle( styleRegistry.defaultFontid, RGB(0,128,128), RGB(255,255,255) ) );
+	m_keyword  = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,    0,255 ), TextStyle::useDefault ) );
+	m_constant = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 128,  0,128 ), TextStyle::useDefault ) );
+	m_string   = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,  128,128 ), TextStyle::useDefault ) );
+	m_illegal  = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 255,255,255 ), RGB( 255,0,0 ) ) );
 }
 
 uint32 RelevanceAnnotator::TokenStyle( RelevanceToken token ) const
@@ -77,7 +78,7 @@ uint32 RelevanceAnnotator::TokenStyle( RelevanceToken token ) const
 		break;
 
 	case RelevanceToken::t_illegal:
-		break;
+		return m_illegal;
 	}
 
 	return m_styleRegistry.defaultStyleid;

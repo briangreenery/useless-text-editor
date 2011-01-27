@@ -32,9 +32,11 @@ public:
 
 	COLORREF gutterColor;
 	COLORREF selectionColor;
+	COLORREF defaultBkColor;
+	COLORREF defaultTextColor;
 
-	uint32 defaultStyleid;
-	uint32 defaultFontid;
+	const uint32 defaultFontid;
+	const uint32 defaultStyleid;
 
 	typedef std::map<uint32,TextStyle> StyleMap;
 	typedef std::map<uint32,TextFontPtr> FontMap;
@@ -45,10 +47,14 @@ public:
 	TextAnnotator* annotator;
 
 private:
+	TextFontPtr CreateFont( LPCWSTR name );
 	void AddFallbackFonts();
 
-	size_t nextStyle;
-	size_t nextFont;
+	TextFontPtr defaultFont;
+	TextStyle defaultStyle;
+
+	uint32 nextStyle;
+	uint32 nextFont;
 };
 
 #endif

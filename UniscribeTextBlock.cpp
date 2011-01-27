@@ -145,7 +145,7 @@ void UniscribeTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT
 			                  std::min<int>( rect.right, xStart + range.second ),
 			                  rect.top + 2*m_styleRegistry.lineHeight };
 
-			SetTextColor( painter.hdc, m_styleRegistry.Style( style->styleid ).textColor );
+			painter.SetTextColor( m_styleRegistry.Style( style->styleid ).textColor );
 			W::ThrowHRESULT( ScriptTextOut( painter.hdc,
 			                                &font.fontCache,
 			                                xStart,
@@ -182,15 +182,18 @@ ArrayOf<const TextStyleRun> UniscribeTextBlock::RunStyles( size_t blockStart, co
 	return ArrayOf<const TextStyleRun>( range.first, range.second );
 }
 
-void UniscribeTextBlock::DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, uint32 color ) const
+void UniscribeTextBlock::DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, COLORREF color ) const
 {
+	if ( color == TextStyle::useDefault )
+		return;
+
 	RECT drawRect = { std::max<int>( xStart, rect.left ),
 	                  rect.top,
 	                  std::min<int>( xEnd, rect.right ),
 	                  rect.top + m_styleRegistry.lineHeight };
 
 	if ( !IsRectEmpty( &drawRect ) )
-		painter.DrawRect( drawRect, color );
+		painter.FillRect( drawRect, color );
 }
 
 POINT UniscribeTextBlock::PointFromChar( size_t pos, bool advancing ) const

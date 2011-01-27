@@ -17,20 +17,20 @@ TextStyleRegistry::TextStyleRegistry()
 	, annotator( 0 )
 	, defaultStyleid( 0 )
 	, defaultFontid( 0 )
-	, nextFont( 0 )
-	, nextStyle( 0 )
+	, nextFont( 1 )
+	, nextStyle( 1 )
 {
+	gutterColor      = RGB( 236, 236, 236 );
+	selectionColor   = RGB( 173, 214, 255 );
+	defaultBkColor   = GetSysColor( COLOR_WINDOW );
+	defaultTextColor = GetSysColor( COLOR_WINDOWTEXT );
+
 	AddFont( L"Consolas" );
-	if ( fonts.empty() )
-		AddFont( L"Courier New" );
-
+	AddFont( L"Courier New" );
 	AddFallbackFonts();
-	AddStyle( TextStyle( 0, RGB(0,0,0), RGB(255,255,255) ) );
 
-	gutterColor    = RGB( 236, 236, 236 );
-	selectionColor = RGB( 173, 214, 255 );
-
-	SetDefaultStyle( 0 );
+	Assert( nextFont > 1 );
+	SetDefaultFont( 1 );
 }
 
 const TextStyle& TextStyleRegistry::Style( uint32 styleid ) const
@@ -39,10 +39,7 @@ const TextStyle& TextStyleRegistry::Style( uint32 styleid ) const
 	if ( it != styles.end() )
 		return it->second;
 
-	it = styles.find( defaultStyleid );
-	Assert( it != styles.end() );
-
-	return it->second;
+	return defaultStyle;
 }
 
 const TextFont& TextStyleRegistry::Font( uint32 fontid ) const
@@ -51,19 +48,23 @@ const TextFont& TextStyleRegistry::Font( uint32 fontid ) const
 	if ( it != fonts.end() )
 		return *it->second;
 
-	it = fonts.find( defaultFontid );
-	Assert( it != fonts.end() );
-
-	return *it->second;
+	return *defaultFont;
 }
 
 void TextStyleRegistry::SetDefaultFont( uint32 fontid )
 {
-	defaultFontid = fontid;
+	FontMap::const_iterator it = fonts.find( fontid );
+	if ( it == fonts.end() )
+		return;
+
+	TextFontPtr font = CreateFont( it->second->name.c_str() );
+	if ( !font )
+		return;
+
+	defaultFont = std::move( font );
 
 	HDC hdc = GetDC( NULL );
-
-	SelectObject( hdc, fonts[fontid]->hfont );
+	SelectObject( hdc, defaultFont->hfont );
 
 	TEXTMETRIC tm;
 	GetTextMetricsW( hdc, &tm );
@@ -84,18 +85,24 @@ uint32 TextStyleRegistry::AddStyle( const TextStyle& style )
 
 void TextStyleRegistry::RemoveStyle( uint32 styleid )
 {
-	if ( styleid != defaultStyleid )
-		styles.erase( styleid );
+	styles.erase( styleid );
 }
 
 void TextStyleRegistry::SetDefaultStyle( uint32 styleid )
 {
-	defaultStyleid = styleid;
-	SetDefaultFont( Style( defaultStyleid ).fontid );
+	StyleMap::const_iterator it = styles.find( styleid );
+	if ( it == styles.end() )
+		return;
+
+	SetDefaultFont( it->second.fontid );
+	defaultBkColor = it->second.bkColor;
+	defaultTextColor = it->second.textColor;
 }
 
-uint32 TextStyleRegistry::AddFont( LPCWSTR name )
+TextFontPtr TextStyleRegistry::CreateFont( LPCWSTR name )
 {
+	TextFontPtr font;
+
 	HDC hdc = GetDC( NULL );
 
 	LOGFONT logFont = {};
@@ -103,25 +110,31 @@ uint32 TextStyleRegistry::AddFont( LPCWSTR name )
 	wcscpy_s( logFont.lfFaceName, name );
 
 	HFONT hfont = CreateFontIndirect( &logFont );
-	if ( !hfont )
+	if ( hfont )
 	{
-		ReleaseDC( NULL, hdc );
-		return defaultFontid;
+		SelectObject( hdc, hfont );
+		font.reset( new TextFont( name, hfont, hdc ) );
 	}
 
-	uint32 fontid = nextFont++;
-
-	SelectObject( hdc, hfont );
-	fonts.insert( std::make_pair( fontid, TextFontPtr( new TextFont( name, hfont, hdc ) ) ) );
 	ReleaseDC( NULL, hdc );
+	return font;
+}
 
+uint32 TextStyleRegistry::AddFont( LPCWSTR name )
+{
+	TextFontPtr font = CreateFont( name );
+
+	if ( !font )
+		return defaultFontid;
+
+	uint32 fontid = nextFont++;
+	fonts.insert( std::make_pair( fontid, std::move( font ) ) );
 	return fontid;
 }
 
 void TextStyleRegistry::RemoveFont( uint32 fontid )
 {
-	if ( fontid != defaultFontid )
-		fonts.erase( fontid );
+	fonts.erase( fontid );
 }
 
 void TextStyleRegistry::AddFallbackFonts()

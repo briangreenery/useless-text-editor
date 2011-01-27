@@ -38,7 +38,7 @@ private:
 	void DrawLineSelection ( size_t line, VisualPainter&, RECT ) const;
 	void DrawLineText      ( size_t line, VisualPainter&, RECT ) const;
 
-	void DrawLineRect( VisualPainter&, RECT, int start, int end, uint32 color ) const;
+	void DrawLineRect( VisualPainter&, RECT, int start, int end, COLORREF color ) const;
 
 	ArrayOf<const TextStyleRun> RunStyles( size_t blockStart, const SimpleTextRun&, ArrayOf<const TextStyleRun> ) const;
 

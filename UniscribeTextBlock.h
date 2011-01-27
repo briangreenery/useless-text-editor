@@ -42,7 +42,7 @@ private:
 	void DrawLineSelection ( size_t line, VisualPainter&, RECT ) const;
 	void DrawLineText      ( size_t line, VisualPainter&, RECT ) const;
 
-	void DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, uint32 color ) const;
+	void DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, COLORREF color ) const;
 
 	ArrayOf<const UniscribeTextRun> LineRuns( size_t line ) const;
 

@@ -104,8 +104,7 @@ void SimpleTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT re
 			if ( xStart >= rect.right )
 				break;
 
-			SetTextColor( painter.hdc, m_styleRegistry.Style( style->styleid ).textColor );
-
+			painter.SetTextColor( m_styleRegistry.Style( style->styleid ).textColor );
 			ExtTextOutW( painter.hdc,
 			             xStart,
 			             rect.top,
@@ -136,15 +135,18 @@ ArrayOf<const TextStyleRun> SimpleTextBlock::RunStyles( size_t blockStart, const
 	return ArrayOf<const TextStyleRun>( range.first, range.second );
 }
 
-void SimpleTextBlock::DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, uint32 color ) const
+void SimpleTextBlock::DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, COLORREF color ) const
 {
+	if ( color == TextStyle::useDefault )
+		return;
+
 	RECT drawRect = { std::max<int>( xStart, rect.left ),
 	                  rect.top,
 	                  std::min<int>( xEnd, rect.right ),
 	                  rect.top + m_styleRegistry.lineHeight };
 
 	if ( !IsRectEmpty( &drawRect ) )
-		painter.DrawRect( drawRect, color );
+		painter.FillRect( drawRect, color );
 }
 
 size_t SimpleTextBlock::LineCount() const

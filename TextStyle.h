@@ -9,11 +9,16 @@
 class TextStyle
 {
 public:
-	TextStyle( uint32 fontid, COLORREF textColor, COLORREF bkColor );
+	TextStyle();
+	TextStyle( uint32   fontid,
+	           COLORREF textColor,
+	           COLORREF bkColor );
 
-	uint32 fontid;
+	uint32   fontid;
 	COLORREF textColor;
 	COLORREF bkColor;
+
+	static const COLORREF useDefault = MAXDWORD;
 };
 
 #endif
