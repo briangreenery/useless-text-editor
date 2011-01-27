@@ -30,7 +30,6 @@ private:
 	uint32 m_keyword;
 	uint32 m_string;
 	uint32 m_constant;
-	uint32 m_illegal;
 
 	std::vector<TextStyleRun> m_styles;
 };
