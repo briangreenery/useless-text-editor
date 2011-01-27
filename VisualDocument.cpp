@@ -28,8 +28,6 @@ void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection ) const
 {
 	VisualPainter painter( hdc, m_doc, m_styleRegistry, selection );
 
-	painter.FillRect( rect, m_styleRegistry.defaultBkColor );
-
 	BlockContaining_Result block = BlockContaining( rect.top );
 	OffsetRect( &rect, 0, -block.yStart );
 
