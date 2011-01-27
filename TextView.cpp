@@ -137,7 +137,11 @@ void TextView::OnLButtonDown( POINT point )
 		return;
 
 	m_selection.endPoint = m_metrics.ClientToText( point );
-	m_selection.start = m_selection.end = m_blocks.CharFromPoint( &m_selection.endPoint );
+	m_selection.end = m_blocks.CharFromPoint( &m_selection.endPoint );
+
+	bool isShiftPressed = GetKeyState( VK_SHIFT ) < 0;
+	if ( !isShiftPressed )
+		m_selection.start = m_selection.end;
 
 	ScrollToCaret();
 	UpdateCaretPos();
