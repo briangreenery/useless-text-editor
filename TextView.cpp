@@ -14,6 +14,9 @@ TextView::TextView( HWND hwnd )
 	: m_hwnd( hwnd )
 	, m_blocks( m_doc, m_styleRegistry )
 	, m_isDoingMouseSel( false )
+	, m_mouseSelTimer( 0 )
+	, m_mouseScrollInterval( 50 )
+	, m_lastMouseScrollTick( 0 )
 	, m_isCaretVisible( false )
 	, m_mouseWheelRemainder( 0 )
 	, m_lineUpCount( 0 )
@@ -148,6 +151,8 @@ void TextView::OnLButtonDown( POINT point )
 	InvalidateRect( m_hwnd, NULL, FALSE );
 
 	SetCapture( m_hwnd );
+	m_mouseSelTimer = SetTimer( m_hwnd, 1, m_mouseScrollInterval, NULL );
+	m_lastMouseScrollTick = GetTickCount();
 	m_isDoingMouseSel = true;
 }
 
@@ -166,15 +171,43 @@ void TextView::OnMouseMove( POINT point )
 	if ( !m_isDoingMouseSel )
 		return;
 
-	// "ClampToVisibleText" firefox suggests that maybe the yOffset should be in terms of pixels, and that we should snap whenever the mouse is finished.
+	DWORD currentTick = GetTickCount();
+	if ( currentTick - m_lastMouseScrollTick >= m_mouseScrollInterval )
+	{
+		if ( point.y < m_metrics.clientRect.top )
+			ScrollDelta( 0, 3*-m_styleRegistry.lineHeight );
+		else if ( point.y >= m_metrics.clientRect.bottom )
+			ScrollDelta( 0, 3*m_styleRegistry.lineHeight );
+
+		m_lastMouseScrollTick = currentTick;
+	}
+
+	point.y = std::min( m_metrics.clientRect.bottom, point.y );
+	point.y = std::max( m_metrics.clientRect.top,    point.y );
+
 	m_selection.endPoint = m_metrics.ClientToText( point );
 	m_selection.end = m_blocks.CharFromPoint( &m_selection.endPoint );
 	UpdateCaretPos();
 	InvalidateRect( m_hwnd, NULL, FALSE );
 }
 
+void TextView::OnTimer( UINT_PTR id )
+{
+	if ( id != m_mouseSelTimer )
+		return;
+
+	Assert( m_isDoingMouseSel );
+
+	POINT point;
+	GetCursorPos( &point );
+	ScreenToClient( m_hwnd, &point );
+
+	OnMouseMove( point );
+}
+
 void TextView::OnCaptureChanged()
 {
+	KillTimer( m_hwnd, m_mouseSelTimer );
 	m_isDoingMouseSel = false;
 }
 
@@ -186,8 +219,8 @@ UINT TextView::OnMouseActivate()
 
 void TextView::OnSetCursor()
 {
-	DWORD pos = GetMessagePos();
-	POINT point = { GET_X_LPARAM( pos ), GET_Y_LPARAM( pos ) };
+	POINT point;
+	GetCursorPos( &point );
 	ScreenToClient( m_hwnd, &point );
 
 	if ( m_isDoingMouseSel || m_metrics.IsInTextOrMargin( point, m_hwnd ) )

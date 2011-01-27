@@ -27,6 +27,7 @@ public:
 	void OnLButtonDown  ( POINT point );
 	void OnLButtonUp    ( POINT point );
 	void OnMouseMove    ( POINT point );
+	void OnTimer( UINT_PTR );
 	void OnCaptureChanged();
 	UINT OnMouseActivate();
 	void OnSetCursor();
@@ -85,7 +86,11 @@ private:
 	TextViewMetrics   m_metrics;
 	VisualDocument    m_blocks;
 
-	bool m_isDoingMouseSel;
+	bool     m_isDoingMouseSel;
+	UINT_PTR m_mouseSelTimer;
+	DWORD    m_lastMouseScrollTick;
+	DWORD    m_mouseScrollInterval;
+
 	bool m_isCaretVisible;
 	int  m_mouseWheelRemainder;
 

@@ -79,6 +79,10 @@ static LRESULT ProcessWindowMsg( TextView* view, HWND hwnd, UINT msg, WPARAM wPa
 	case WM_MOUSEWHEEL:
 		view->OnMouseWheel( (short) HIWORD( wParam ) );
 		return 0;
+
+	case WM_TIMER:
+		view->OnTimer( static_cast<UINT_PTR>( wParam ) );
+		return 0;
 	}
 
 	return DefWindowProc( hwnd, msg, wParam, lParam );
