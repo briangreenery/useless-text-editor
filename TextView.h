@@ -58,7 +58,7 @@ public:
 	void SelectAll();
 	void SelectWord();
 
-	void Clear( bool moveCaret );
+	void Clear( TextSelection );
 	void Cut();
 	void Copy();
 	void Paste();
@@ -69,12 +69,12 @@ public:
 	void Redo();
 
 private:
-	void UpdateLayout( TextChange );
+	void UpdateLayout( TextChange, TextSelection );
 	void UpdateLayout();
 
 	void HideCaret();
 	void ShowCaret();
-	void MoveCaret( size_t, bool advancing );
+	void MoveSelection( TextSelection, bool scrollToCaret );
 	void ScrollToCaret();
 	void UpdateCaretPos();
 

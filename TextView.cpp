@@ -139,16 +139,15 @@ void TextView::OnLButtonDown( POINT point )
 	if ( !m_metrics.IsInTextOrMargin( point, m_hwnd ) )
 		return;
 
-	m_selection.endPoint = m_metrics.ClientToText( point );
-	m_selection.end = m_blocks.CharFromPoint( &m_selection.endPoint );
+	TextSelection selection = m_selection;
+	selection.endPoint = m_metrics.ClientToText( point );
+	selection.end = m_blocks.CharFromPoint( &selection.endPoint );
 
 	bool isShiftPressed = GetKeyState( VK_SHIFT ) < 0;
 	if ( !isShiftPressed )
-		m_selection.start = m_selection.end;
+		selection.start = selection.end;
 
-	ScrollToCaret();
-	UpdateCaretPos();
-	InvalidateRect( m_hwnd, NULL, FALSE );
+	MoveSelection( selection, true );
 
 	SetCapture( m_hwnd );
 	m_mouseSelTimer = SetTimer( m_hwnd, 1, m_mouseScrollInterval, NULL );
@@ -185,10 +184,11 @@ void TextView::OnMouseMove( POINT point )
 	point.y = std::min( m_metrics.clientRect.bottom, point.y );
 	point.y = std::max( m_metrics.clientRect.top,    point.y );
 
-	m_selection.endPoint = m_metrics.ClientToText( point );
-	m_selection.end = m_blocks.CharFromPoint( &m_selection.endPoint );
-	UpdateCaretPos();
-	InvalidateRect( m_hwnd, NULL, FALSE );
+	TextSelection selection = m_selection;
+	selection.endPoint = m_metrics.ClientToText( point );
+	selection.end = m_blocks.CharFromPoint( &selection.endPoint );
+
+	MoveSelection( selection, false );
 }
 
 void TextView::OnTimer( UINT_PTR id )
@@ -244,74 +244,84 @@ void TextView::OnKillFocus( HWND )
 
 void TextView::AdvanceCaret( bool wholeWord, bool moveSelection )
 {
-	if ( !wholeWord && !moveSelection && !m_selection.IsEmpty() )
+	TextSelection selection = m_selection;
+
+	if ( !wholeWord && !moveSelection && !selection.IsEmpty() )
 	{
-		m_selection.start = m_selection.end = m_selection.Max();
+		selection.start = selection.end = selection.Max();
 	}
 	else
 	{
-		m_selection.end = wholeWord
-		                     ? m_doc.NextNonWhitespace( m_doc.NextWordStop( m_selection.end ) )
-		                     : m_doc.NextCharStop( m_selection.end );
+		selection.end = wholeWord
+		                   ? m_doc.NextNonWhitespace( m_doc.NextWordStop( selection.end ) )
+		                   : m_doc.NextCharStop( selection.end );
 
 		if ( !moveSelection )
-			m_selection.start = m_selection.end;
+			selection.start = selection.end;
 	}
 
-	MoveCaret( m_selection.end, true );
-	InvalidateRect( m_hwnd, NULL, FALSE );
+	selection.endPoint = m_blocks.PointFromChar( selection.end, true );
+	MoveSelection( selection, true );
 }
 
 void TextView::RetireCaret( bool wholeWord, bool moveSelection )
 {
-	if ( !wholeWord && !moveSelection && !m_selection.IsEmpty() )
+	TextSelection selection = m_selection;
+
+	if ( !wholeWord && !moveSelection && !selection.IsEmpty() )
 	{
-		m_selection.start = m_selection.end = m_selection.Min();
+		selection.start = selection.end = selection.Min();
 	}
 	else
 	{
-		m_selection.end = wholeWord
-		                     ? m_doc.PrevWordStop( m_doc.PrevNonWhitespace( m_selection.end ) )
-		                     : m_doc.PrevCharStop( m_selection.end );
+		selection.end = wholeWord
+		                   ? m_doc.PrevWordStop( m_doc.PrevNonWhitespace( selection.end ) )
+		                   : m_doc.PrevCharStop( selection.end );
 
 		if ( !moveSelection )
-			m_selection.start = m_selection.end;
+			selection.start = selection.end;
 	}
 
-	MoveCaret( m_selection.end, false );
-	InvalidateRect( m_hwnd, NULL, FALSE );
+	selection.endPoint = m_blocks.PointFromChar( selection.end, false );
+	MoveSelection( selection, true );
 }
 
 void TextView::Home( bool gotoDocStart, bool moveSelection )
 {
-	m_selection.end = gotoDocStart
-	                     ? 0
-	                     : m_blocks.LineStart( m_selection.endPoint.y );
+	TextSelection selection = m_selection;
+
+	selection.end = gotoDocStart
+	                   ? 0
+	                   : m_blocks.LineStart( selection.endPoint.y );
 
 	if ( !moveSelection )
-		m_selection.start = m_selection.end;
+		selection.start = selection.end;
 
-	MoveCaret( m_selection.end, false );
-	InvalidateRect( m_hwnd, NULL, FALSE );
+	selection.endPoint = m_blocks.PointFromChar( selection.end, false );
+	MoveSelection( selection, true );
 }
 
 void TextView::End( bool gotoDocEnd, bool moveSelection )
 {
-	m_selection.end = gotoDocEnd
-	                     ? m_doc.Length()
-	                     : m_blocks.LineEnd( m_selection.endPoint.y );
+	TextSelection selection = m_selection;
+
+	selection.end = gotoDocEnd
+	                   ? m_doc.Length()
+	                   : m_blocks.LineEnd( selection.endPoint.y );
 
 	if ( !moveSelection )
-		m_selection.start = m_selection.end;
+		selection.start = selection.end;
 
-	MoveCaret( m_selection.end, true );
-	InvalidateRect( m_hwnd, NULL, FALSE );
+	selection.endPoint = m_blocks.PointFromChar( selection.end, true );
+	MoveSelection( selection, true );
 }
 
 void TextView::LineUp( bool moveSelection, bool up )
 {
+	TextSelection selection = m_selection;
+
 	if ( m_lineUpCount == 0 )
-		m_lineUpStart = m_selection.endPoint;
+		m_lineUpStart = selection.endPoint;
 
 	int count = up
 	            ? m_lineUpCount + 1
@@ -322,47 +332,49 @@ void TextView::LineUp( bool moveSelection, bool up )
 	if ( 0 <= y && y < m_blocks.Height() )
 	{
 		m_lineUpCount = count;
-		m_selection.endPoint.y = y;
-		m_selection.endPoint.x = m_lineUpStart.x;
-		m_selection.end = m_blocks.CharFromPoint( &m_selection.endPoint );
+		selection.endPoint.y = y;
+		selection.endPoint.x = m_lineUpStart.x;
+		selection.end = m_blocks.CharFromPoint( &selection.endPoint );
 	}
 
 	if ( !moveSelection )
-		m_selection.start = m_selection.end;
+		selection.start = selection.end;
 
-	ScrollToCaret();
-	UpdateCaretPos();
-	InvalidateRect( m_hwnd, NULL, FALSE );
+	MoveSelection( selection, true );
 }
 
 void TextView::Backspace( bool wholeWord )
 {
-	if ( m_selection.IsEmpty() )
+	TextSelection selection = m_selection;
+
+	if ( selection.IsEmpty() )
 	{
-		if ( m_selection.end == 0 )
+		if ( selection.end == 0 )
 			return;
 
-		m_selection.end = wholeWord
-		                     ? m_doc.PrevWordStop( m_selection.end - 1 )
-		                     : m_selection.end - 1;
+		selection.end = wholeWord
+		                   ? m_doc.PrevWordStop( selection.end - 1 )
+		                   : selection.end - 1;
 	}
 
-	Clear( true );
+	Clear( selection );
 }
 
 void TextView::Delete( bool wholeWord )
 {
-	if ( m_selection.IsEmpty() )
+	TextSelection selection = m_selection;
+
+	if ( selection.IsEmpty() )
 	{
-		if ( m_selection.end == m_doc.Length() )
+		if ( selection.end == m_doc.Length() )
 			return;
 
-		m_selection.end = wholeWord
-		                     ? m_doc.NextWordStop( m_selection.end )
-		                     : m_doc.NextCharStop( m_selection.end );
+		selection.end = wholeWord
+		                   ? m_doc.NextWordStop( selection.end )
+		                   : m_doc.NextCharStop( selection.end );
 	}
 
-	Clear( true );
+	Clear( selection );
 }
 
 void TextView::Insert( UTF16Ref text )
@@ -370,52 +382,54 @@ void TextView::Insert( UTF16Ref text )
 	TextChange change;
 	change.AddChange( m_doc.Delete( m_selection.Min(), m_selection.Size() ) );
 	change.AddChange( m_doc.Insert( m_selection.Min(), text ) );
-	
-	UpdateLayout( change );
 
-	m_selection.end   = m_selection.Max() + change.delta;
-	m_selection.start = m_selection.end;
-	MoveCaret( m_selection.end, true );
+	TextSelection selection;
+	selection.start = m_selection.Max() + change.delta;
+	selection.end   = selection.start;
+
+	UpdateLayout( change, selection );
 }
 
 void TextView::SelectAll()
 {
-	m_selection.start = 0;
-	m_selection.end   = m_doc.Length();
+	TextSelection selection;
+	selection.start    = 0;
+	selection.end      = m_doc.Length();
+	selection.endPoint = m_blocks.PointFromChar( selection.end, true );
 
-	MoveCaret( m_selection.end, true );
-	InvalidateRect( m_hwnd, NULL, FALSE );
+	MoveSelection( selection, true );
 }
 
 void TextView::SelectWord()
 {
 	std::pair<size_t, size_t> word = m_doc.WordAt( m_selection.end );
 
-	m_selection.start = word.first;
-	m_selection.end   = word.second;
+	TextSelection selection;
+	selection.start    = word.first;
+	selection.end      = word.second;
+	selection.endPoint = m_blocks.PointFromChar( selection.end, true );
 
-	MoveCaret( m_selection.end, true );
-	InvalidateRect( m_hwnd, NULL, FALSE );
+	MoveSelection( selection, true );
 }
 
-void TextView::Clear( bool moveCaret )
+void TextView::Clear( TextSelection rangeToClear )
 {
-	if ( m_selection.IsEmpty() )
+	if ( rangeToClear.IsEmpty() )
 		return;
 
-	TextChange change = m_doc.Delete( m_selection.Min(), m_selection.Size() );
-	UpdateLayout( change );
+	TextChange change = m_doc.Delete( rangeToClear.Min(), rangeToClear.Size() );
 
-	m_selection.start = m_selection.end = m_selection.Min();
+	TextSelection selection;
+	selection.start = rangeToClear.Min();
+	selection.end   = selection.start;
 
-	if ( moveCaret )
-		MoveCaret( m_selection.end, true );
+	UpdateLayout( change, selection );
 }
 
 void TextView::Cut()
 {
 	Copy();
-	Clear( true );
+	Clear( m_selection );
 }
 
 void TextView::Copy()
@@ -495,10 +509,13 @@ void TextView::Redo()
 		return;
 }
 
-void TextView::UpdateLayout( TextChange change )
+void TextView::UpdateLayout( TextChange change, TextSelection selection )
 {
 	if ( m_styleRegistry.annotator )
+	{
 		m_styleRegistry.annotator->TextChanged( change );
+		m_styleRegistry.annotator->SelectionChanged( selection.start, selection.end );
+	}
 
 	RECT rect = m_metrics.TextRect( m_hwnd );
 
@@ -506,20 +523,33 @@ void TextView::UpdateLayout( TextChange change )
 	m_blocks.Update( hdc, rect.right - rect.left, change );
 	ReleaseDC( m_hwnd, hdc );
 
+	selection.endPoint = m_blocks.PointFromChar( selection.end, true );
+	m_selection = selection;
+
+	ScrollToCaret();
+	UpdateCaretPos();
+
 	InvalidateRect( m_hwnd, NULL, FALSE );
-	ScrollDelta( 0, 0 );
 }
 
 void TextView::UpdateLayout()
 {
-	UpdateLayout( TextChange( 0, m_doc.Length(), TextChange::modification ) );
+	TextChange change( 0, m_doc.Length(), TextChange::modification );
+	UpdateLayout( change, m_selection );
 }
 
-void TextView::MoveCaret( size_t pos, bool advancing )
+void TextView::MoveSelection( TextSelection selection, bool scroll )
 {
-	m_selection.endPoint = m_blocks.PointFromChar( pos, advancing );
-	ScrollToCaret();
+	if ( m_styleRegistry.annotator )
+		m_styleRegistry.annotator->SelectionChanged( selection.start, selection.end );
+
+	m_selection = selection;
+
+	if ( scroll )
+		ScrollToCaret();
+
 	UpdateCaretPos();
+	InvalidateRect( m_hwnd, NULL, TRUE );
 }
 
 void TextView::ScrollToCaret()
