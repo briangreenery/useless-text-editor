@@ -514,7 +514,9 @@ void TextView::UpdateLayout( TextChange change, TextSelection selection )
 	if ( m_styleRegistry.annotator )
 	{
 		m_styleRegistry.annotator->TextChanged( change );
-		m_styleRegistry.annotator->SelectionChanged( selection.start, selection.end );
+
+		if ( m_selection != selection )
+			m_styleRegistry.annotator->SelectionChanged( selection.start, selection.end );
 	}
 
 	RECT rect = m_metrics.TextRect( m_hwnd );
@@ -540,6 +542,9 @@ void TextView::UpdateLayout()
 
 void TextView::MoveSelection( TextSelection selection, bool scroll )
 {
+	if ( selection == m_selection )
+		return;
+
 	if ( m_styleRegistry.annotator )
 		m_styleRegistry.annotator->SelectionChanged( selection.start, selection.end );
 

@@ -29,4 +29,7 @@ public:
 	POINT  endPoint;
 };
 
+bool operator==( const TextSelection&, const TextSelection& );
+bool operator!=( const TextSelection&, const TextSelection& );
+
 #endif

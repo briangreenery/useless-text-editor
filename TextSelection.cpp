@@ -13,3 +13,13 @@ bool TextSelection::Intersects( size_t theStart, size_t theEnd ) const
 {
 	return Min() < theEnd && theStart < Max();
 }
+
+bool operator==( const TextSelection& a, const TextSelection& b )
+{
+	return a.start == b.start && a.end == b.end;
+}
+
+bool operator!=( const TextSelection& a, const TextSelection& b )
+{
+	return !( a == b );
+}
