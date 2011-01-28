@@ -81,15 +81,6 @@ bool TextViewMetrics::IsInTextOrMargin( POINT point, HWND hwnd ) const
 	return PtInRect( &text, point ) ? true : false;
 }
 
-HDC TextViewMetrics::ClientToGutter( HDC hdc ) const
-{
-	POINT clientOrigin = { 0, 0 };
-	clientOrigin = ClientToGutter( clientOrigin );
-
-	SetWindowOrgEx( hdc, clientOrigin.x, clientOrigin.y, NULL );
-	return hdc;
-}
-
 RECT TextViewMetrics::ClientToGutter( RECT rect ) const
 {
 	POINT topLeft     = { rect.left, rect.top };
@@ -119,7 +110,8 @@ HDC TextViewMetrics::ClientToText( HDC hdc, POINT* oldOrigin ) const
 	POINT clientOrigin = { 0, 0 };
 	clientOrigin = ClientToText( clientOrigin );
 
-	SetWindowOrgEx( hdc, clientOrigin.x, clientOrigin.y, oldOrigin );
+	GetWindowOrgEx( hdc, oldOrigin );
+	SetWindowOrgEx( hdc, oldOrigin->x + clientOrigin.x, oldOrigin->y + clientOrigin.y, oldOrigin );
 	return hdc;
 }
 

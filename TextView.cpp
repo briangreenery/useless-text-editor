@@ -621,9 +621,7 @@ void TextView::ScrollTo( int x, int y )
 	y = std::min( y, int( ( m_blocks.LineCount() - m_metrics.linesPerPage ) * m_styleRegistry.lineHeight ) );
 	y = std::max( y, int( 0 ) );
 
-	//ScrollWindowEx( m_hwnd, 0, ( m_metrics.yOffset - y ) * m_styleRegistry.lineHeight, NULL, NULL, NULL, NULL, SW_ERASE | SW_INVALIDATE );
-	InvalidateRect( m_hwnd, NULL, FALSE );
-
+	ScrollWindowEx( m_hwnd, 0, m_metrics.yOffset - y, NULL, NULL, NULL, NULL, SW_ERASE | SW_INVALIDATE );
 	m_metrics.yOffset = y;
 
 	SCROLLINFO si = { sizeof si };
