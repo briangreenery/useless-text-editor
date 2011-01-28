@@ -136,5 +136,9 @@ void RelevanceAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t 
 
 		uint32 styleid = TokenStyle( it->token );
 
-		if ( !styles.empty() && styles.back().styleid == styleid )			styles.back().count += overlapEnd - overlapStart;		else			styles.push_back( TextStyleRun( styleid, overlapStart, overlapEnd - overlapStart ) );	}
+		if ( !styles.empty() && styles.back().styleid == styleid )
+			styles.back().count += overlapEnd - overlapStart;
+		else
+			styles.push_back( TextStyleRun( styleid, overlapStart, overlapEnd - overlapStart ) );
+	}
 }
