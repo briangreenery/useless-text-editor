@@ -3,13 +3,15 @@
 #include "RelevanceAnnotator.h"
 #include "TextEditRelevanceLexer.h"
 #include "TextStyleRegistry.h"
+#include "TextDocument.h"
 #include <algorithm>
 
 #undef min
 #undef max
 
 RelevanceAnnotator::RelevanceAnnotator( const TextDocument& doc, TextStyleRegistry& styleRegistry )
-	: m_relevanceLexer( doc )
+	: m_doc( doc )
+	, m_relevanceLexer( doc )
 	, m_styleRegistry( styleRegistry )
 {
 	m_keyword  = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,    0,255 ), TextStyle::useDefault ) );
@@ -86,9 +88,9 @@ uint32 RelevanceAnnotator::TokenStyle( RelevanceToken token ) const
 void RelevanceAnnotator::TextChanged( TextChange change )
 {
 	m_relevanceLexer.Reset();
-	m_styles.clear();
+	m_tokens.clear();
 
-	size_t position = 0;
+	size_t start = 0;
 	while ( true )
 	{
 		RelevanceToken token = m_relevanceLexer.NextToken();
@@ -96,21 +98,24 @@ void RelevanceAnnotator::TextChanged( TextChange change )
 		if ( token == RelevanceToken::t_endOfInput )
 			break;
 
-		uint32 styleid = TokenStyle( token );
-		size_t count = m_relevanceLexer.Position() - position;
-
-		if ( !m_styles.empty() && m_styles.back().styleid == styleid )
-			m_styles.back().count += count;
-		else
-			m_styles.push_back( TextStyleRun( styleid, position, count ) );
-
-		position += count;
+		size_t count = m_relevanceLexer.Position() - start;
+		m_tokens.push_back( RelevanceTokenRun( token, start, count ) );
+		start += count;
 	}
 }
 
 void RelevanceAnnotator::SelectionChanged( size_t start, size_t end )
 {
 }
+
+typedef std::pair<size_t,size_t> TextRange;
+
+struct TokenRunCompare
+{
+	bool operator()( const RelevanceTokenRun& a, const RelevanceTokenRun&  b ) const { return a.start + a.count  <= b.start; }
+	bool operator()( const RelevanceTokenRun& a, const TextRange&          b ) const { return a.start + a.count  <= b.first; }
+	bool operator()( const TextRange&         a, const RelevanceTokenRun&  b ) const { return a.first + a.second <= b.start; }
+};
 
 void RelevanceAnnotator::GetFonts( TextFontRuns& fonts, size_t start, size_t count )
 {
@@ -119,24 +124,17 @@ void RelevanceAnnotator::GetFonts( TextFontRuns& fonts, size_t start, size_t cou
 
 void RelevanceAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t count )
 {
-	typedef std::pair<size_t,size_t> TextRange;
-	typedef std::pair<TextStyleRuns::const_iterator, TextStyleRuns::const_iterator> StyleRange;
-
-	struct StyleRunEqual
-	{
-		bool operator()( const TextStyleRun& a, const TextStyleRun&  b ) const { return a.start + a.count < b.start; }
-		bool operator()( const TextStyleRun& a, const TextRange&     b ) const { return a.start + a.count <= b.first; }
-		bool operator()( const TextRange&    a, const TextStyleRun&  b ) const { return a.first + a.second <= b.start; }
-	};
+	typedef std::pair<RelevanceTokenRuns::const_iterator, RelevanceTokenRuns::const_iterator> TokenRange;
 
 	TextRange textRange( start, count );
-	StyleRange range = std::equal_range( m_styles.begin(), m_styles.end(), textRange, StyleRunEqual() );
+	TokenRange range = std::equal_range( m_tokens.begin(), m_tokens.end(), textRange, TokenRunCompare() );
 
-	for ( TextStyleRuns::const_iterator it = range.first; it != range.second; ++it )
+	for ( RelevanceTokenRuns::const_iterator it = range.first; it != range.second; ++it )
 	{
 		size_t overlapStart = std::max( start, it->start );
 		size_t overlapEnd   = std::min( start + count, it->start + it->count );
 
-		styles.push_back( TextStyleRun( it->styleid, overlapStart, overlapEnd - overlapStart ) );
-	}
+		uint32 styleid = TokenStyle( it->token );
+
+		if ( !styles.empty() && styles.back().styleid == styleid )			styles.back().count += overlapEnd - overlapStart;		else			styles.push_back( TextStyleRun( styleid, overlapStart, overlapEnd - overlapStart ) );	}
 }

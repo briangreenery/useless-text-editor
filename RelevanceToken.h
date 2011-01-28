@@ -3,6 +3,8 @@
 #ifndef RelevanceToken_h
 #define RelevanceToken_h
 
+#include <vector>
+
 class RelevanceToken
 {
 public:
@@ -72,5 +74,17 @@ public:
 private:
 	Token m_token;
 };
+
+class RelevanceTokenRun
+{
+public:
+	RelevanceTokenRun( RelevanceToken, size_t start, size_t count );
+
+	RelevanceToken token;
+	size_t start;
+	size_t count;
+};
+
+typedef std::vector<RelevanceTokenRun> RelevanceTokenRuns;
 
 #endif

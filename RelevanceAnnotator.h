@@ -24,6 +24,7 @@ public:
 private:
 	uint32 TokenStyle( RelevanceToken ) const;
 
+	const TextDocument& m_doc;
 	TextStyleRegistry& m_styleRegistry;
 	TextEditRelevanceLexer m_relevanceLexer;
 
@@ -31,7 +32,7 @@ private:
 	uint32 m_string;
 	uint32 m_constant;
 
-	std::vector<TextStyleRun> m_styles;
+	RelevanceTokenRuns m_tokens;
 };
 
 #endif
