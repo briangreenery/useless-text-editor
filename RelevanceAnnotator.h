@@ -22,7 +22,11 @@ public:
 	virtual void GetStyles( TextStyleRuns&, size_t start, size_t count );
 
 private:
-	uint32 TokenStyle( RelevanceToken ) const;
+	size_t TokenAt( size_t position ) const;
+	uint32 TokenStyle( size_t token ) const;
+
+	void MatchOpenParen( size_t position );
+	void MatchCloseParen( size_t position );
 
 	const TextDocument& m_doc;
 	TextStyleRegistry& m_styleRegistry;
@@ -31,7 +35,9 @@ private:
 	uint32 m_keyword;
 	uint32 m_string;
 	uint32 m_constant;
+	uint32 m_matching;
 
+	std::vector<size_t> m_matchingTokens;
 	RelevanceTokenRuns m_tokens;
 };
 

@@ -14,14 +14,18 @@ RelevanceAnnotator::RelevanceAnnotator( const TextDocument& doc, TextStyleRegist
 	, m_relevanceLexer( doc )
 	, m_styleRegistry( styleRegistry )
 {
-	m_keyword  = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,    0,255 ), TextStyle::useDefault ) );
-	m_constant = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 128,  0,128 ), TextStyle::useDefault ) );
-	m_string   = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,  128,128 ), TextStyle::useDefault ) );
+	m_keyword  = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,    0,255 ),    TextStyle::useDefault ) );
+	m_constant = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 128,  0,128 ),    TextStyle::useDefault ) );
+	m_string   = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,  128,128 ),    TextStyle::useDefault ) );
+	m_matching = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, TextStyle::useDefault, RGB( 219,224,204 ) ) );
 }
 
-uint32 RelevanceAnnotator::TokenStyle( RelevanceToken token ) const
+uint32 RelevanceAnnotator::TokenStyle( size_t token ) const
 {
-	switch ( token )
+	if ( std::find( m_matchingTokens.begin(), m_matchingTokens.end(), token ) != m_matchingTokens.end() )
+		return m_matching;
+
+	switch ( m_tokens[token].token )
 	{
 	case RelevanceToken::t_and:
 	case RelevanceToken::t_as:
@@ -89,6 +93,7 @@ void RelevanceAnnotator::TextChanged( TextChange change )
 {
 	m_relevanceLexer.Reset();
 	m_tokens.clear();
+	m_matchingTokens.clear();
 
 	size_t start = 0;
 	while ( true )
@@ -106,9 +111,73 @@ void RelevanceAnnotator::TextChanged( TextChange change )
 
 void RelevanceAnnotator::SelectionChanged( size_t start, size_t end )
 {
+	m_matchingTokens.clear();
+
+	if ( start != end || start == 0 )
+		return;
+
+	if ( m_doc[start - 1] == '(' )
+	{
+		size_t openParen = TokenAt( start - 1 );
+		if ( m_tokens[openParen].token == RelevanceToken::t_openParen )
+			MatchOpenParen( openParen );
+	}
+	else if ( m_doc[start - 1] == ')' )
+	{
+		size_t closeParen = TokenAt( start - 1 );
+		if ( m_tokens[closeParen].token == RelevanceToken::t_closeParen )
+			MatchCloseParen( closeParen );
+	}
+}
+
+void RelevanceAnnotator::MatchOpenParen( size_t openParen )
+{
+	size_t nesting = 0;
+	for ( size_t i = openParen + 1; i < m_tokens.size(); ++i )
+	{
+		RelevanceToken token = m_tokens[i].token;
+
+		if ( token == RelevanceToken::t_closeParen )
+		{
+			if ( nesting == 0 )
+			{
+				m_matchingTokens.push_back( openParen );
+				m_matchingTokens.push_back( i );
+				break;
+			}
+
+			nesting--;
+		}
+		else if ( token == RelevanceToken::t_openParen )
+			++nesting;
+	}
+}
+
+void RelevanceAnnotator::MatchCloseParen( size_t closeParen )
+{
+	size_t nesting = 0;
+	for ( size_t i = closeParen; i-- > 0; )
+	{
+		RelevanceToken token = m_tokens[i].token;
+
+		if ( token == RelevanceToken::t_openParen )
+		{
+			if ( nesting == 0 )
+			{
+				m_matchingTokens.push_back( i );
+				m_matchingTokens.push_back( closeParen );
+				break;
+			}
+
+			nesting--;
+		}
+		else if ( token == RelevanceToken::t_closeParen )
+			++nesting;
+	}
 }
 
 typedef std::pair<size_t,size_t> TextRange;
+typedef std::pair<RelevanceTokenRuns::const_iterator, RelevanceTokenRuns::const_iterator> TokenRange;
 
 struct TokenRunCompare
 {
@@ -117,6 +186,15 @@ struct TokenRunCompare
 	bool operator()( const TextRange&         a, const RelevanceTokenRun&  b ) const { return a.first + a.second <= b.start; }
 };
 
+size_t RelevanceAnnotator::TokenAt( size_t position ) const
+{
+	TextRange textRange( position, 1 );
+	TokenRange range = std::equal_range( m_tokens.begin(), m_tokens.end(), textRange, TokenRunCompare() );
+
+	Assert( range.first + 1 == range.second );
+	return range.first - m_tokens.begin();
+}
+
 void RelevanceAnnotator::GetFonts( TextFontRuns& fonts, size_t start, size_t count )
 {
 	fonts.push_back( TextFontRun( m_styleRegistry.defaultFontid, count ) );
@@ -124,8 +202,6 @@ void RelevanceAnnotator::GetFonts( TextFontRuns& fonts, size_t start, size_t cou
 
 void RelevanceAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t count )
 {
-	typedef std::pair<RelevanceTokenRuns::const_iterator, RelevanceTokenRuns::const_iterator> TokenRange;
-
 	TextRange textRange( start, count );
 	TokenRange range = std::equal_range( m_tokens.begin(), m_tokens.end(), textRange, TokenRunCompare() );
 
@@ -134,7 +210,7 @@ void RelevanceAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t 
 		size_t overlapStart = std::max( start, it->start );
 		size_t overlapEnd   = std::min( start + count, it->start + it->count );
 
-		uint32 styleid = TokenStyle( it->token );
+		uint32 styleid = TokenStyle( it - m_tokens.begin() );
 
 		if ( !styles.empty() && styles.back().styleid == styleid )
 			styles.back().count += overlapEnd - overlapStart;
