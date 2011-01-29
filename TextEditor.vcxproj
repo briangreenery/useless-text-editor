@@ -54,7 +54,7 @@
       <AdditionalIncludeDirectories>C:\Users\brian_green\Desktop\icu\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;icuucd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;icuucd.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>C:\Users\brian_green\Desktop\icu\lib</AdditionalLibraryDirectories>
@@ -73,7 +73,7 @@
       <AdditionalIncludeDirectories>C:\Users\brian_green\Desktop\icu\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;icuucd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;icuucd.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -103,6 +103,7 @@
     <ClCompile Include="TextBuffer.cpp" />
     <ClCompile Include="TextBlock.cpp" />
     <ClCompile Include="TextFont.cpp" />
+    <ClCompile Include="TextSquiggle.cpp" />
     <ClCompile Include="TextStyleReader.cpp" />
     <ClCompile Include="TextStyleRegistry.cpp" />
     <ClCompile Include="TextStyleRun.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="SizedAutoArray.h" />
     <ClInclude Include="TextBlock.h" />
     <ClInclude Include="TextFont.h" />
+    <ClInclude Include="TextSquiggle.h" />
     <ClInclude Include="TextStyleReader.h" />
     <ClInclude Include="TextStyleRegistry.h" />
     <ClInclude Include="TextStyleRun.h" />

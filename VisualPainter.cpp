@@ -3,11 +3,12 @@
 #include "VisualPainter.h"
 #include "TextStyleRegistry.h"
 #include "TextStyle.h"
+#include "TextSquiggle.h"
 
 #undef min
 #undef max
 
-VisualPainter::VisualPainter( HDC _hdc, const TextDocument& _doc, TextStyleRegistry& _styleRegistry, TextSelection _selection )
+VisualPainter::VisualPainter( HDC _hdc, const TextDocument& _doc, TextStyleRegistry& _styleRegistry, const TextSquiggle& _squiggle, TextSelection _selection )
 	: hdc( _hdc )
 	, styleRegistry( _styleRegistry )
 	, doc( _doc )
@@ -16,6 +17,7 @@ VisualPainter::VisualPainter( HDC _hdc, const TextDocument& _doc, TextStyleRegis
 	, textStart( 0 )
 	, docReader( _doc )
 	, styleReader( _styleRegistry )
+	, squiggle( _squiggle )
 {
 	GetWindowOrgEx( hdc, &oldOrigin );
 
@@ -60,4 +62,9 @@ void VisualPainter::SetTextColor( COLORREF color )
 		::SetTextColor( hdc, styleRegistry.defaultTextColor );
 	else
 		::SetTextColor( hdc, color );
+}
+
+void VisualPainter::DrawSquiggles( int xStart, int xEnd, RECT rect )
+{
+	squiggle.Draw( hdc, xStart, xEnd, rect.top + styleRegistry.lineHeight );
 }

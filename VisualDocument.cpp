@@ -26,7 +26,7 @@ VisualDocument::VisualDocument( const TextDocument& doc, TextStyleRegistry& styl
 
 void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection ) const
 {
-	VisualPainter painter( hdc, m_doc, m_styleRegistry, selection );
+	VisualPainter painter( hdc, m_doc, m_styleRegistry, m_squiggle, selection );
 
 	BlockContaining_Result block = BlockContaining( rect.top );
 	OffsetRect( &rect, 0, -block.yStart );

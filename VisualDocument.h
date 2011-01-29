@@ -6,6 +6,7 @@
 #include "TextBlock.h"
 #include "TextChange.h"
 #include "UString.h"
+#include "TextSquiggle.h"
 #include <Windows.h>
 #include <list>
 
@@ -52,6 +53,7 @@ private:
 
 	const TextDocument& m_doc;
 	TextStyleRegistry&  m_styleRegistry;
+	TextSquiggle        m_squiggle;
 	size_t              m_lineCount;
 	TextBlockList       m_blocks;
 };

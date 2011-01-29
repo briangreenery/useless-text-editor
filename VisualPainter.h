@@ -10,18 +10,20 @@
 #include <Windows.h>
 #include <usp10.h>
 
+class TextSquiggle;
 class TextStyleRegistry;
 class TextDocument;
 
 class VisualPainter
 {
 public:
-	VisualPainter( HDC, const TextDocument&, TextStyleRegistry&, TextSelection );
+	VisualPainter( HDC, const TextDocument&, TextStyleRegistry&, const TextSquiggle&, TextSelection );
 	~VisualPainter();
 
 	void SetOrigin( size_t textStart, LONG yStart );
 	void SetTextColor( COLORREF );
 	void FillRect( RECT rect, COLORREF color );
+	void DrawSquiggles( int xStart, int xEnd, RECT rect );
 
 	HDC                 hdc;
 	TextSelection       selection;
@@ -32,6 +34,8 @@ public:
 	TextStyleReader     styleReader;
 
 private:
+	const TextSquiggle& squiggle;
+
 	TextSelection oldSelection;
 	POINT         oldOrigin;
 	HGDIOBJ       oldFont;

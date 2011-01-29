@@ -22,6 +22,7 @@ void SimpleTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) const
 	{
 		DrawLineBackground( line, painter, rect );
 		DrawLineSelection ( line, painter, rect );
+		DrawLineSquiggles ( line, painter, rect );
 		rect.top += m_styleRegistry.lineHeight;
 	}
 }
@@ -76,6 +77,23 @@ void SimpleTextBlock::DrawLineSelection( size_t line, VisualPainter& painter, RE
 		int xEnd   = LineWidth( line ) + m_styleRegistry.avgCharWidth;
 
 		DrawLineRect( painter, rect, xStart, xEnd, m_styleRegistry.selectionColor );
+	}
+}
+
+void SimpleTextBlock::DrawLineSquiggles( size_t line, VisualPainter& painter, RECT rect ) const
+{
+	size_t pos = TextStart( line );
+	int xStart = 0;
+
+	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + pos, TextEnd( line ) - pos );
+	for ( const TextStyleRun* it = styles.begin(); it != styles.end() && xStart < rect.right; ++it )
+	{
+		int xEnd = CPtoX( line, pos + it->count - 1, true );
+
+		painter.DrawSquiggles( xStart, xEnd, rect );
+
+		pos += it->count;
+		xStart = xEnd;
 	}
 }
 
