@@ -47,7 +47,7 @@ void TextView::OnSize( UINT state, int cx, int cy )
 	if ( cx != ( oldClientRect.right - oldClientRect.left ) )
 		UpdateLayout();
 
-	InvalidateRect( m_hwnd, NULL, FALSE );
+	ScrollDelta( 0, 0 );
 }
 
 void TextView::OnPaint()
@@ -628,7 +628,7 @@ void TextView::ScrollTo( int x, int y )
 	si.fMask      = SIF_PAGE | SIF_POS | SIF_RANGE | SIF_DISABLENOSCROLL;
 	si.nPage      = m_metrics.linesPerPage * m_styleRegistry.lineHeight;
 	si.nMin       = 0;
-	si.nMax       = ( m_blocks.LineCount() - 1 ) * m_styleRegistry.lineHeight;
+	si.nMax       = m_blocks.LineCount() * m_styleRegistry.lineHeight - 1;
 	si.nPos       = m_metrics.yOffset;
 
 	SetScrollInfo( m_hwnd, SB_VERT, &si, TRUE );
