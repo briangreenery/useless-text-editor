@@ -39,7 +39,7 @@ private:
 	void DrawLineSquiggles ( size_t line, VisualPainter&, RECT ) const;
 	void DrawLineText      ( size_t line, VisualPainter&, RECT ) const;
 
-	void DrawLineRect( VisualPainter&, RECT, int start, int end, COLORREF color ) const;
+	void DrawLineRect( VisualPainter&, RECT, int start, int end, COLORREF ) const;
 
 	ArrayOf<const TextStyleRun> RunStyles( size_t blockStart, const SimpleTextRun&, ArrayOf<const TextStyleRun> ) const;
 

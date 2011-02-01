@@ -25,8 +25,16 @@ private:
 	size_t TokenAt( size_t position ) const;
 	uint32 TokenStyle( size_t token ) const;
 
-	void MatchOpenParen( size_t position );
+	void MatchOpenParen ( size_t position );
 	void MatchCloseParen( size_t position );
+	void MatchIf        ( size_t position );
+	void MatchThen      ( size_t position );
+	void MatchElse      ( size_t position );
+
+	size_t PrevIf  ( size_t position ) const;
+	size_t PrevThen( size_t position ) const;
+	size_t NextThen( size_t position ) const;
+	size_t NextElse( size_t position ) const;
 
 	const TextDocument& m_doc;
 	TextStyleRegistry& m_styleRegistry;

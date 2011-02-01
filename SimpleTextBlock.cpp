@@ -22,7 +22,6 @@ void SimpleTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) const
 	{
 		DrawLineBackground( line, painter, rect );
 		DrawLineSelection ( line, painter, rect );
-		DrawLineSquiggles ( line, painter, rect );
 		rect.top += m_styleRegistry.lineHeight;
 	}
 }

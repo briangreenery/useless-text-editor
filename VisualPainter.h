@@ -22,7 +22,8 @@ public:
 
 	void SetOrigin( size_t textStart, LONG yStart );
 	void SetTextColor( COLORREF );
-	void FillRect( RECT rect, COLORREF color );
+
+	void FillRect ( RECT rect, COLORREF color );
 	void DrawSquiggles( int xStart, int xEnd, RECT rect );
 
 	HDC                 hdc;
