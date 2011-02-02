@@ -13,6 +13,7 @@ public:
 	EmptyTextBlock( bool endsWithNewline, TextStyleRegistry& );
 
 	virtual void DrawBackground( VisualPainter&, RECT ) const;
+	virtual void DrawSquiggles ( VisualPainter&, RECT ) const;
 	virtual void DrawText      ( VisualPainter&, RECT ) const;
 
 	virtual size_t LineCount() const;

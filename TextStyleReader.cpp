@@ -40,3 +40,16 @@ ArrayOf<const TextStyleRun> TextStyleReader::Styles( size_t start, size_t count 
 
 	return ArrayOf<const TextStyleRun>( &m_styles.front(), &m_styles.back() + 1 );
 }
+
+ArrayOf<const TextRange> TextStyleReader::Squiggles( size_t start, size_t count )
+{
+	m_squiggles.clear();
+
+	if ( m_styleRegistry.annotator )
+		m_styleRegistry.annotator->GetSquiggles( m_squiggles, start, count );
+
+	if ( m_squiggles.empty() )
+		return ArrayOf<const TextRange>();
+
+	return ArrayOf<const TextRange>( &m_squiggles.front(), &m_squiggles.back() + 1 );
+}

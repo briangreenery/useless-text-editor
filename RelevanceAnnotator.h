@@ -18,8 +18,9 @@ public:
 	virtual void TextChanged( TextChange );
 	virtual void SelectionChanged( size_t start, size_t end );
 
-	virtual void GetFonts ( TextFontRuns&,  size_t start, size_t count );
-	virtual void GetStyles( TextStyleRuns&, size_t start, size_t count );
+	virtual void GetFonts    ( TextFontRuns&,  size_t start, size_t count );
+	virtual void GetStyles   ( TextStyleRuns&, size_t start, size_t count );
+	virtual void GetSquiggles( TextRanges&,    size_t start, size_t count );
 
 private:
 	size_t TokenAt( size_t position ) const;

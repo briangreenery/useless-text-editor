@@ -31,6 +31,18 @@ void UniscribeTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) con
 	}
 }
 
+void UniscribeTextBlock::DrawSquiggles( VisualPainter& painter, RECT rect ) const
+{
+	size_t firstLine = rect.top / m_styleRegistry.lineHeight;
+	rect.top = firstLine * m_styleRegistry.lineHeight;
+
+	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &rect ); ++line )
+	{
+		DrawLineSquiggles( line, painter, rect );
+		rect.top += m_styleRegistry.lineHeight;
+	}
+}
+
 void UniscribeTextBlock::DrawText( VisualPainter& painter, RECT rect ) const
 {
 	size_t firstLine = rect.top / m_styleRegistry.lineHeight;
@@ -46,11 +58,12 @@ void UniscribeTextBlock::DrawText( VisualPainter& painter, RECT rect ) const
 void UniscribeTextBlock::DrawLineBackground( size_t line, VisualPainter& painter, RECT rect ) const
 {
 	size_t lineStart = TextStart( line );
-	size_t lineEnd = TextEnd( line );
+	size_t lineEnd   = TextEnd( line );
 
 	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
-	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
 	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + lineStart, lineEnd - lineStart );
+
+	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
 
 	int xStart = 0;
 	for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
@@ -78,12 +91,11 @@ void UniscribeTextBlock::DrawLineBackground( size_t line, VisualPainter& painter
 
 void UniscribeTextBlock::DrawLineSelection( size_t line, VisualPainter& painter, RECT rect ) const
 {
-	std::vector<int> visualToLogical = VisualToLogicalMapping( LineRuns( line ) );
+	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
+	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
 
 	if ( painter.selection.Intersects( TextStart( line ), TextEnd( line ) ) )
 	{
-		ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
-
 		int xStart = 0;
 		for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
 		{
@@ -113,10 +125,43 @@ void UniscribeTextBlock::DrawLineSelection( size_t line, VisualPainter& painter,
 	}
 }
 
+void UniscribeTextBlock::DrawLineSquiggles( size_t line, VisualPainter& painter, RECT rect ) const
+{
+	size_t lineStart = TextStart( line );
+	size_t lineEnd   = TextEnd( line );
+
+	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
+	ArrayOf<const TextRange> squiggles = painter.styleReader.Squiggles( painter.textStart + lineStart, lineEnd - lineStart );
+
+	if ( squiggles.empty() )
+		return;
+
+	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
+
+	int xStart = 0;
+	for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
+	{
+		const UniscribeTextRun& run = runs[visualToLogical[i]];
+
+		ArrayOf<const TextRange> runSquiggles = RunSquiggles( painter.textStart, run, squiggles );
+		for ( const TextRange* squiggle = runSquiggles.begin(); squiggle != runSquiggles.end(); ++squiggle )
+		{
+			size_t squiggleStart = squiggle->start - painter.textStart;
+			size_t squiggleEnd   = squiggle->start - painter.textStart + squiggle->count;
+
+			std::pair<int,int> range = RunCPtoXRange( run, squiggleStart, squiggleEnd );
+
+			painter.DrawSquiggles( xStart + range.first, xStart + range.second, rect );
+		}
+
+		xStart += run.width;
+	}
+}
+
 void UniscribeTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT rect ) const
 {
 	size_t lineStart = TextStart( line );
-	size_t lineEnd = TextEnd( line );
+	size_t lineEnd   = TextEnd( line );
 
 	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
 	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + lineStart, lineEnd - lineStart );
@@ -171,15 +216,29 @@ ArrayOf<const TextStyleRun> UniscribeTextBlock::RunStyles( size_t blockStart, co
 	struct StyleRunEqual
 	{
 		StyleRunEqual( size_t blockStart ) : m_blockStart( blockStart ) {}
-		bool operator()( const TextStyleRun&     a, const TextStyleRun&     b ) const { return a.start + a.count < b.start; }
+		bool operator()( const TextStyleRun&     a, const TextStyleRun&     b ) const { return a.start + a.count <= b.start; }
 		bool operator()( const TextStyleRun&     a, const UniscribeTextRun& b ) const { return a.start + a.count <= m_blockStart + b.textStart; }
 		bool operator()( const UniscribeTextRun& a, const TextStyleRun&     b ) const { return m_blockStart + a.textStart + a.textCount <= b.start; }
 		size_t m_blockStart;
 	};
 
 	std::pair<const TextStyleRun*, const TextStyleRun*> range = std::equal_range( styles.begin(), styles.end(), run, StyleRunEqual( blockStart ) );
-
 	return ArrayOf<const TextStyleRun>( range.first, range.second );
+}
+
+ArrayOf<const TextRange> UniscribeTextBlock::RunSquiggles( size_t blockStart, const UniscribeTextRun& run, ArrayOf<const TextRange> squiggles ) const
+{
+	struct TextRangeEqual
+	{
+		TextRangeEqual( size_t blockStart ) : m_blockStart( blockStart ) {}
+		bool operator()( const TextRange&        a, const TextRange&        b ) const { return a.start + a.count <= b.start; }
+		bool operator()( const TextRange&        a, const UniscribeTextRun& b ) const { return a.start + a.count <= m_blockStart + b.textStart; }
+		bool operator()( const UniscribeTextRun& a, const TextRange&        b ) const { return m_blockStart + a.textStart + a.textCount <= b.start; }
+		size_t m_blockStart;
+	};
+
+	std::pair<const TextRange*, const TextRange*> range = std::equal_range( squiggles.begin(), squiggles.end(), run, TextRangeEqual( blockStart ) );
+	return ArrayOf<const TextRange>( range.first, range.second );
 }
 
 void UniscribeTextBlock::DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, COLORREF color ) const

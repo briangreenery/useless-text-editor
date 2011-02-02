@@ -31,34 +31,19 @@ void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection ) const
 	BlockContaining_Result block = BlockContaining( rect.top );
 	OffsetRect( &rect, 0, -block.yStart );
 
-	DrawBackground( block, painter, rect );
-	DrawText      ( block, painter, rect );
+	Draw( block, painter, rect, &TextBlock::DrawBackground );
+	Draw( block, painter, rect, &TextBlock::DrawSquiggles );
+	Draw( block, painter, rect, &TextBlock::DrawText );
 }
 
-void VisualDocument::DrawBackground( BlockContaining_Result block, VisualPainter& painter, RECT rect ) const
+void VisualDocument::Draw( BlockContaining_Result block, VisualPainter& painter, RECT rect, DrawFunction drawFunction ) const
 {
 	while ( block.it != m_blocks.end() && !IsRectEmpty( &rect ) )
 	{
 		painter.SetOrigin( block.textStart, block.yStart );
 
-		block->DrawBackground( painter, rect );
-
-		rect.bottom -= block->Height() - rect.top;
-		rect.top = 0;
-
-		block.yStart += block->Height();
-		block.textStart += block->Length();
-		++block.it;
-	}
-}
-
-void VisualDocument::DrawText( BlockContaining_Result block, VisualPainter& painter, RECT rect ) const
-{
-	while ( block.it != m_blocks.end() && !IsRectEmpty( &rect ) )
-	{
-		painter.SetOrigin( block.textStart, block.yStart );
-
-		block->DrawText( painter, rect );
+		const TextBlock& textBlock = **block.it;
+		(textBlock.*drawFunction)( painter, rect );
 
 		rect.bottom -= block->Height() - rect.top;
 		rect.top = 0;

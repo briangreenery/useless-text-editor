@@ -4,6 +4,7 @@
 #include "TextEditRelevanceLexer.h"
 #include "TextStyleRegistry.h"
 #include "TextDocument.h"
+#include "TextRange.h"
 #include <algorithm>
 
 #undef min
@@ -319,23 +320,22 @@ size_t RelevanceAnnotator::NextElse( size_t position ) const
 	return m_tokens.size();
 }
 
-typedef std::pair<size_t,size_t> TextRange;
 typedef std::pair<RelevanceTokenRuns::const_iterator, RelevanceTokenRuns::const_iterator> TokenRange;
 
 struct TokenRunCompare
 {
-	bool operator()( const RelevanceTokenRun& a, const RelevanceTokenRun&  b ) const { return a.start + a.count  <= b.start; }
-	bool operator()( const RelevanceTokenRun& a, const TextRange&          b ) const { return a.start + a.count  <= b.first; }
-	bool operator()( const TextRange&         a, const RelevanceTokenRun&  b ) const { return a.first + a.second <= b.start; }
+	bool operator()( const RelevanceTokenRun& a, const RelevanceTokenRun&  b ) const { return a.start + a.count <= b.start; }
+	bool operator()( const RelevanceTokenRun& a, const TextRange&          b ) const { return a.start + a.count <= b.start; }
+	bool operator()( const TextRange&         a, const RelevanceTokenRun&  b ) const { return a.start + a.count <= b.start; }
 };
 
 size_t RelevanceAnnotator::TokenAt( size_t position ) const
 {
 	TextRange textRange( position, 1 );
-	TokenRange range = std::equal_range( m_tokens.begin(), m_tokens.end(), textRange, TokenRunCompare() );
+	RelevanceTokenRuns::const_iterator it = std::lower_bound( m_tokens.begin(), m_tokens.end(), textRange, TokenRunCompare() );
 
-	Assert( range.first + 1 == range.second );
-	return range.first - m_tokens.begin();
+	Assert( it != m_tokens.end() );
+	return it - m_tokens.begin();
 }
 
 void RelevanceAnnotator::GetFonts( TextFontRuns& fonts, size_t start, size_t count )
@@ -359,5 +359,26 @@ void RelevanceAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t 
 			styles.back().count += overlapEnd - overlapStart;
 		else
 			styles.push_back( TextStyleRun( styleid, overlapStart, overlapEnd - overlapStart ) );
+	}
+}
+
+void RelevanceAnnotator::GetSquiggles( TextRanges& squiggles, size_t start, size_t count )
+{
+	TextRange textRange( start, count );
+	TokenRange range = std::equal_range( m_tokens.begin(), m_tokens.end(), textRange, TokenRunCompare() );
+
+	for ( RelevanceTokenRuns::const_iterator it = range.first; it != range.second; ++it )
+	{
+		size_t overlapStart = std::max( start, it->start );
+		size_t overlapEnd   = std::min( start + count, it->start + it->count );
+
+		if ( it->token == RelevanceToken::t_illegal
+		  || it->token == RelevanceToken::t_unterminatedString )
+		{
+			if ( !squiggles.empty() && squiggles.back().start + squiggles.back().count == overlapStart )
+				squiggles.back().count += overlapEnd - overlapStart;
+			else
+				squiggles.push_back( TextRange( overlapStart, overlapEnd - overlapStart ) );
+		}
 	}
 }

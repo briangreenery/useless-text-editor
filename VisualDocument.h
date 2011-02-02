@@ -48,8 +48,8 @@ private:
 	BlockContaining_Result BlockContaining( size_t pos ) const;
 	BlockContaining_Result BlockContaining( int y ) const;
 
-	virtual void DrawBackground( BlockContaining_Result, VisualPainter&, RECT ) const;
-	virtual void DrawText      ( BlockContaining_Result, VisualPainter&, RECT ) const;
+	typedef void (TextBlock::*DrawFunction)( VisualPainter&, RECT ) const;
+	void Draw( BlockContaining_Result, VisualPainter&, RECT, DrawFunction ) const;
 
 	const TextDocument& m_doc;
 	TextStyleRegistry&  m_styleRegistry;

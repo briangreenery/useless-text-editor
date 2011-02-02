@@ -6,6 +6,7 @@
 #include "TextBlock.h"
 #include "UniscribeLayoutData.h"
 #include "TextStyleRun.h"
+#include "TextRange.h"
 #include "ArrayOf.h"
 #include <Windows.h>
 #include <usp10.h>
@@ -22,6 +23,7 @@ public:
 	UniscribeTextBlock( UniscribeLayoutDataPtr, const TextStyleRegistry& );
 
 	virtual void DrawBackground( VisualPainter&, RECT ) const;
+	virtual void DrawSquiggles ( VisualPainter&, RECT ) const;
 	virtual void DrawText      ( VisualPainter&, RECT ) const;
 
 	virtual size_t LineCount() const;
@@ -40,13 +42,15 @@ public:
 private:
 	void DrawLineBackground( size_t line, VisualPainter&, RECT ) const;
 	void DrawLineSelection ( size_t line, VisualPainter&, RECT ) const;
+	void DrawLineSquiggles ( size_t line, VisualPainter&, RECT ) const;
 	void DrawLineText      ( size_t line, VisualPainter&, RECT ) const;
 
 	void DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, COLORREF color ) const;
 
 	ArrayOf<const UniscribeTextRun> LineRuns( size_t line ) const;
 
-	ArrayOf<const TextStyleRun> RunStyles( size_t blockStart, const UniscribeTextRun&, ArrayOf<const TextStyleRun> ) const;
+	ArrayOf<const TextStyleRun> RunStyles   ( size_t blockStart, const UniscribeTextRun&, ArrayOf<const TextStyleRun> ) const;
+	ArrayOf<const TextRange>    RunSquiggles( size_t blockStart, const UniscribeTextRun&, ArrayOf<const TextRange>    ) const;
 
 	size_t TextStart( size_t line ) const;
 	size_t TextEnd  ( size_t line ) const;

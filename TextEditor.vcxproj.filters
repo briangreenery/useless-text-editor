@@ -148,6 +148,9 @@
     <ClCompile Include="TextSquiggle.cpp">
       <Filter>TextView</Filter>
     </ClCompile>
+    <ClCompile Include="TextRange.cpp">
+      <Filter>TextDocument</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayOf.h">
@@ -284,6 +287,9 @@
     </ClInclude>
     <ClInclude Include="TextSquiggle.h">
       <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="TextRange.h">
+      <Filter>TextDocument</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

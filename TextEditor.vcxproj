@@ -103,6 +103,7 @@
     <ClCompile Include="TextBuffer.cpp" />
     <ClCompile Include="TextBlock.cpp" />
     <ClCompile Include="TextFont.cpp" />
+    <ClCompile Include="TextRange.cpp" />
     <ClCompile Include="TextSquiggle.cpp" />
     <ClCompile Include="TextStyleReader.cpp" />
     <ClCompile Include="TextStyleRegistry.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="SizedAutoArray.h" />
     <ClInclude Include="TextBlock.h" />
     <ClInclude Include="TextFont.h" />
+    <ClInclude Include="TextRange.h" />
     <ClInclude Include="TextSquiggle.h" />
     <ClInclude Include="TextStyleReader.h" />
     <ClInclude Include="TextStyleRegistry.h" />
