@@ -84,5 +84,5 @@ void TextSquiggle::Draw( HDC target, int xStart, int xEnd, int y ) const
 	blendFunction.SourceConstantAlpha = 255;
 	blendFunction.AlphaFormat         = AC_SRC_ALPHA;
 
-	AlphaBlend( target, xStart, y - squiggleHeight + 1, xEnd - xStart, squiggleHeight, m_squiggleDC, 0, 0, xEnd - xStart, 3, blendFunction );
+	AlphaBlend( target, xStart, y - squiggleHeight, xEnd - xStart, squiggleHeight, m_squiggleDC, 0, 0, xEnd - xStart, 3, blendFunction );
 }

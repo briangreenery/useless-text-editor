@@ -73,7 +73,7 @@ void TextStyleRegistry::SetDefaultFont( uint32 fontid )
 
 	avgCharWidth = tm.tmAveCharWidth;
 	tabSize = 4 * tm.tmAveCharWidth;
-	lineHeight = tm.tmHeight;
+	lineHeight = tm.tmHeight + 1; // The "+1" is to give a little more room for the squiggle.
 }
 
 uint32 TextStyleRegistry::AddStyle( const TextStyle& style )
