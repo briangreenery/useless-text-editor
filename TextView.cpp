@@ -60,7 +60,8 @@ void TextView::OnPaint()
 	PaintGutter( hdc, ps.rcPaint );
 
 	RECT fillRect = m_metrics.IntersectWithTextOrMargin( ps.rcPaint, m_hwnd );
-	FillRect( hdc, &fillRect, GetSysColorBrush( COLOR_WINDOW ) );
+	SetBkColor( hdc, m_styleRegistry.defaultBkColor );
+	ExtTextOut( hdc, 0, 0, ETO_OPAQUE, &fillRect, L"", 0, NULL );
 
 	POINT oldOrigin;
 	m_blocks.Draw( m_metrics.ClientToText( hdc, &oldOrigin ),
