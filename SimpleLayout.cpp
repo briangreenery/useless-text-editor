@@ -30,7 +30,7 @@ static size_t LayoutRun( SimpleTextRun run,
 	if ( run.textCount == 1 && args.text[run.textStart] == '\t' && args.styleRegistry.tabSize > 0 )
 	{
 		int tabWidth = args.styleRegistry.tabSize - ( xStart % args.styleRegistry.tabSize );
-		layoutData.xOffsets[run.textStart - 1] = tabWidth;
+		layoutData.xOffsets[run.textStart] = tabWidth;
 		fit = ( tabWidth < maxWidth ? 1 : 0 );
 	}
 	else
@@ -41,7 +41,7 @@ static size_t LayoutRun( SimpleTextRun run,
 		if ( !GetTextExtentExPoint( args.hdc,
 		                            args.text.begin() + run.textStart,
 		                            textCount,
-		                            args.maxWidth - std::min( maxWidth, xStart ),
+		                            maxWidth - std::min( maxWidth, xStart ),
 		                            &fit,
 		                            &layoutData.xOffsets.front() + run.textStart,
 		                            &size ) )
@@ -105,7 +105,7 @@ TextBlockPtr SimpleLayoutParagraph( const TextLayoutArgs& args )
 
 		if ( fit == run.textCount )
 		{
-			lineWidth += layoutData->xOffsets[run.textStart + run.textCount];
+			lineWidth += layoutData->xOffsets[run.textStart + run.textCount - 1];
 		}
 		else
 		{
