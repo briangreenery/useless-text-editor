@@ -16,29 +16,26 @@
 class DebuggableException {};
 class SimpleLayoutFailed : public DebuggableException {};
 
-static bool LayoutRun( SimpleTextRun run,
-                       SimpleLayoutData& layoutData,
-                       const TextLayoutArgs& args,
-                       int xStart,
-                       bool forceFit )
+static size_t LayoutRun( SimpleTextRun run,
+                         SimpleLayoutData& layoutData,
+                         const TextLayoutArgs& args,
+                         int xStart,
+                         bool forceFit )
 {
 	SIZE size;
 	INT fit;
 
 	int maxWidth = ( forceFit || args.maxWidth == 0 ) ? std::numeric_limits<int>::max() : args.maxWidth;
 
-	Assert( layoutData.xOffsets.size() == run.textStart );
-	layoutData.xOffsets.resize( layoutData.xOffsets.size() + run.textCount );
-
 	if ( run.textCount == 1 && args.text[run.textStart] == '\t' && args.styleRegistry.tabSize > 0 )
 	{
 		int tabWidth = args.styleRegistry.tabSize - ( xStart % args.styleRegistry.tabSize );
-		layoutData.xOffsets.back() = tabWidth;
+		layoutData.xOffsets[run.textStart - 1] = tabWidth;
 		fit = ( tabWidth < maxWidth ? 1 : 0 );
 	}
 	else
 	{
-		size_t textCount = std::min<size_t>( run.textCount, 1024 );
+		size_t textCount = std::min<size_t>( run.textCount, 256 );
 		
 		SelectObject( args.hdc, args.styleRegistry.Font( run.fontid ).hfont );
 		if ( !GetTextExtentExPoint( args.hdc,
@@ -54,13 +51,9 @@ static bool LayoutRun( SimpleTextRun run,
 		}
 	}
 
-	bool needsWrapping = ( size_t( fit ) < run.textCount );
-
 	run.textCount = fit;
-	layoutData.xOffsets.resize( run.textStart + fit );
-
 	layoutData.runs.push_back( run );
-	return !needsWrapping;
+	return fit;
 }
 
 static size_t WrapLine( SimpleLayoutData& layoutData,
@@ -108,10 +101,11 @@ TextBlockPtr SimpleLayoutParagraph( const TextLayoutArgs& args )
 	for ( SimpleTextRunLoop loop( args.text, args.fonts ); loop.Unfinished(); )
 	{
 		SimpleTextRun run = loop.NextRun();
+		size_t fit = LayoutRun( run, *layoutData, args, lineWidth, false );
 
-		if ( LayoutRun( run, *layoutData, args, lineWidth, false ) )
+		if ( fit == run.textCount )
 		{
-			lineWidth += layoutData->xOffsets.back();
+			lineWidth += layoutData->xOffsets[run.textStart + run.textCount];
 		}
 		else
 		{

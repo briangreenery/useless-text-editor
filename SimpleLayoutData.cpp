@@ -10,6 +10,8 @@ SimpleLayoutData::SimpleLayoutData( UTF16Ref text, bool _endsWithNewline )
 {
 	if ( endsWithNewline )
 		length++;
+
+	xOffsets.resize( text.size() );
 }
 
 void SimpleLayoutData::DiscardFrom( size_t position )
@@ -31,6 +33,4 @@ void SimpleLayoutData::DiscardFrom( size_t position )
 	{
 		runs.erase( runs.begin() + i, runs.end() );
 	}
-
-	xOffsets.erase( xOffsets.begin() + position, xOffsets.end() );
 }
