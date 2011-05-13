@@ -1,0 +1,15 @@
+<primary>         := ( <expression> ) | string | numeral | it
+<index>           := phrase <primary> | phrase | <primary>
+<property>        := <property> whose <primary> | <index>
+<reference>       := <property> of <reference> | <property>
+<cast>            := <cast> as phrase | <reference>
+<unary>           := exists <unary> | notExists <unary> | not <unary> | - <unary> | <cast>
+<productOperator> := * | / | mod | &
+<product>         := <product> <productOperator> <unary> | <unary>
+<sum>             := <sum> + <product> | <sum> - <product> | <product>
+<relationExpr>    := <sum> relation <sum> | <sum>
+<andExpression>   := <andExpression> and <relationExpr> | <relationExpr>
+<orExpression>    := <orExpression> or <andExpression> | <andExpression>
+<tuple>           := <orExpression> , <tuple> | <orExpression>
+<collection>      := <collection> ; <tuple> | <tuple>
+<expression>      := if <expression> then <expression> else <expression> | <collection>
