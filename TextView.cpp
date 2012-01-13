@@ -24,7 +24,7 @@ TextView::TextView( HWND hwnd )
 	m_metrics.gutterWidth = 25;
 	m_metrics.marginWidth = 5;
 
-	m_styleRegistry.annotator = new RelevanceAnnotator( m_doc, m_styleRegistry );
+	//m_styleRegistry.annotator = new RelevanceAnnotator( m_doc, m_styleRegistry );
 }
 
 int TextView::OnCreate( LPCREATESTRUCT )
@@ -488,26 +488,36 @@ void TextView::Paste()
 	CloseClipboard();
 }
 
-bool TextView::CanUndo()
-{
-	return false;
-}
-
-bool TextView::CanRedo()
-{
-	return false;
-}
-
 void TextView::Undo()
 {
-	if ( !CanUndo() )
+	if ( !m_doc.CanUndo() )
 		return;
+
+	TextChange change = m_doc.Undo();
+
+	TextSelection selection;
+	selection.start = change.start;
+	selection.end   = change.start;
+	if ( change.delta > 0 )
+		selection.end += change.delta;
+
+	UpdateLayout( change, selection );
 }
 
 void TextView::Redo()
 {
-	if ( !CanRedo() )
+	if ( !m_doc.CanRedo() )
 		return;
+
+	TextChange change = m_doc.Redo();
+
+	TextSelection selection;
+	selection.start = change.start;
+	selection.end   = change.start;
+	if ( change.delta > 0 )
+		selection.end += change.delta;
+
+	UpdateLayout( change, selection );
 }
 
 void TextView::UpdateLayout( TextChange change, TextSelection selection )

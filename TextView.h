@@ -63,8 +63,6 @@ public:
 	void Copy();
 	void Paste();
 
-	bool CanUndo();
-	bool CanRedo();
 	void Undo();
 	void Redo();
 

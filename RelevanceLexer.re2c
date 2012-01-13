@@ -34,7 +34,6 @@ RelevanceToken RelevanceLexer::NextToken()
 	ws           = '\t' | '\r' | '\n' | ' ';
 	ignored      = 'a' | 'an' | 'the';
 	keywordspace = ws+ ( ignored ws+ )*;
-	ks           = keywordspace;
 	null         = [\000];
 	nonword      = [^0-9a-zA-Z_'] | null;
 	nw           = nonword;
@@ -65,58 +64,58 @@ RelevanceToken RelevanceLexer::NextToken()
 	">"                { return RelevanceToken::t_greater; }
 	">="               { return RelevanceToken::t_greaterOrEqual; }
 
-	'a'                                                             /nw { return RelevanceToken::t_ignored; }
-	'an'                                                            /nw { return RelevanceToken::t_ignored; }
-	'the'                                                           /nw { return RelevanceToken::t_ignored; }
+	'a'                               /nw { return RelevanceToken::t_ignored; }
+	'an'                              /nw { return RelevanceToken::t_ignored; }
+	'the'                             /nw { return RelevanceToken::t_ignored; }
 
-	'and'                                                           /nw { return RelevanceToken::t_and; }
-	'as'                                                            /nw { return RelevanceToken::t_as; }
-	'contains'                                                      /nw { return RelevanceToken::t_contains; }
-	'does' ks 'not' ks 'contain'                                    /nw { return RelevanceToken::t_notContains; }
-	'does' ks 'not' ks 'end' ks 'with'                              /nw { return RelevanceToken::t_notEndsWith; }
-	'does' ks 'not' ks 'equal'                                      /nw { return RelevanceToken::t_notEqual; }
-	'does' ks 'not' ks 'start' ks 'with'                            /nw { return RelevanceToken::t_notStartsWith; }
-	'else'                                                          /nw { return RelevanceToken::t_else; }
-	'ends' ks 'with'                                                /nw { return RelevanceToken::t_endsWith; }
-	'equals'                                                        /nw { return RelevanceToken::t_equal; }
-	'exist'                                                         /nw { return RelevanceToken::t_exists; }
-	'exist' ks 'no'                                                 /nw { return RelevanceToken::t_notExists; }
-	'exists'                                                        /nw { return RelevanceToken::t_exists; }
-	'exists' ks 'no'                                                /nw { return RelevanceToken::t_notExists; }
-	'false'                                                         /nw { return RelevanceToken::t_false; }
-	'if'                                                            /nw { return RelevanceToken::t_if; }
-	'is'                                                            /nw { return RelevanceToken::t_equal; }
-	'is' ks 'contained' ks 'by'                                     /nw { return RelevanceToken::t_containedBy; }
-	'is' ks 'equal' ks 'to'                                         /nw { return RelevanceToken::t_equal; }
-	'is' ks 'greater' ks 'than'                                     /nw { return RelevanceToken::t_greater; }
-	'is' ks 'greater' ks 'than' ks 'or' ks 'equal' ks 'to'          /nw { return RelevanceToken::t_greaterOrEqual; }
-	'is' ks 'less' ks 'than'                                        /nw { return RelevanceToken::t_less; }
-	'is' ks 'less' ks 'than' ks 'or' ks 'equal' ks 'to'             /nw { return RelevanceToken::t_lessOrEqual; }
-	'is' ks 'not'                                                   /nw { return RelevanceToken::t_notEqual; }
-	'is' ks 'not' ks 'contained' ks 'by'                            /nw { return RelevanceToken::t_notContainedBy; }
-	'is' ks 'not' ks 'equal' ks 'to'                                /nw { return RelevanceToken::t_notEqual; }
-	'is' ks 'not' ks 'greater' ks 'than'                            /nw { return RelevanceToken::t_notGreater; }
-	'is' ks 'not' ks 'greater' ks 'than' ks 'or' ks 'equal' ks 'to' /nw { return RelevanceToken::t_notGreaterOrEqual; }
-	'is' ks 'not' ks 'less' ks 'than'                               /nw { return RelevanceToken::t_notLess; }
-	'is' ks 'not' ks 'less' ks 'than' ks 'or' ks 'equal' ks 'to'    /nw { return RelevanceToken::t_notLessOrEqual; }
-	'it'                                                            /nw { return RelevanceToken::t_it; }
-	'item'                                                          /nw { return RelevanceToken::t_phraseItem; }
-	'items'                                                         /nw { return RelevanceToken::t_phraseItems; }
-	'mod'                                                           /nw { return RelevanceToken::t_mod; }
-	'not'                                                           /nw { return RelevanceToken::t_not; }
-	'number'                                                        /nw { return RelevanceToken::t_phraseNumber; }
-	'of'                                                            /nw { return RelevanceToken::t_of; }
-	'or'                                                            /nw { return RelevanceToken::t_or; }
-	'starts' ks 'with'                                              /nw { return RelevanceToken::t_startsWith; }
-	'then'                                                          /nw { return RelevanceToken::t_then; }
-	'there' ks 'do' ks 'not' ks 'exist'                             /nw { return RelevanceToken::t_notExists; }
-	'there' ks 'does' ks 'not' ks 'exist'                           /nw { return RelevanceToken::t_notExists; }
-	'there' ks 'exist'                                              /nw { return RelevanceToken::t_exists; }
-	'there' ks 'exist' ks 'no'                                      /nw { return RelevanceToken::t_notExists; }
-	'there' ks 'exists'                                             /nw { return RelevanceToken::t_exists; }
-	'there' ks 'exists' ks 'no'                                     /nw { return RelevanceToken::t_notExists; }
-	'true'                                                          /nw { return RelevanceToken::t_true; }
-	'whose'                                                         /nw { return RelevanceToken::t_whose; }
+	'and'                             /nw { return RelevanceToken::t_and; }
+	'as'                              /nw { return RelevanceToken::t_as; }
+	'contains'                        /nw { return RelevanceToken::t_contains; }
+	'does not contain'                /nw { return RelevanceToken::t_notContains; }
+	'does not end with'               /nw { return RelevanceToken::t_notEndsWith; }
+	'does not equal'                  /nw { return RelevanceToken::t_notEqual; }
+	'does not start with'             /nw { return RelevanceToken::t_notStartsWith; }
+	'else'                            /nw { return RelevanceToken::t_else; }
+	'ends with'                       /nw { return RelevanceToken::t_endsWith; }
+	'equals'                          /nw { return RelevanceToken::t_equal; }
+	'exist'                           /nw { return RelevanceToken::t_exists; }
+	'exist no'                        /nw { return RelevanceToken::t_notExists; }
+	'exists'                          /nw { return RelevanceToken::t_exists; }
+	'exists no'                       /nw { return RelevanceToken::t_notExists; }
+	'false'                           /nw { return RelevanceToken::t_false; }
+	'if'                              /nw { return RelevanceToken::t_if; }
+	'is'                              /nw { return RelevanceToken::t_equal; }
+	'is contained by'                 /nw { return RelevanceToken::t_containedBy; }
+	'is equal to'                     /nw { return RelevanceToken::t_equal; }
+	'is greater than'                 /nw { return RelevanceToken::t_greater; }
+	'is greater than or equal to'     /nw { return RelevanceToken::t_greaterOrEqual; }
+	'is less than'                    /nw { return RelevanceToken::t_less; }
+	'is less than or equal to'        /nw { return RelevanceToken::t_lessOrEqual; }
+	'is not'                          /nw { return RelevanceToken::t_notEqual; }
+	'is not contained by'             /nw { return RelevanceToken::t_notContainedBy; }
+	'is not equal to'                 /nw { return RelevanceToken::t_notEqual; }
+	'is not greater than'             /nw { return RelevanceToken::t_notGreater; }
+	'is not greater than or equal to' /nw { return RelevanceToken::t_notGreaterOrEqual; }
+	'is not less than'                /nw { return RelevanceToken::t_notLess; }
+	'is not less than or equal to'    /nw { return RelevanceToken::t_notLessOrEqual; }
+	'it'                              /nw { return RelevanceToken::t_it; }
+	'item'                            /nw { return RelevanceToken::t_phraseItem; }
+	'items'                           /nw { return RelevanceToken::t_phraseItems; }
+	'mod'                             /nw { return RelevanceToken::t_mod; }
+	'not'                             /nw { return RelevanceToken::t_not; }
+	'number'                          /nw { return RelevanceToken::t_phraseNumber; }
+	'of'                              /nw { return RelevanceToken::t_of; }
+	'or'                              /nw { return RelevanceToken::t_or; }
+	'starts with'                     /nw { return RelevanceToken::t_startsWith; }
+	'then'                            /nw { return RelevanceToken::t_then; }
+	'there do not exist'              /nw { return RelevanceToken::t_notExists; }
+	'there does not exist'            /nw { return RelevanceToken::t_notExists; }
+	'there exist'                     /nw { return RelevanceToken::t_exists; }
+	'there exist no'                  /nw { return RelevanceToken::t_notExists; }
+	'there exists'                    /nw { return RelevanceToken::t_exists; }
+	'there exists no'                 /nw { return RelevanceToken::t_notExists; }
+	'true'                            /nw { return RelevanceToken::t_true; }
+	'whose'                           /nw { return RelevanceToken::t_whose; }
 
 	null { return RelevanceToken::t_endOfInput; }
 	any  { return RelevanceToken::t_illegal; }

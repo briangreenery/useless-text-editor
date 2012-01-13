@@ -151,6 +151,9 @@
     <ClCompile Include="TextRange.cpp">
       <Filter>TextDocument</Filter>
     </ClCompile>
+    <ClCompile Include="TextDocumentUndo.cpp">
+      <Filter>TextDocument</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayOf.h">
@@ -289,6 +292,9 @@
       <Filter>TextView</Filter>
     </ClInclude>
     <ClInclude Include="TextRange.h">
+      <Filter>TextDocument</Filter>
+    </ClInclude>
+    <ClInclude Include="TextDocumentUndo.h">
       <Filter>TextDocument</Filter>
     </ClInclude>
   </ItemGroup>

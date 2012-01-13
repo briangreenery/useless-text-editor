@@ -8,16 +8,16 @@
 #undef min
 #undef max
 
-VisualPainter::VisualPainter( HDC _hdc, const TextDocument& _doc, TextStyleRegistry& _styleRegistry, const TextSquiggle& _squiggle, TextSelection _selection )
-	: hdc( _hdc )
-	, styleRegistry( _styleRegistry )
-	, doc( _doc )
-	, selection( _selection )
-	, oldSelection( _selection )
+VisualPainter::VisualPainter( HDC hdc, const TextDocument& doc, TextStyleRegistry& styleRegistry, const TextSquiggle& squiggle, TextSelection selection )
+	: hdc( hdc )
+	, styleRegistry( styleRegistry )
+	, doc( doc )
+	, selection( selection )
+	, oldSelection( selection )
 	, textStart( 0 )
-	, docReader( _doc )
-	, styleReader( _styleRegistry )
-	, squiggle( _squiggle )
+	, docReader( doc )
+	, styleReader( styleRegistry )
+	, squiggle( squiggle )
 {
 	GetWindowOrgEx( hdc, &oldOrigin );
 

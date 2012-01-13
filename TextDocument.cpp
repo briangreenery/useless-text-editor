@@ -2,6 +2,8 @@
 
 #include "TextDocument.h"
 #include "DocumentCharIter.h"
+#include "TextUndoInsertion.h"
+#include "TextUndoDeletion.h"
 #include "Assert.h"
 #include <Windows.h>
 
@@ -104,6 +106,8 @@ TextChange TextDocument::Insert( size_t pos, UTF16Ref text )
 		it = SkipLineBreak( lineBreak, text.end() );
 	}
 
+	m_undo.RecordInsertion( *this, pos, count );
+
 	m_needIterReset = true;
 	return TextChange( pos, count, TextChange::insertion );
 }
@@ -113,9 +117,32 @@ TextChange TextDocument::Delete( size_t pos, size_t count )
 	if ( count == 0 )
 		return TextChange();
 
+	m_undo.RecordDeletion( *this, pos, count );
+
 	m_buffer.erase( pos, count );
+
 	m_needIterReset = true;
 	return TextChange( pos, count, TextChange::deletion );
+}
+
+TextChange TextDocument::Undo()
+{
+	return m_undo.Undo( *this );
+}
+
+TextChange TextDocument::Redo()
+{
+	return m_undo.Redo( *this );
+}
+
+bool TextDocument::CanUndo() const
+{
+	return m_undo.CanUndo();
+}
+
+bool TextDocument::CanRedo() const
+{
+	return m_undo.CanRedo();
 }
 
 void TextDocument::ResetIterators() const

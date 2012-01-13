@@ -6,8 +6,10 @@
 #include "TextChange.h"
 #include "TextBuffer.h"
 #include "UString.h"
+#include "TextDocumentUndo.h"
 #include <unicode/brkiter.h>
 #include <utility>
+#include <vector>
 
 class TextDocument
 {
@@ -41,14 +43,11 @@ public:
 	size_t SizeWithCRLF( size_t start, size_t count ) const;
 	void ReadWithCRLF( size_t start, size_t count, ArrayOf<UTF16::Unit> out ) const;
 
-	//TextChange Undo();
-	//TextChange Redo();
+	TextChange Undo();
+	TextChange Redo();
 
-	//bool CanUndo() const;
-	//bool CanRedo() const;
-
-	//void BeginUndoGroup();
-	//void EndUndoGroup();
+	bool CanUndo() const;
+	bool CanRedo() const;
 
 private:
 	void ResetIterators() const;
@@ -56,6 +55,7 @@ private:
 	size_t PrevBreak( icu::BreakIterator*, size_t ) const;
 
 	TextBuffer m_buffer;
+	TextDocumentUndo m_undo;
 
 	mutable bool m_needIterReset;
 	UErrorCode m_charErrorStatus;
