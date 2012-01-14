@@ -2,8 +2,6 @@
 
 #include "TextDocument.h"
 #include "DocumentCharIter.h"
-#include "TextUndoInsertion.h"
-#include "TextUndoDeletion.h"
 #include "Assert.h"
 #include <Windows.h>
 
@@ -125,7 +123,7 @@ TextChange TextDocument::Delete( size_t pos, size_t count )
 	return TextChange( pos, count, TextChange::deletion );
 }
 
-TextChange TextDocument::Undo()
+std::pair<TextChange,TextSelection> TextDocument::Undo()
 {
 	return m_undo.Undo( *this );
 }
@@ -143,6 +141,16 @@ bool TextDocument::CanUndo() const
 bool TextDocument::CanRedo() const
 {
 	return m_undo.CanRedo();
+}
+
+void TextDocument::SetBeforeSelection( const TextSelection& selection )
+{
+	m_undo.SetBeforeSelection( selection );
+}
+
+void TextDocument::StopUndoGrouping()
+{
+	m_undo.StopGrouping();
 }
 
 void TextDocument::ResetIterators() const

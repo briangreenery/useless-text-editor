@@ -43,11 +43,14 @@ public:
 	size_t SizeWithCRLF( size_t start, size_t count ) const;
 	void ReadWithCRLF( size_t start, size_t count, ArrayOf<UTF16::Unit> out ) const;
 
-	TextChange Undo();
-	TextChange Redo();
+	std::pair<TextChange,TextSelection> Undo();
+	TextChange                          Redo();
 
 	bool CanUndo() const;
 	bool CanRedo() const;
+
+	void SetBeforeSelection( const TextSelection& );
+	void StopUndoGrouping();
 
 private:
 	void ResetIterators() const;

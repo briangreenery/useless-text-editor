@@ -380,6 +380,8 @@ void TextView::Delete( bool wholeWord )
 
 void TextView::Insert( UTF16Ref text )
 {
+	m_doc.SetBeforeSelection( m_selection );
+
 	TextChange change;
 	change.AddChange( m_doc.Delete( m_selection.Min(), m_selection.Size() ) );
 	change.AddChange( m_doc.Insert( m_selection.Min(), text ) );
@@ -417,6 +419,8 @@ void TextView::Clear( TextSelection rangeToClear )
 {
 	if ( rangeToClear.IsEmpty() )
 		return;
+
+	m_doc.SetBeforeSelection( m_selection );
 
 	TextChange change = m_doc.Delete( rangeToClear.Min(), rangeToClear.Size() );
 
@@ -493,15 +497,8 @@ void TextView::Undo()
 	if ( !m_doc.CanUndo() )
 		return;
 
-	TextChange change = m_doc.Undo();
-
-	TextSelection selection;
-	selection.start = change.start;
-	selection.end   = change.start;
-	if ( change.delta > 0 )
-		selection.end += change.delta;
-
-	UpdateLayout( change, selection );
+	std::pair<TextChange,TextSelection> change = m_doc.Undo();
+	UpdateLayout( change.first, change.second );
 }
 
 void TextView::Redo()
@@ -512,10 +509,8 @@ void TextView::Redo()
 	TextChange change = m_doc.Redo();
 
 	TextSelection selection;
-	selection.start = change.start;
-	selection.end   = change.start;
-	if ( change.delta > 0 )
-		selection.end += change.delta;
+	selection.start = change.end + change.delta;
+	selection.end   = selection.start;
 
 	UpdateLayout( change, selection );
 }
@@ -555,6 +550,8 @@ void TextView::MoveSelection( TextSelection selection, bool scroll )
 {
 	if ( selection == m_selection )
 		return;
+
+	m_doc.StopUndoGrouping();
 
 	if ( m_styleRegistry.annotator )
 		m_styleRegistry.annotator->SelectionChanged( selection.start, selection.end );
