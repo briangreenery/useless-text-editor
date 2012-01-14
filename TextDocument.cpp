@@ -148,9 +148,9 @@ void TextDocument::SetBeforeSelection( const TextSelection& selection )
 	m_undo.SetBeforeSelection( selection );
 }
 
-void TextDocument::StopUndoGrouping()
+void TextDocument::EndUndoGroup()
 {
-	m_undo.StopGrouping();
+	m_undo.EndGroup();
 }
 
 void TextDocument::ResetIterators() const

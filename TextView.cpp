@@ -433,6 +433,8 @@ void TextView::Clear( TextSelection rangeToClear )
 
 void TextView::Cut()
 {
+	m_doc.EndUndoGroup();
+
 	Copy();
 	Clear( m_selection );
 }
@@ -471,6 +473,8 @@ void TextView::Copy()
 
 void TextView::Paste()
 {
+	m_doc.EndUndoGroup();
+
 	if ( !IsClipboardFormatAvailable( CF_UNICODETEXT ) )
 		return;
 
@@ -551,7 +555,7 @@ void TextView::MoveSelection( TextSelection selection, bool scroll )
 	if ( selection == m_selection )
 		return;
 
-	m_doc.StopUndoGrouping();
+	m_doc.EndUndoGroup();
 
 	if ( m_styleRegistry.annotator )
 		m_styleRegistry.annotator->SelectionChanged( selection.start, selection.end );

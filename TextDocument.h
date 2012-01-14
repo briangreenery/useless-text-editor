@@ -50,7 +50,7 @@ public:
 	bool CanRedo() const;
 
 	void SetBeforeSelection( const TextSelection& );
-	void StopUndoGrouping();
+	void EndUndoGroup();
 
 private:
 	void ResetIterators() const;

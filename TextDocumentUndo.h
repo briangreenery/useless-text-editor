@@ -52,14 +52,14 @@ public:
 	TextChange                          Redo( TextDocument& );
 
 	void SetBeforeSelection( const TextSelection& );
-	void StopGrouping();
+	void EndGroup();
 
 private:
 	size_t SaveText( TextDocument&, size_t pos, size_t length );
 
 	void RemoveUnreachableGroups();
 
-	bool m_stopGrouping;
+	bool m_endGroup;
 	bool m_undoingOrRedoing;
 
 	TextSelection m_beforeSelection;

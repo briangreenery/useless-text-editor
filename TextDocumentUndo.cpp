@@ -62,7 +62,7 @@ TextChange TextUndoGroup::Redo( TextDocument& doc, UTF16Ref savedText ) const
 }
 
 TextDocumentUndo::TextDocumentUndo()
-	: m_stopGrouping( false )
+	: m_endGroup( false )
 	, m_index( 0 )
 	, m_undoingOrRedoing( false )
 {
@@ -83,13 +83,13 @@ void TextDocumentUndo::RecordInsertion( TextDocument& doc, size_t pos, size_t le
 
 	RemoveUnreachableGroups();
 
-	if ( m_stopGrouping || m_groups.empty() )
+	if ( m_endGroup || m_groups.empty() )
 		m_groups.push_back( TextUndoGroup( m_beforeSelection ) );
 
 	m_groups.back().RecordInsertion( doc, pos, length, SaveText( doc, pos, length ) );
 	m_index = m_groups.size();
 
-	m_stopGrouping = false;
+	m_endGroup = false;
 }
 
 void TextDocumentUndo::RecordDeletion( TextDocument& doc, size_t pos, size_t length )
@@ -99,13 +99,13 @@ void TextDocumentUndo::RecordDeletion( TextDocument& doc, size_t pos, size_t len
 
 	RemoveUnreachableGroups();
 
-	if ( m_stopGrouping || m_groups.empty() )
+	if ( m_endGroup || m_groups.empty() )
 		m_groups.push_back( TextUndoGroup( m_beforeSelection ) );
 
 	m_groups.back().RecordDeletion( doc, pos, length, SaveText( doc, pos, length ) );
 	m_index = m_groups.size();
 
-	m_stopGrouping = false;
+	m_endGroup = false;
 }
 
 bool TextDocumentUndo::CanUndo() const
@@ -123,7 +123,7 @@ std::pair<TextChange,TextSelection> TextDocumentUndo::Undo( TextDocument& doc )
 	if ( !CanUndo() )
 		return std::pair<TextChange,TextSelection>();
 
-	m_stopGrouping = true;
+	m_endGroup = true;
 	const TextUndoGroup& group = m_groups[--m_index];
 
 	m_undoingOrRedoing = true;
@@ -138,7 +138,7 @@ TextChange TextDocumentUndo::Redo( TextDocument& doc )
 	if ( !CanRedo() )
 		return TextChange();
 
-	m_stopGrouping = true;
+	m_endGroup = true;
 	const TextUndoGroup& group = m_groups[m_index++];
 
 	m_undoingOrRedoing = true;
@@ -153,9 +153,9 @@ void TextDocumentUndo::SetBeforeSelection( const TextSelection& beforeSelection 
 	m_beforeSelection = beforeSelection;
 }
 
-void TextDocumentUndo::StopGrouping()
+void TextDocumentUndo::EndGroup()
 {
-	m_stopGrouping = true;
+	m_endGroup = true;
 }
 
 void TextDocumentUndo::RemoveUnreachableGroups()
