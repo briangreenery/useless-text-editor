@@ -94,6 +94,8 @@ private:
 
 	POINT m_lineUpStart;
 	int   m_lineUpCount;
+
+	enum { lastWasInsert, lastWasClear } m_lastEditOperation;
 };
 
 #endif

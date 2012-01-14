@@ -382,6 +382,12 @@ void TextView::Insert( UTF16Ref text )
 {
 	m_doc.SetBeforeSelection( m_selection );
 
+	if ( m_lastEditOperation != lastWasInsert )
+	{
+		m_doc.EndUndoGroup();
+		m_lastEditOperation = lastWasInsert;
+	}
+
 	TextChange change;
 	change.AddChange( m_doc.Delete( m_selection.Min(), m_selection.Size() ) );
 	change.AddChange( m_doc.Insert( m_selection.Min(), text ) );
@@ -421,6 +427,12 @@ void TextView::Clear( TextSelection rangeToClear )
 		return;
 
 	m_doc.SetBeforeSelection( m_selection );
+
+	if ( m_lastEditOperation != lastWasClear )
+	{
+		m_doc.EndUndoGroup();
+		m_lastEditOperation = lastWasClear;
+	}
 
 	TextChange change = m_doc.Delete( rangeToClear.Min(), rangeToClear.Size() );
 
