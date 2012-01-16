@@ -96,6 +96,8 @@ private:
 	int   m_lineUpCount;
 
 	enum { lastWasInsert, lastWasClear } m_lastEditOperation;
+	DWORD m_lastUndoTick;
+	DWORD m_editTimeout;
 };
 
 #endif
