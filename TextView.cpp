@@ -21,7 +21,6 @@ TextView::TextView( HWND hwnd )
 	, m_mouseWheelRemainder( 0 )
 	, m_lineUpCount( 0 )
 	, m_lastUndoTick( 0 )
-	, m_editTimeout( 3000 )
 {
 	m_metrics.gutterWidth = 25;
 	m_metrics.marginWidth = 5;
@@ -384,11 +383,10 @@ void TextView::Insert( UTF16Ref text )
 {
 	m_doc.SetBeforeSelection( m_selection );
 
-	if ( m_lastEditOperation != lastWasInsert || GetTickCount() - m_lastUndoTick > m_editTimeout )
+	if ( m_lastEditOperation != lastWasInsert )
 	{
 		m_doc.EndUndoGroup();
 		m_lastEditOperation = lastWasInsert;
-		m_lastUndoTick = GetTickCount();
 	}
 
 	TextChange change;
@@ -431,11 +429,10 @@ void TextView::Clear( TextSelection rangeToClear )
 
 	m_doc.SetBeforeSelection( m_selection );
 
-	if ( m_lastEditOperation != lastWasClear || GetTickCount() - m_lastUndoTick > m_editTimeout )
+	if ( m_lastEditOperation != lastWasClear )
 	{
 		m_doc.EndUndoGroup();
 		m_lastEditOperation = lastWasClear;
-		m_lastUndoTick = GetTickCount();
 	}
 
 	TextChange change = m_doc.Delete( rangeToClear.Min(), rangeToClear.Size() );
