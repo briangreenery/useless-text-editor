@@ -138,8 +138,6 @@ private:
 	RelevanceTokenRuns& m_runs;
 };
 
-#define BUFFER_SIZE 1
-
 void RelevanceAnnotator::TextChanged( TextChange change )
 {
 	m_tokens.clear();
@@ -152,10 +150,10 @@ void RelevanceAnnotator::TextChanged( TextChange change )
 
 	lexer.Reset();
 
-	for ( size_t start = 0; start < m_doc.Length(); start += BUFFER_SIZE )
+	for ( size_t start = 0; start < m_doc.Length(); start += 512 )
 	{
-		char buffer[BUFFER_SIZE];
-		UTF16Ref text = reader.WeakRange( start, BUFFER_SIZE );
+		char buffer[512];
+		UTF16Ref text = reader.WeakRange( start, 512 );
 
 		for ( size_t i = 0; i < text.size(); ++i )
 			buffer[i] = text[i] < 128 ? text[i] : -1;
