@@ -4,7 +4,8 @@
 #define RelevanceAnnotator_h
 
 #include "TextAnnotator.h"
-#include "TextEditRelevanceLexer.h"
+#include "RelevanceLexer.h"
+#include "RelevanceTokenRun.h"
 #include "TextStyleRun.h"
 
 class TextDocument;
@@ -39,7 +40,6 @@ private:
 
 	const TextDocument& m_doc;
 	TextStyleRegistry& m_styleRegistry;
-	TextEditRelevanceLexer m_relevanceLexer;
 
 	uint32 m_keyword;
 	uint32 m_string;

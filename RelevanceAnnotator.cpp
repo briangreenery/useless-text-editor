@@ -1,9 +1,9 @@
 // RelevanceAnnotator.cpp
 
 #include "RelevanceAnnotator.h"
-#include "TextEditRelevanceLexer.h"
 #include "TextStyleRegistry.h"
 #include "TextDocument.h"
+#include "TextDocumentReader.h"
 #include "TextRange.h"
 #include <algorithm>
 
@@ -12,7 +12,6 @@
 
 RelevanceAnnotator::RelevanceAnnotator( const TextDocument& doc, TextStyleRegistry& styleRegistry )
 	: m_doc( doc )
-	, m_relevanceLexer( doc )
 	, m_styleRegistry( styleRegistry )
 {
 	m_keyword  = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,    0,255 ),    TextStyle::useDefault ) );
@@ -25,64 +24,65 @@ uint32 RelevanceAnnotator::TokenStyle( size_t token ) const
 {
 	switch ( m_tokens[token].token )
 	{
-	case RelevanceToken::t_and:
-	case RelevanceToken::t_as:
-	case RelevanceToken::t_comma:
-	case RelevanceToken::t_concat:
-	case RelevanceToken::t_containedBy:
-	case RelevanceToken::t_contains:
-	case RelevanceToken::t_endsWith:
-	case RelevanceToken::t_equal:
-	case RelevanceToken::t_exists:
-	case RelevanceToken::t_greater:
-	case RelevanceToken::t_greaterOrEqual:
-	case RelevanceToken::t_it:
-	case RelevanceToken::t_less:
-	case RelevanceToken::t_lessOrEqual:
-	case RelevanceToken::t_minus:
-	case RelevanceToken::t_mod:
-	case RelevanceToken::t_not:
-	case RelevanceToken::t_notContainedBy:
-	case RelevanceToken::t_notContains:
-	case RelevanceToken::t_notEndsWith:
-	case RelevanceToken::t_notEqual:
-	case RelevanceToken::t_notExists:
-	case RelevanceToken::t_notGreater:
-	case RelevanceToken::t_notGreaterOrEqual:
-	case RelevanceToken::t_notLess:
-	case RelevanceToken::t_notLessOrEqual:
-	case RelevanceToken::t_notStartsWith:
-	case RelevanceToken::t_of:
-	case RelevanceToken::t_or:
-	case RelevanceToken::t_phraseItem:
-	case RelevanceToken::t_phraseItems:
-	case RelevanceToken::t_phraseNumber:
-	case RelevanceToken::t_plus:
-	case RelevanceToken::t_semiColon:
-	case RelevanceToken::t_slash:
-	case RelevanceToken::t_star:
-	case RelevanceToken::t_startsWith:
-	case RelevanceToken::t_whose:
+	case Relevance::t_concat:
+	case Relevance::t_star:
+	case Relevance::t_plus:
+	case Relevance::t_comma:
+	case Relevance::t_minus:
+	case Relevance::t_slash:
+	case Relevance::t_semi_colon:
+	case Relevance::t_or:
+	case Relevance::t_not:
+	case Relevance::t_equal:
+	case Relevance::t_not_equal:
+	case Relevance::t_contained_by:
+	case Relevance::t_less:
+	case Relevance::t_less_or_equal:
+	case Relevance::t_greater:
+	case Relevance::t_greater_or_equal:
+	case Relevance::t_not_greater:
+	case Relevance::t_not_greater_or_equal:
+	case Relevance::t_not_less:
+	case Relevance::t_not_less_or_equal:
+	case Relevance::t_not_contained_by:
+	case Relevance::t_not_contains:
+	case Relevance::t_not_ends_with:
+	case Relevance::t_not_starts_with:
+	case Relevance::t_ends_with:
+	case Relevance::t_starts_with:
+	case Relevance::t_exist:
+	case Relevance::t_not_exist:
+	case Relevance::t_contains:
+	case Relevance::t_mod:
+	case Relevance::t_whose:
+	case Relevance::t_of:
+	case Relevance::t_it:
+	case Relevance::t_as:
+	case Relevance::t_and:
 		return m_keyword;
+
+	case Relevance::t_comment:
+	case Relevance::e_comment_not_terminated:
+		return m_styleRegistry.defaultStyleid;
 		
-	case RelevanceToken::t_number:
-	case RelevanceToken::t_false:
-	case RelevanceToken::t_true:
+	case Relevance::t_number:
+	case Relevance::e_number_too_big:
 		return m_constant;
 
-	case RelevanceToken::t_string:
-	case RelevanceToken::t_unterminatedString:
+	case Relevance::t_string:
+	case Relevance::e_string_too_long:
+	case Relevance::e_string_not_terminated:
 		return m_string;
 
-	case RelevanceToken::t_if:
-	case RelevanceToken::t_then:
-	case RelevanceToken::t_else:
+	case Relevance::t_if:
+	case Relevance::t_then:
+	case Relevance::t_else:
 		return ( std::find( m_matchingTokens.begin(), m_matchingTokens.end(), token ) != m_matchingTokens.end() )
 		          ? m_matching
 		          : m_keyword;
 
-	case RelevanceToken::t_openParen:
-	case RelevanceToken::t_closeParen:
+	case Relevance::t_open_paren:
+	case Relevance::t_close_paren:
 		return ( std::find( m_matchingTokens.begin(), m_matchingTokens.end(), token ) != m_matchingTokens.end() )
 		          ? m_matching
 		          : m_styleRegistry.defaultStyleid;
@@ -91,24 +91,79 @@ uint32 RelevanceAnnotator::TokenStyle( size_t token ) const
 	return m_styleRegistry.defaultStyleid;
 }
 
+class LexerOutputReceiver : public Relevance::LexerOutput
+{
+public:
+	LexerOutputReceiver( RelevanceTokenRuns& runs )
+		: m_runs( runs )
+		, m_lastEnd( 0 )
+	{}
+
+	virtual void Token( Relevance::LexerToken token, uint32_t pos, uint32_t length )
+	{
+		if ( token != Relevance::e_bad_percent_sequence )
+			AddToken( token, pos, length );
+	}
+
+	virtual void Word( Relevance::TextRef, uint32_t pos, uint32_t length )
+	{
+		AddToken( Relevance::t_word, pos, length );
+	}
+
+	virtual void Number( uint64_t value, uint32_t pos, uint32_t length )
+	{
+		AddToken( Relevance::t_number, pos, length );
+	}
+
+	virtual void String( Relevance::TextRef value, uint32_t pos, uint32_t length )
+	{
+		AddToken( Relevance::t_string, pos, length );
+	}
+
+private:
+	void AddToken( Relevance::LexerToken token, uint32_t pos, uint32_t length )
+	{
+		Assert( pos >= m_lastEnd );
+
+		if ( pos > m_lastEnd )
+			m_runs.push_back( RelevanceTokenRun( Relevance::t_default, m_lastEnd, pos - m_lastEnd ) );
+
+		if ( token != Relevance::t_end_of_input )
+			m_runs.push_back( RelevanceTokenRun( token, pos, length ) );
+
+		m_lastEnd = pos + length;
+	}
+
+	size_t m_lastEnd;
+	RelevanceTokenRuns& m_runs;
+};
+
+#define BUFFER_SIZE 1
+
 void RelevanceAnnotator::TextChanged( TextChange change )
 {
-	m_relevanceLexer.Reset();
 	m_tokens.clear();
 	m_matchingTokens.clear();
 
-	size_t start = 0;
-	while ( true )
+	TextDocumentReader reader( m_doc );
+
+	LexerOutputReceiver receiver( m_tokens );
+	Relevance::Lexer lexer( receiver );
+
+	lexer.Reset();
+
+	for ( size_t start = 0; start < m_doc.Length(); start += BUFFER_SIZE )
 	{
-		RelevanceToken token = m_relevanceLexer.NextToken();
+		char buffer[BUFFER_SIZE];
+		UTF16Ref text = reader.WeakRange( start, BUFFER_SIZE );
 
-		if ( token == RelevanceToken::t_endOfInput )
-			break;
+		for ( size_t i = 0; i < text.size(); ++i )
+			buffer[i] = text[i] < 128 ? text[i] : -1;
 
-		size_t count = m_relevanceLexer.Position() - start;
-		m_tokens.push_back( RelevanceTokenRun( token, start, count ) );
-		start += count;
+		lexer.Receive( buffer, text.size() );
 	}
+
+	lexer.Finish();
 }
 
 void RelevanceAnnotator::SelectionChanged( size_t start, size_t end )
@@ -121,23 +176,23 @@ void RelevanceAnnotator::SelectionChanged( size_t start, size_t end )
 	size_t token = TokenAt( start - 1 );
 	switch ( m_tokens[token].token )
 	{
-	case RelevanceToken::t_openParen:
+	case Relevance::t_open_paren:
 		MatchOpenParen( token );
 		break;
 
-	case RelevanceToken::t_closeParen:
+	case Relevance::t_close_paren:
 		MatchCloseParen( token );
 		break;
 
-	case RelevanceToken::t_if:
+	case Relevance::t_if:
 		MatchIf( token );
 		break;
 
-	case RelevanceToken::t_then:
+	case Relevance::t_then:
 		MatchThen( token );
 		break;
 
-	case RelevanceToken::t_else:
+	case Relevance::t_else:
 		MatchElse( token );
 		break;
 	}
@@ -148,8 +203,8 @@ void RelevanceAnnotator::MatchOpenParen( size_t openParen )
 	size_t nesting = 0;
 	for ( size_t i = openParen + 1; i < m_tokens.size(); ++i )
 	{
-		RelevanceToken token = m_tokens[i].token;
-		if ( token == RelevanceToken::t_closeParen )
+		Relevance::LexerToken token = m_tokens[i].token;
+		if ( token == Relevance::t_close_paren )
 		{
 			if ( nesting == 0 )
 			{
@@ -160,7 +215,7 @@ void RelevanceAnnotator::MatchOpenParen( size_t openParen )
 
 			nesting--;
 		}
-		else if ( token == RelevanceToken::t_openParen )
+		else if ( token == Relevance::t_open_paren )
 			nesting++;
 	}
 }
@@ -170,8 +225,8 @@ void RelevanceAnnotator::MatchCloseParen( size_t closeParen )
 	size_t nesting = 0;
 	for ( size_t i = closeParen; i-- > 0; )
 	{
-		RelevanceToken token = m_tokens[i].token;
-		if ( token == RelevanceToken::t_openParen )
+		Relevance::LexerToken token = m_tokens[i].token;
+		if ( token == Relevance::t_open_paren )
 		{
 			if ( nesting == 0 )
 			{
@@ -182,7 +237,7 @@ void RelevanceAnnotator::MatchCloseParen( size_t closeParen )
 
 			nesting--;
 		}
-		else if ( token == RelevanceToken::t_closeParen )
+		else if ( token == Relevance::t_close_paren )
 			nesting++;
 	}
 }
@@ -234,15 +289,15 @@ size_t RelevanceAnnotator::PrevIf( size_t position ) const
 	size_t nesting = 0;
 	for ( size_t i = position; i-- > 0; )
 	{
-		RelevanceToken token = m_tokens[i].token;
-		if ( token == RelevanceToken::t_if )
+		Relevance::LexerToken token = m_tokens[i].token;
+		if ( token == Relevance::t_if )
 		{
 			if ( nesting == 0 )
 				return i;
 
 			nesting--;
 		}
-		else if ( token == RelevanceToken::t_else )
+		else if ( token == Relevance::t_else )
 			nesting++;
 	}
 	return m_tokens.size();
@@ -256,17 +311,17 @@ size_t RelevanceAnnotator::PrevThen( size_t position ) const
 	size_t nesting = 0;
 	for ( size_t i = position; i-- > 0; )
 	{
-		RelevanceToken token = m_tokens[i].token;
-		if ( token == RelevanceToken::t_else )
+		Relevance::LexerToken token = m_tokens[i].token;
+		if ( token == Relevance::t_else )
 		{
 			nesting++;
 		}
-		else if ( token == RelevanceToken::t_then )
+		else if ( token == Relevance::t_then )
 		{
 			if ( nesting == 0 )
 				return i;
 		}
-		else if ( token == RelevanceToken::t_if )
+		else if ( token == Relevance::t_if )
 		{
 			if ( nesting == 0 )
 				break;
@@ -281,17 +336,17 @@ size_t RelevanceAnnotator::NextThen( size_t position ) const
 	size_t nesting = 0;
 	for ( size_t i = position + 1; i < m_tokens.size(); ++i )
 	{
-		RelevanceToken::Token token = m_tokens[i].token;
-		if ( token == RelevanceToken::t_if )
+		Relevance::LexerToken token = m_tokens[i].token;
+		if ( token == Relevance::t_if )
 		{
 			nesting++;
 		}
-		else if ( token == RelevanceToken::t_then )
+		else if ( token == Relevance::t_then )
 		{
 			if ( nesting == 0 )
 				return i;
 		}
-		else if ( token == RelevanceToken::t_else )
+		else if ( token == Relevance::t_else )
 		{
 			if ( nesting == 0 )
 				break;
@@ -306,15 +361,15 @@ size_t RelevanceAnnotator::NextElse( size_t position ) const
 	size_t nesting = 0;
 	for ( size_t i = position + 1; i < m_tokens.size(); ++i )
 	{
-		RelevanceToken::Token token = m_tokens[i].token;
-		if ( token == RelevanceToken::t_else )
+		Relevance::LexerToken token = m_tokens[i].token;
+		if ( token == Relevance::t_else )
 		{
 			if ( nesting == 0 )
 				return i;
 
 			nesting--;
 		}
-		else if ( token == RelevanceToken::t_if )
+		else if ( token == Relevance::t_if )
 			nesting++;
 	}
 	return m_tokens.size();
@@ -372,8 +427,13 @@ void RelevanceAnnotator::GetSquiggles( TextRanges& squiggles, size_t start, size
 		size_t overlapStart = std::max( start, it->start );
 		size_t overlapEnd   = std::min( start + count, it->start + it->count );
 
-		if ( it->token == RelevanceToken::t_illegal
-		  || it->token == RelevanceToken::t_unterminatedString )
+		if ( it->token == Relevance::e_word_too_long
+		  || it->token == Relevance::e_number_too_big
+		  || it->token == Relevance::e_comment_not_terminated
+		  || it->token == Relevance::e_bad_percent_sequence
+		  || it->token == Relevance::e_string_too_long
+		  || it->token == Relevance::e_string_not_terminated
+		  || it->token == Relevance::e_illegal_character )
 		{
 			if ( !squiggles.empty() && squiggles.back().start + squiggles.back().count == overlapStart )
 				squiggles.back().count += overlapEnd - overlapStart;

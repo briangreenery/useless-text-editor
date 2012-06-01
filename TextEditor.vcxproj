@@ -50,7 +50,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>icu\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>icu\include;..\RelevanceLexer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;gdiplus.lib;icuuc.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -68,7 +68,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>icu\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>icu\include;..\RelevanceLexer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;icuuc.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -80,15 +80,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\RelevanceLexer\RelevanceLexer.cpp" />
     <ClCompile Include="ArrayOf.cpp" />
     <ClCompile Include="DocumentCharIter.cpp" />
     <ClCompile Include="EmptyTextBlock.cpp" />
     <ClCompile Include="RelevanceAnnotator.cpp" />
-    <ClCompile Include="RelevanceLexer.cpp" />
-    <ClCompile Include="RelevanceToken.cpp" />
+    <ClCompile Include="RelevanceTokenRun.cpp" />
     <ClCompile Include="TextAnnotator.cpp" />
     <ClCompile Include="TextChangeTest.cpp" />
-    <ClCompile Include="TextEditRelevanceLexer.cpp" />
     <ClCompile Include="TextFontRun.cpp" />
     <ClCompile Include="TextLayoutArgs.cpp" />
     <ClCompile Include="SimpleLayout.cpp" />
@@ -124,6 +123,10 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\RelevanceLexer\RelevanceLexer.h" />
+    <ClInclude Include="..\RelevanceLexer\RelevanceLexerOutput.h" />
+    <ClInclude Include="..\RelevanceLexer\RelevanceLexerToken.h" />
+    <ClInclude Include="..\RelevanceLexer\RelevanceTextRef.h" />
     <ClInclude Include="ArrayOf.h" />
     <ClInclude Include="Assert.h" />
     <ClInclude Include="DebuggableException.h" />
@@ -132,11 +135,9 @@
     <ClInclude Include="Error.h" />
     <ClInclude Include="Integers.h" />
     <ClInclude Include="RelevanceAnnotator.h" />
-    <ClInclude Include="RelevanceLexer.h" />
-    <ClInclude Include="RelevanceToken.h" />
+    <ClInclude Include="RelevanceTokenRun.h" />
     <ClInclude Include="TextAnnotator.h" />
     <ClInclude Include="TextChangeTest.h" />
-    <ClInclude Include="TextEditRelevanceLexer.h" />
     <ClInclude Include="TextFontRun.h" />
     <ClInclude Include="TextLayoutArgs.h" />
     <ClInclude Include="Require.h" />
@@ -171,9 +172,6 @@
     <ClInclude Include="UniscribeLayout.h" />
     <ClInclude Include="UniscribeTextRun.h" />
     <ClInclude Include="UniscribeTextRunLoop.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="RelevanceLexer.re2c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

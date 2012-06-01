@@ -25,7 +25,7 @@ TextView::TextView( HWND hwnd )
 	m_metrics.gutterWidth = 25;
 	m_metrics.marginWidth = 5;
 
-	//m_styleRegistry.annotator = new RelevanceAnnotator( m_doc, m_styleRegistry );
+	m_styleRegistry.annotator = new RelevanceAnnotator( m_doc, m_styleRegistry );
 }
 
 int TextView::OnCreate( LPCREATESTRUCT )

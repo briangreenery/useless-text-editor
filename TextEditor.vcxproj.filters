@@ -28,6 +28,9 @@
     <Filter Include="Relevance">
       <UniqueIdentifier>{01e98e77-53bd-4c5a-8737-e385986223a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Relevance\Lexer">
+      <UniqueIdentifier>{506c0249-6adf-41f7-b4a2-3296cb608810}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ArrayOf.cpp">
@@ -133,16 +136,7 @@
     <ClCompile Include="TextStyleReader.cpp">
       <Filter>TextStyle</Filter>
     </ClCompile>
-    <ClCompile Include="RelevanceToken.cpp">
-      <Filter>Relevance</Filter>
-    </ClCompile>
-    <ClCompile Include="RelevanceLexer.cpp">
-      <Filter>Relevance</Filter>
-    </ClCompile>
     <ClCompile Include="RelevanceAnnotator.cpp">
-      <Filter>Relevance</Filter>
-    </ClCompile>
-    <ClCompile Include="TextEditRelevanceLexer.cpp">
       <Filter>Relevance</Filter>
     </ClCompile>
     <ClCompile Include="TextSquiggle.cpp">
@@ -153,6 +147,12 @@
     </ClCompile>
     <ClCompile Include="TextDocumentUndo.cpp">
       <Filter>TextDocument</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RelevanceLexer\RelevanceLexer.cpp">
+      <Filter>Relevance\Lexer</Filter>
+    </ClCompile>
+    <ClCompile Include="RelevanceTokenRun.cpp">
+      <Filter>Relevance</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -276,16 +276,7 @@
     <ClInclude Include="TextStyleReader.h">
       <Filter>TextStyle</Filter>
     </ClInclude>
-    <ClInclude Include="RelevanceToken.h">
-      <Filter>Relevance</Filter>
-    </ClInclude>
-    <ClInclude Include="RelevanceLexer.h">
-      <Filter>Relevance</Filter>
-    </ClInclude>
     <ClInclude Include="RelevanceAnnotator.h">
-      <Filter>Relevance</Filter>
-    </ClInclude>
-    <ClInclude Include="TextEditRelevanceLexer.h">
       <Filter>Relevance</Filter>
     </ClInclude>
     <ClInclude Include="TextSquiggle.h">
@@ -297,10 +288,20 @@
     <ClInclude Include="TextDocumentUndo.h">
       <Filter>TextDocument</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="RelevanceLexer.re2c">
+    <ClInclude Include="..\RelevanceLexer\RelevanceLexer.h">
+      <Filter>Relevance\Lexer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RelevanceLexer\RelevanceLexerOutput.h">
+      <Filter>Relevance\Lexer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RelevanceLexer\RelevanceLexerToken.h">
+      <Filter>Relevance\Lexer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RelevanceLexer\RelevanceTextRef.h">
+      <Filter>Relevance\Lexer</Filter>
+    </ClInclude>
+    <ClInclude Include="RelevanceTokenRun.h">
       <Filter>Relevance</Filter>
-    </None>
+    </ClInclude>
   </ItemGroup>
 </Project>
