@@ -41,7 +41,7 @@ private:
 
 struct UTF16
 {
-	typedef unsigned short Unit;
+	typedef wchar_t Unit;
 };
 
 typedef UStringRef<UTF16> UTF16Ref;
