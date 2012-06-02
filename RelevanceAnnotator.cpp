@@ -141,8 +141,6 @@ void RelevanceAnnotator::TextChanged( TextChange change )
 	LexerOutputReceiver receiver( m_tokens );
 	Relevance::Lexer lexer( receiver );
 
-	lexer.Reset();
-
 	for ( size_t start = 0; start < m_doc.Length(); start += 512 )
 	{
 		char buffer[512];
