@@ -3,6 +3,7 @@
 #include "TextEdit.h"
 #include <windows.h>
 #include <uxtheme.h>
+#include <GdiPlus.h>
 
 #define APPCLASS TEXT( "GoodNewsEveryone" )
 
@@ -62,6 +63,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	RunTests();
 
+	ULONG_PTR gdiplusToken;
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	Gdiplus::GdiplusStartup( &gdiplusToken, &gdiplusStartupInput, NULL );
+
 	CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
 	BufferedPaintInit();
 
@@ -89,6 +94,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	BufferedPaintUnInit();
 	CoUninitialize();
+	Gdiplus::GdiplusShutdown( gdiplusToken );
 
 	return 0;
 }

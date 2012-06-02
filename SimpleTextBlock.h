@@ -18,7 +18,6 @@ public:
 	SimpleTextBlock( SimpleLayoutDataPtr, const TextStyleRegistry& );
 
 	virtual void DrawBackground( VisualPainter&, RECT ) const;
-	virtual void DrawSquiggles ( VisualPainter&, RECT ) const;
 	virtual void DrawText      ( VisualPainter&, RECT ) const;
 
 	virtual size_t LineCount() const;
@@ -38,6 +37,7 @@ private:
 	void DrawLineBackground( size_t line, VisualPainter&, RECT ) const;
 	void DrawLineSelection ( size_t line, VisualPainter&, RECT ) const;
 	void DrawLineSquiggles ( size_t line, VisualPainter&, RECT ) const;
+	void DrawLineHighlights( size_t line, VisualPainter&, RECT ) const;
 	void DrawLineText      ( size_t line, VisualPainter&, RECT ) const;
 
 	void DrawLineRect( VisualPainter&, RECT, int start, int end, COLORREF ) const;

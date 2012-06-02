@@ -32,7 +32,6 @@ void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection ) const
 	OffsetRect( &rect, 0, -block.yStart );
 
 	Draw( block, painter, rect, &TextBlock::DrawBackground );
-	Draw( block, painter, rect, &TextBlock::DrawSquiggles );
 	Draw( block, painter, rect, &TextBlock::DrawText );
 }
 

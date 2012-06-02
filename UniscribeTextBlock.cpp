@@ -27,18 +27,8 @@ void UniscribeTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) con
 	{
 		DrawLineBackground( line, painter, rect );
 		DrawLineSelection ( line, painter, rect );
-		rect.top += m_styleRegistry.lineHeight;
-	}
-}
-
-void UniscribeTextBlock::DrawSquiggles( VisualPainter& painter, RECT rect ) const
-{
-	size_t firstLine = rect.top / m_styleRegistry.lineHeight;
-	rect.top = firstLine * m_styleRegistry.lineHeight;
-
-	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &rect ); ++line )
-	{
-		DrawLineSquiggles( line, painter, rect );
+		DrawLineSquiggles ( line, painter, rect );
+		DrawLineHighlights( line, painter, rect );
 		rect.top += m_styleRegistry.lineHeight;
 	}
 }
@@ -152,6 +142,39 @@ void UniscribeTextBlock::DrawLineSquiggles( size_t line, VisualPainter& painter,
 			std::pair<int,int> range = RunCPtoXRange( run, squiggleStart, squiggleEnd );
 
 			painter.DrawSquiggles( xStart + range.first, xStart + range.second, rect );
+		}
+
+		xStart += run.width;
+	}
+}
+
+void UniscribeTextBlock::DrawLineHighlights( size_t line, VisualPainter& painter, RECT rect ) const
+{
+	size_t lineStart = TextStart( line );
+	size_t lineEnd   = TextEnd( line );
+
+	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
+	ArrayOf<const TextRange> highlights = painter.styleReader.Highlights( painter.textStart + lineStart, lineEnd - lineStart );
+
+	if ( highlights.empty() )
+		return;
+
+	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
+
+	int xStart = 0;
+	for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
+	{
+		const UniscribeTextRun& run = runs[visualToLogical[i]];
+
+		ArrayOf<const TextRange> runHighlights = RunSquiggles( painter.textStart, run, highlights );
+		for ( const TextRange* highlight = runHighlights.begin(); highlight != runHighlights.end(); ++highlight )
+		{
+			size_t highlightStart = highlight->start - painter.textStart;
+			size_t highlightEnd   = highlight->start - painter.textStart + highlight->count;
+
+			std::pair<int,int> range = RunCPtoXRange( run, highlightStart, highlightEnd );
+
+			painter.DrawHighlight( xStart + range.first, xStart + range.second, rect );
 		}
 
 		xStart += run.width;

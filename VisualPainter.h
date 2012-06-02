@@ -25,6 +25,7 @@ public:
 
 	void FillRect ( RECT rect, COLORREF color );
 	void DrawSquiggles( int xStart, int xEnd, RECT rect );
+	void DrawHighlight( int xStart, int xEnd, RECT rect );
 
 	HDC                 hdc;
 	TextSelection       selection;

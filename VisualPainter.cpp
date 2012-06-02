@@ -1,5 +1,8 @@
 // VisualPainter.cpp
 
+#include <Windows.h>
+#include <GdiPlus.h>
+
 #include "VisualPainter.h"
 #include "TextStyleRegistry.h"
 #include "TextStyle.h"
@@ -64,7 +67,44 @@ void VisualPainter::SetTextColor( COLORREF color )
 		::SetTextColor( hdc, color );
 }
 
+
 void VisualPainter::DrawSquiggles( int xStart, int xEnd, RECT rect )
 {
 	squiggle.Draw( hdc, xStart, xEnd, rect.top + styleRegistry.lineHeight );
+}
+
+static void RoundRect( HDC hdc, int x, int y, int width, int height, int radius, COLORREF topColorRef, COLORREF bottomColorRef )
+{
+	using namespace Gdiplus;
+
+	GraphicsPath path;
+
+	path.AddLine(x + radius, y, x + width - (radius * 2), y);
+    path.AddArc(x + width - (radius * 2), y, radius * 2, radius * 2, 270, 90);
+    path.AddLine(x + width, y + radius, x + width, y + height - (radius * 2));
+    path.AddArc(x + width - (radius * 2), y + height - (radius * 2), radius * 2, radius * 2, 0, 90);
+    path.AddLine(x + width - (radius * 2), y + height, x + radius, y + height);
+    path.AddArc(x, y + height - (radius * 2), radius * 2, radius * 2, 90, 90);
+    path.AddLine(x, y + height - (radius * 2), x, y + radius);
+    path.AddArc(x, y, radius * 2, radius * 2, 180, 90);
+    path.CloseFigure();
+
+	Color topColor;
+	topColor.SetFromCOLORREF( topColorRef );
+
+	Color bottomColor;
+	bottomColor.SetFromCOLORREF( bottomColorRef );
+
+	Rect gradientRect( x, y, width, height );
+	LinearGradientBrush brush( gradientRect, topColor, bottomColor, LinearGradientModeVertical );
+
+	Graphics g( hdc );
+	g.SetSmoothingMode( SmoothingModeHighQuality );
+	g.FillPath( &brush, &path );
+}
+
+void VisualPainter::DrawHighlight( int xStart, int xEnd, RECT rect )
+{
+	RoundRect( hdc, xStart,     rect.top + 1, xEnd - xStart,     styleRegistry.lineHeight, 3, RGB( 190, 190, 190 ), RGB( 190, 190, 190 ) );
+	RoundRect( hdc, xStart - 1, rect.top    , xEnd - xStart + 1, styleRegistry.lineHeight, 3, RGB( 255, 215,  87 ), RGB( 255, 188,  43 ) );
 }

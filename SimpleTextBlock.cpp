@@ -22,18 +22,8 @@ void SimpleTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) const
 	{
 		DrawLineBackground( line, painter, rect );
 		DrawLineSelection ( line, painter, rect );
-		rect.top += m_styleRegistry.lineHeight;
-	}
-}
-
-void SimpleTextBlock::DrawSquiggles( VisualPainter& painter, RECT rect ) const
-{
-	size_t firstLine = rect.top / m_styleRegistry.lineHeight;
-	rect.top = firstLine * m_styleRegistry.lineHeight;
-
-	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &rect ); ++line )
-	{
-		DrawLineSquiggles( line, painter, rect );
+		DrawLineSquiggles ( line, painter, rect );
+		DrawLineHighlights( line, painter, rect );
 		rect.top += m_styleRegistry.lineHeight;
 	}
 }
@@ -106,6 +96,24 @@ void SimpleTextBlock::DrawLineSquiggles( size_t line, VisualPainter& painter, RE
 			break;
 
 		painter.DrawSquiggles( xStart, xEnd, rect );
+	}
+}
+
+void SimpleTextBlock::DrawLineHighlights( size_t line, VisualPainter& painter, RECT rect ) const
+{
+	size_t textStart = TextStart( line );
+	size_t textEnd   = TextEnd( line );
+
+	ArrayOf<const TextRange> highlights = painter.styleReader.Highlights( painter.textStart + textStart, textEnd - textStart );
+	for ( const TextRange* it = highlights.begin(); it != highlights.end(); ++it )
+	{
+		int xStart = CPtoX( line, it->start - painter.textStart,                 false );
+		int xEnd   = CPtoX( line, it->start - painter.textStart + it->count - 1, true );
+
+		if ( xStart >= rect.right )
+			break;
+
+		painter.DrawHighlight( xStart, xEnd, rect );
 	}
 }
 

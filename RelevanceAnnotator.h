@@ -19,9 +19,10 @@ public:
 	virtual void TextChanged( TextChange );
 	virtual void SelectionChanged( size_t start, size_t end );
 
-	virtual void GetFonts    ( TextFontRuns&,  size_t start, size_t count );
-	virtual void GetStyles   ( TextStyleRuns&, size_t start, size_t count );
-	virtual void GetSquiggles( TextRanges&,    size_t start, size_t count );
+	virtual void GetFonts     ( TextFontRuns&,  size_t start, size_t count );
+	virtual void GetStyles    ( TextStyleRuns&, size_t start, size_t count );
+	virtual void GetSquiggles ( TextRanges&,    size_t start, size_t count );
+	virtual void GetHighlights( TextRanges&,    size_t start, size_t count );
 
 private:
 	size_t TokenAt( size_t position ) const;
@@ -44,7 +45,6 @@ private:
 	uint32 m_keyword;
 	uint32 m_string;
 	uint32 m_constant;
-	uint32 m_matching;
 
 	std::vector<size_t> m_matchingTokens;
 	RelevanceTokenRuns m_tokens;

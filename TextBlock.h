@@ -16,7 +16,6 @@ public:
 	TextBlock() {}
 
 	virtual void DrawBackground( VisualPainter&, RECT ) const = 0;
-	virtual void DrawSquiggles ( VisualPainter&, RECT ) const = 0;
 	virtual void DrawText      ( VisualPainter&, RECT ) const = 0;
 
 	virtual size_t LineCount() const = 0;

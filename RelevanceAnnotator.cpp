@@ -14,10 +14,9 @@ RelevanceAnnotator::RelevanceAnnotator( const TextDocument& doc, TextStyleRegist
 	: m_doc( doc )
 	, m_styleRegistry( styleRegistry )
 {
-	m_keyword  = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,    0,255 ),    TextStyle::useDefault ) );
-	m_constant = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 128,  0,128 ),    TextStyle::useDefault ) );
-	m_string   = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,  128,128 ),    TextStyle::useDefault ) );
-	m_matching = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, TextStyle::useDefault, RGB( 255,150,50 )     ) );
+	m_keyword  = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,    0,255 ), TextStyle::useDefault ) );
+	m_constant = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 128,  0,128 ), TextStyle::useDefault ) );
+	m_string   = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,  128,128 ), TextStyle::useDefault ) );
 }
 
 uint32 RelevanceAnnotator::TokenStyle( size_t token ) const
@@ -78,14 +77,8 @@ uint32 RelevanceAnnotator::TokenStyle( size_t token ) const
 	case Relevance::t_then:
 	case Relevance::t_else:
 		return ( std::find( m_matchingTokens.begin(), m_matchingTokens.end(), token ) != m_matchingTokens.end() )
-		          ? m_matching
+		          ? m_styleRegistry.defaultStyleid
 		          : m_keyword;
-
-	case Relevance::t_open_paren:
-	case Relevance::t_close_paren:
-		return ( std::find( m_matchingTokens.begin(), m_matchingTokens.end(), token ) != m_matchingTokens.end() )
-		          ? m_matching
-		          : m_styleRegistry.defaultStyleid;
 	}
 
 	return m_styleRegistry.defaultStyleid;
@@ -437,6 +430,26 @@ void RelevanceAnnotator::GetSquiggles( TextRanges& squiggles, size_t start, size
 				squiggles.back().count += overlapEnd - overlapStart;
 			else
 				squiggles.push_back( TextRange( overlapStart, overlapEnd - overlapStart ) );
+		}
+	}
+}
+
+void RelevanceAnnotator::GetHighlights( TextRanges& highlights, size_t start, size_t count )
+{
+	TextRange textRange( start, count );
+	TokenRange range = std::equal_range( m_tokens.begin(), m_tokens.end(), textRange, TokenRunCompare() );
+
+	for ( RelevanceTokenRuns::const_iterator it = range.first; it != range.second; ++it )
+	{
+		size_t overlapStart = std::max( start, it->start );
+		size_t overlapEnd   = std::min( start + count, it->start + it->count );
+
+		if ( std::find( m_matchingTokens.begin(), m_matchingTokens.end(), it - m_tokens.begin() ) != m_matchingTokens.end() )
+		{
+			if ( !highlights.empty() && highlights.back().start + highlights.back().count == overlapStart )
+				highlights.back().count += overlapEnd - overlapStart;
+			else
+				highlights.push_back( TextRange( overlapStart, overlapEnd - overlapStart ) );
 		}
 	}
 }

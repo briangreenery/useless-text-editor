@@ -16,15 +16,17 @@ class TextStyleReader
 public:
 	TextStyleReader( const TextStyleRegistry& styleRegistry );
 
-	ArrayOf<const TextFontRun>  Fonts    ( size_t start, size_t count );
-	ArrayOf<const TextStyleRun> Styles   ( size_t start, size_t count );
-	ArrayOf<const TextRange>    Squiggles( size_t start, size_t count );
+	ArrayOf<const TextFontRun>  Fonts     ( size_t start, size_t count );
+	ArrayOf<const TextStyleRun> Styles    ( size_t start, size_t count );
+	ArrayOf<const TextRange>    Squiggles ( size_t start, size_t count );
+	ArrayOf<const TextRange>    Highlights( size_t start, size_t count );
 
 private:
 	const TextStyleRegistry& m_styleRegistry;
 	TextFontRuns m_fonts;
 	TextStyleRuns m_styles;
 	TextRanges m_squiggles;
+	TextRanges m_highlights;
 };
 
 #endif

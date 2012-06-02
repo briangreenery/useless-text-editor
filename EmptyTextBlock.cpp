@@ -24,10 +24,6 @@ void EmptyTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) const
 	}
 }
 
-void EmptyTextBlock::DrawSquiggles( VisualPainter& painter, RECT rect ) const
-{
-}
-
 void EmptyTextBlock::DrawText( VisualPainter& painter, RECT rect ) const
 {
 }

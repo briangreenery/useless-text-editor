@@ -53,3 +53,16 @@ ArrayOf<const TextRange> TextStyleReader::Squiggles( size_t start, size_t count 
 
 	return ArrayOf<const TextRange>( &m_squiggles.front(), &m_squiggles.back() + 1 );
 }
+
+ArrayOf<const TextRange> TextStyleReader::Highlights( size_t start, size_t count )
+{
+	m_highlights.clear();
+
+	if ( m_styleRegistry.annotator )
+		m_styleRegistry.annotator->GetHighlights( m_highlights, start, count );
+
+	if ( m_highlights.empty() )
+		return ArrayOf<const TextRange>();
+
+	return ArrayOf<const TextRange>( &m_highlights.front(), &m_highlights.back() + 1 );
+}
