@@ -21,6 +21,7 @@ TextView::TextView( HWND hwnd )
 	, m_mouseWheelRemainder( 0 )
 	, m_lineUpCount( 0 )
 	, m_lastUndoTick( 0 )
+	, m_lastEditOperation( lastWasNothing )
 {
 	m_metrics.gutterWidth = 25;
 	m_metrics.marginWidth = 5;
@@ -379,6 +380,33 @@ void TextView::Delete( bool wholeWord )
 	Clear( selection );
 }
 
+std::wstring TextView::GetText()
+{
+	std::wstring text;
+
+	if ( !m_doc.Empty() )
+	{
+		text.resize( m_doc.Length() );
+		m_doc.Read( 0, m_doc.Length(), &text[0] );
+	}
+
+	return text;
+}
+
+void TextView::SetText( UTF16Ref text )
+{
+	m_doc.SetBeforeSelection( m_selection );
+	m_doc.EndUndoGroup();
+	m_lastEditOperation = lastWasNothing;
+
+	TextChange change;
+	change.AddChange( m_doc.Delete( 0, m_doc.Length() ) );
+	change.AddChange( m_doc.Insert( 0, text ) );
+
+	TextSelection selection;
+	UpdateLayout( change, selection );
+}
+
 void TextView::Insert( UTF16Ref text )
 {
 	m_doc.SetBeforeSelection( m_selection );
@@ -717,4 +745,9 @@ UINT TextView::GetTrackPos( int scrollBar )
 int TextView::SnapToLine( int y )
 {
 	return m_styleRegistry.lineHeight * ( y / m_styleRegistry.lineHeight );
+}
+
+HWND TextView::WindowHandle() const
+{
+	return m_hwnd;
 }

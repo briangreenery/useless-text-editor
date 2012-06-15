@@ -66,6 +66,11 @@ public:
 	void Undo();
 	void Redo();
 
+	std::wstring GetText();
+	void SetText( UTF16Ref );
+
+	HWND WindowHandle() const;
+
 private:
 	void UpdateLayout( TextChange, TextSelection );
 	void UpdateLayout();
@@ -95,7 +100,7 @@ private:
 	POINT m_lineUpStart;
 	int   m_lineUpCount;
 
-	enum { lastWasInsert, lastWasClear } m_lastEditOperation;
+	enum { lastWasNothing, lastWasInsert, lastWasClear } m_lastEditOperation;
 	DWORD m_lastUndoTick;
 };
 

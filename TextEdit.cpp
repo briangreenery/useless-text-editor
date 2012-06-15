@@ -2,6 +2,7 @@
 
 #include "TextEdit.h"
 #include "TextView.h"
+#include "AccessibleTextView.h"
 #include <Windowsx.h>
 
 static inline POINT MakePOINT( LPARAM lParam )
@@ -83,6 +84,12 @@ static LRESULT ProcessWindowMsg( TextView* view, HWND hwnd, UINT msg, WPARAM wPa
 	case WM_TIMER:
 		view->OnTimer( static_cast<UINT_PTR>( wParam ) );
 		return 0;
+
+	case WM_GETOBJECT:
+		AccessibleTextView* accessibleTextView = new AccessibleTextView( *view );
+		LRESULT result = LresultFromObject( IID_IAccessible, wParam, static_cast<IUnknown*>( accessibleTextView ) );
+		accessibleTextView->Release();
+		return result;
 	}
 
 	return DefWindowProc( hwnd, msg, wParam, lParam );

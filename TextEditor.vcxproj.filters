@@ -154,6 +154,9 @@
     <ClCompile Include="RelevanceTokenRun.cpp">
       <Filter>Relevance</Filter>
     </ClCompile>
+    <ClCompile Include="AccessibleTextView.cpp">
+      <Filter>TextView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayOf.h">
@@ -302,6 +305,9 @@
     </ClInclude>
     <ClInclude Include="RelevanceTokenRun.h">
       <Filter>Relevance</Filter>
+    </ClInclude>
+    <ClInclude Include="AccessibleTextView.h">
+      <Filter>TextView</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

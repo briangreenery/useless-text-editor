@@ -53,7 +53,7 @@
       <AdditionalIncludeDirectories>icu\include;..\RelevanceLexer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;gdiplus.lib;icuuc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;gdiplus.lib;Oleacc.lib;icuuc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>icu\lib</AdditionalLibraryDirectories>
@@ -71,7 +71,7 @@
       <AdditionalIncludeDirectories>icu\include;..\RelevanceLexer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;icuuc.lib;gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>usp10.lib;Msimg32.lib;uxtheme.lib;icuuc.lib;gdiplus.lib;Oleacc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -86,6 +86,7 @@
     <ClCompile Include="EmptyTextBlock.cpp" />
     <ClCompile Include="RelevanceAnnotator.cpp" />
     <ClCompile Include="RelevanceTokenRun.cpp" />
+    <ClCompile Include="AccessibleTextView.cpp" />
     <ClCompile Include="TextAnnotator.cpp" />
     <ClCompile Include="TextChangeTest.cpp" />
     <ClCompile Include="TextFontRun.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="Integers.h" />
     <ClInclude Include="RelevanceAnnotator.h" />
     <ClInclude Include="RelevanceTokenRun.h" />
+    <ClInclude Include="AccessibleTextView.h" />
     <ClInclude Include="TextAnnotator.h" />
     <ClInclude Include="TextChangeTest.h" />
     <ClInclude Include="TextFontRun.h" />
