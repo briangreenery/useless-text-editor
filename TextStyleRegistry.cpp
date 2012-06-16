@@ -17,6 +17,7 @@ TextStyleRegistry::TextStyleRegistry()
 {
 	gutterColor      = RGB( 255, 255, 255 );
 	gutterLineColor  = RGB( 225, 225, 225 );
+	gutterTextColor  = RGB( 150, 150, 150 );
 	selectionColor   = RGB( 173, 214, 255 );
 	defaultBkColor   = GetSysColor( COLOR_WINDOW );
 	defaultTextColor = GetSysColor( COLOR_WINDOWTEXT );

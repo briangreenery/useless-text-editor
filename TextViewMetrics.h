@@ -22,6 +22,7 @@ public:
 	bool IsInText        ( POINT, HWND ) const;
 	bool IsInTextOrMargin( POINT, HWND ) const;
 
+	HDC   ClientToGutter( HDC, POINT* ) const;
 	RECT  ClientToGutter( RECT ) const;
 	POINT ClientToGutter( POINT ) const;
 	POINT GutterToClient( POINT ) const;

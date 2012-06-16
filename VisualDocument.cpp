@@ -38,22 +38,17 @@ void VisualDocument::DrawLineNumbers( HDC hdc, RECT rect ) const
 	VisualPainter painter( hdc, m_doc, m_styleRegistry, m_squiggle, TextSelection() );
 
 	BlockContaining_Result block = BlockContaining( rect.top );
-	//OffsetRect( &rect, 0, -block.yStart );
 
+	COLORREF oldTextColor = SetTextColor( hdc, m_styleRegistry.gutterTextColor );
 	UINT oldAlign = SetTextAlign( hdc, TA_RIGHT );
 
-	while ( block.it != m_blocks.end() && !IsRectEmpty( &rect ) )
+	while ( block.it != m_blocks.end() && block.yStart < rect.bottom )
 	{
-		painter.SetOrigin( block.textStart, block.yStart );
-
 		wchar_t buffer[20];
 		int length = swprintf_s( buffer, L"%d", block.logicalLine );
 
 		if ( length > 0 )
-			ExtTextOutW( painter.hdc, rect.right - m_styleRegistry.avgCharWidth / 2, 0, ETO_CLIPPED, &rect, buffer, length, NULL );
-
-		rect.bottom -= block->Height() - rect.top;
-		rect.top = 0;
+			ExtTextOutW( painter.hdc, rect.right - m_styleRegistry.avgCharWidth, block.yStart, ETO_CLIPPED, &rect, buffer, length, NULL );
 
 		block.yStart += block->Height();
 		block.textStart += block->Length();
@@ -62,6 +57,7 @@ void VisualDocument::DrawLineNumbers( HDC hdc, RECT rect ) const
 	}
 
 	SetTextAlign( hdc, oldAlign );
+	SetTextColor( hdc, oldTextColor );
 }
 
 void VisualDocument::Draw( BlockContaining_Result block, VisualPainter& painter, RECT rect, DrawFunction drawFunction ) const

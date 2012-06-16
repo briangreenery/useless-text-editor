@@ -32,6 +32,7 @@ public:
 
 	COLORREF gutterColor;
 	COLORREF gutterLineColor;
+	COLORREF gutterTextColor;
 	COLORREF selectionColor;
 	COLORREF defaultBkColor;
 	COLORREF defaultTextColor;
