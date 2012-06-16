@@ -13,9 +13,6 @@
 #include "EmptyTextBlock.h"
 #include "Assert.h"
 
-#undef min
-#undef max
-
 VisualDocument::VisualDocument( const TextDocument& doc, TextStyleRegistry& styleRegistry )
 	: m_doc( doc )
 	, m_styleRegistry( styleRegistry )
@@ -84,7 +81,7 @@ bool VisualDocument::IsSimpleText( UTF16Ref text ) const
 void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start, size_t count, HDC hdc, int maxWidth )
 {
 	if ( maxWidth != 0 )
-		maxWidth = std::max( maxWidth, m_styleRegistry.avgCharWidth * 10 );
+		maxWidth = (std::max)( maxWidth, m_styleRegistry.avgCharWidth * 10 );
 
 	TextLayoutArgs layoutArgs( m_doc, m_styleRegistry, hdc, maxWidth );
 
@@ -163,7 +160,7 @@ POINT VisualDocument::PointFromChar( size_t pos, bool advancing ) const
 
 size_t VisualDocument::CharFromPoint( POINT* point ) const
 {
-	point->y = std::max( point->y, LONG( 0 ) );
+	point->y = (std::max)( point->y, LONG( 0 ) );
 
 	BlockContaining_Result block = BlockContaining( point->y );
 

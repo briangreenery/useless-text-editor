@@ -7,9 +7,6 @@
 #include "TextRange.h"
 #include <algorithm>
 
-#undef min
-#undef max
-
 RelevanceAnnotator::RelevanceAnnotator( const TextDocument& doc, TextStyleRegistry& styleRegistry )
 	: m_doc( doc )
 	, m_styleRegistry( styleRegistry )
@@ -394,8 +391,8 @@ void RelevanceAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t 
 
 	for ( RelevanceTokenRuns::const_iterator it = range.first; it != range.second; ++it )
 	{
-		size_t overlapStart = std::max( start, it->start );
-		size_t overlapEnd   = std::min( start + count, it->start + it->count );
+		size_t overlapStart = (std::max)( start, it->start );
+		size_t overlapEnd   = (std::min)( start + count, it->start + it->count );
 
 		uint32 styleid = TokenStyle( it - m_tokens.begin() );
 
@@ -413,8 +410,8 @@ void RelevanceAnnotator::GetSquiggles( TextRanges& squiggles, size_t start, size
 
 	for ( RelevanceTokenRuns::const_iterator it = range.first; it != range.second; ++it )
 	{
-		size_t overlapStart = std::max( start, it->start );
-		size_t overlapEnd   = std::min( start + count, it->start + it->count );
+		size_t overlapStart = (std::max)( start, it->start );
+		size_t overlapEnd   = (std::min)( start + count, it->start + it->count );
 
 		if ( it->token == Relevance::e_word_too_long
 		  || it->token == Relevance::e_number_too_big
@@ -439,8 +436,8 @@ void RelevanceAnnotator::GetHighlights( TextRanges& highlights, size_t start, si
 
 	for ( RelevanceTokenRuns::const_iterator it = range.first; it != range.second; ++it )
 	{
-		size_t overlapStart = std::max( start, it->start );
-		size_t overlapEnd   = std::min( start + count, it->start + it->count );
+		size_t overlapStart = (std::max)( start, it->start );
+		size_t overlapEnd   = (std::min)( start + count, it->start + it->count );
 
 		if ( std::find( m_matchingTokens.begin(), m_matchingTokens.end(), it - m_tokens.begin() ) != m_matchingTokens.end() )
 		{

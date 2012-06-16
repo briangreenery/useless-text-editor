@@ -2,9 +2,6 @@
 
 #include "TextBuffer.h"
 
-#undef min
-#undef max
-
 TextBuffer::TextBuffer()
 	: m_size( 0 )
 	, m_gapPos( 0 )
@@ -36,7 +33,7 @@ void TextBuffer::MoveGapTo( size_t pos )
 
 void TextBuffer::GrowByAtLeast( size_t amount )
 {
-	size_t newCapacity = m_buffer.size() + std::max( amount, m_buffer.size() );
+	size_t newCapacity = m_buffer.size() + (std::max)( amount, m_buffer.size() );
 	SizedAutoArray<UTF16::Unit> newBuffer = CreateArray<UTF16::Unit>( newCapacity );
 
 	copy( newBuffer.begin(), m_size, 0 );
@@ -78,7 +75,7 @@ size_t TextBuffer::count( size_t pos, size_t num, UTF16::Unit unit ) const
 
 	if ( pos < m_gapPos )
 	{
-		size_t numToScan = std::min( num, m_gapPos - pos );
+		size_t numToScan = (std::min)( num, m_gapPos - pos );
 
 		const UTF16::Unit* start = m_buffer.begin() + pos;
 		unitCount  += std::count( start, start + numToScan, unit );
@@ -87,7 +84,7 @@ size_t TextBuffer::count( size_t pos, size_t num, UTF16::Unit unit ) const
 
 	if ( numScanned < num )
 	{
-		size_t numToScan = std::min( m_size - m_gapPos, num - numScanned );
+		size_t numToScan = (std::min)( m_size - m_gapPos, num - numScanned );
 
 		const UTF16::Unit* start = m_buffer.begin() + pos + numScanned + GapLength();
 		unitCount += std::count( start, start + numToScan, unit );
@@ -105,7 +102,7 @@ size_t TextBuffer::copy( UTF16::Unit* buffer, size_t num, size_t pos ) const
 
 	if ( pos < m_gapPos )
 	{
-		size_t numToCopy = std::min( num, m_gapPos - pos );
+		size_t numToCopy = (std::min)( num, m_gapPos - pos );
 
 		const UTF16::Unit* start = m_buffer.begin() + pos;
 		std::copy( start, start + numToCopy, buffer );
@@ -114,7 +111,7 @@ size_t TextBuffer::copy( UTF16::Unit* buffer, size_t num, size_t pos ) const
 
 	if ( numCopied < num )
 	{
-		size_t numToCopy = std::min( m_size - ( pos + numCopied ), num - numCopied );
+		size_t numToCopy = (std::min)( m_size - ( pos + numCopied ), num - numCopied );
 
 		const UTF16::Unit* start = m_buffer.begin() + pos + numCopied + GapLength();
 		std::copy( start, start + numToCopy, buffer + numCopied );

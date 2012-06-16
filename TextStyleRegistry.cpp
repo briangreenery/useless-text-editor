@@ -6,9 +6,6 @@
 
 namespace W = Windows;
 
-#undef min
-#undef max
-
 TextStyleRegistry::TextStyleRegistry()
 	: fontSize( 10 )
 	, lineHeight( 0 )

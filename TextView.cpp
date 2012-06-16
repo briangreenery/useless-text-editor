@@ -7,9 +7,6 @@
 #include <Windowsx.h>
 #include <uxtheme.h>
 
-#undef min
-#undef max
-
 TextView::TextView( HWND hwnd )
 	: m_hwnd( hwnd )
 	, m_blocks( m_doc, m_styleRegistry )
@@ -184,8 +181,8 @@ void TextView::OnMouseMove( POINT point )
 		m_lastMouseScrollTick = currentTick;
 	}
 
-	point.y = std::min( m_metrics.clientRect.bottom, point.y );
-	point.y = std::max( m_metrics.clientRect.top,    point.y );
+	point.y = (std::min)( m_metrics.clientRect.bottom, point.y );
+	point.y = (std::max)( m_metrics.clientRect.top,    point.y );
 
 	TextSelection selection = m_selection;
 	selection.endPoint = m_metrics.ClientToText( point );
@@ -671,8 +668,8 @@ void TextView::ShowCaret()
 
 void TextView::ScrollTo( int x, int y )
 {
-	y = std::min( y, int( ( m_blocks.LineCount() - m_metrics.linesPerPage ) * m_styleRegistry.lineHeight ) );
-	y = std::max( y, int( 0 ) );
+	y = (std::min)( y, int( ( m_blocks.LineCount() - m_metrics.linesPerPage ) * m_styleRegistry.lineHeight ) );
+	y = (std::max)( y, int( 0 ) );
 
 	ScrollWindowEx( m_hwnd, 0, m_metrics.yOffset - y, NULL, NULL, NULL, NULL, SW_ERASE | SW_INVALIDATE );
 	m_metrics.yOffset = y;

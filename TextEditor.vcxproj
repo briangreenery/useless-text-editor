@@ -87,7 +87,6 @@
     <ClCompile Include="RelevanceAnnotator.cpp" />
     <ClCompile Include="RelevanceTokenRun.cpp" />
     <ClCompile Include="AccessibleTextView.cpp" />
-    <ClCompile Include="TextAnnotator.cpp" />
     <ClCompile Include="TextChangeTest.cpp" />
     <ClCompile Include="TextFontRun.cpp" />
     <ClCompile Include="TextLayoutArgs.cpp" />

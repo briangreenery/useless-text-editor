@@ -9,9 +9,6 @@
 
 namespace W = Windows;
 
-#undef min
-#undef max
-
 UniscribeTextBlock::UniscribeTextBlock( UniscribeLayoutDataPtr data, const TextStyleRegistry& styleRegistry )
 	: m_data( std::move( data ) )
 	, m_styleRegistry( styleRegistry )
@@ -393,8 +390,8 @@ int UniscribeTextBlock::RunCPtoX( const UniscribeTextRun& run, size_t cp, bool t
 
 std::pair<int,int> UniscribeTextBlock::RunCPtoXRange( const UniscribeTextRun& run, size_t start, size_t end ) const
 {
-	size_t overlapStart = std::max( start, run.textStart );
-	size_t overlapEnd   = std::min( end,   run.textStart + run.textCount );
+	size_t overlapStart = (std::max)( start, run.textStart );
+	size_t overlapEnd   = (std::min)( end,   run.textStart + run.textCount );
 
 	if ( overlapStart >= overlapEnd )
 		return std::make_pair( 0, 0 );

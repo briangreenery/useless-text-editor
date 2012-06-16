@@ -61,8 +61,8 @@ void SimpleTextBlock::DrawLineSelection( size_t line, VisualPainter& painter, RE
 {
 	if ( painter.selection.Intersects( TextStart( line ), TextEnd( line ) ) )
 	{
-		size_t start = std::max( painter.selection.Min(), TextStart( line ) );
-		size_t end   = std::min( painter.selection.Max(), TextEnd  ( line ) );
+		size_t start = (std::max)( painter.selection.Min(), TextStart( line ) );
+		size_t end   = (std::min)( painter.selection.Max(), TextEnd  ( line ) );
 
 		int xStart = CPtoX( line, start, false );
 		int xEnd   = CPtoX( line, end - 1, true );
@@ -135,8 +135,8 @@ void SimpleTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT re
 		ArrayOf<const TextStyleRun> runStyles = RunStyles( painter.textStart, *run, styles );
 		for ( const TextStyleRun* style = runStyles.begin(); style != runStyles.end(); ++style )
 		{
-			size_t overlapStart = std::max( style->start - painter.textStart,                run->textStart );
-			size_t overlapEnd   = std::min( style->start - painter.textStart + style->count, run->textStart + run->textCount );
+			size_t overlapStart = (std::max)( style->start - painter.textStart,                run->textStart );
+			size_t overlapEnd   = (std::min)( style->start - painter.textStart + style->count, run->textStart + run->textCount );
 
 			int xStart = xRunStart + RunCPtoX( *run, overlapStart, false );
 			if ( xStart >= rect.right )

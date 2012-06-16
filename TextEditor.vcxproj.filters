@@ -118,9 +118,6 @@
     <ClCompile Include="TextChangeTest.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="TextAnnotator.cpp">
-      <Filter>TextStyle</Filter>
-    </ClCompile>
     <ClCompile Include="TextStyleRun.cpp">
       <Filter>TextStyle</Filter>
     </ClCompile>

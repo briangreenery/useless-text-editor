@@ -1,15 +1,11 @@
 // VisualPainter.cpp
 
-#include <Windows.h>
-#include <GdiPlus.h>
-
 #include "VisualPainter.h"
 #include "TextStyleRegistry.h"
 #include "TextStyle.h"
 #include "TextSquiggle.h"
-
-#undef min
-#undef max
+#include <Windows.h>
+#include <GdiPlus.h>
 
 VisualPainter::VisualPainter( HDC hdc, const TextDocument& doc, TextStyleRegistry& styleRegistry, const TextSquiggle& squiggle, TextSelection selection )
 	: hdc( hdc )
@@ -47,8 +43,8 @@ void VisualPainter::SetOrigin( size_t _textStart, LONG yStart )
 {
 	textStart = _textStart;
 
-	selection.start = oldSelection.start - std::min( oldSelection.start, textStart );
-	selection.end   = oldSelection.end - std::min( oldSelection.end, textStart );
+	selection.start = oldSelection.start - (std::min)( oldSelection.start, textStart );
+	selection.end   = oldSelection.end - (std::min)( oldSelection.end, textStart );
 
 	SetWindowOrgEx( hdc, oldOrigin.x, oldOrigin.y - yStart, NULL );
 }

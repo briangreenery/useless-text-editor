@@ -4,9 +4,6 @@
 #include "Assert.h"
 #include <algorithm>
 
-#undef min
-#undef max
-
 UniscribeTextRunLoop::UniscribeTextRunLoop( UTF16Ref text, const std::vector<SCRIPT_ITEM>& items, ArrayOf<const TextFontRun> fonts )
 	: m_text( text )
 	, m_position( 0 )
@@ -32,7 +29,7 @@ UniscribeTextRun UniscribeTextRunLoop::NextRun()
 	if ( m_nextTab <= m_position )
 		m_nextTab = std::find( m_text.begin() + m_position, m_text.end(), UTF16::Unit( '\t' ) ) - m_text.begin();
 
-	UniscribeTextRun run( m_item - m_items.begin(), m_position, std::min( itemSize, std::min( fontSize, m_nextTab - m_position ) ), m_font->fontid );
+	UniscribeTextRun run( m_item - m_items.begin(), m_position, (std::min)( itemSize, (std::min)( fontSize, m_nextTab - m_position ) ), m_font->fontid );
 
 	if ( run.textCount == 0 )
 		run.textCount = 1;

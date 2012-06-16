@@ -10,9 +10,6 @@
 #include "Assert.h"
 #include <algorithm>
 
-#undef min
-#undef max
-
 class DebuggableException {};
 class SimpleLayoutFailed : public DebuggableException {};
 
@@ -25,7 +22,7 @@ static size_t LayoutRun( SimpleTextRun run,
 	SIZE size;
 	INT fit;
 
-	int maxWidth = ( forceFit || args.maxWidth == 0 ) ? std::numeric_limits<int>::max() : args.maxWidth;
+	int maxWidth = ( forceFit || args.maxWidth == 0 ) ? (std::numeric_limits<int>::max)() : args.maxWidth;
 
 	if ( run.textCount == 1 && args.text[run.textStart] == '\t' && args.styleRegistry.tabSize > 0 )
 	{
@@ -41,7 +38,7 @@ static size_t LayoutRun( SimpleTextRun run,
 		if ( !GetTextExtentExPoint( args.hdc,
 		                            args.text.begin() + run.textStart,
 		                            textCount,
-		                            maxWidth - std::min( maxWidth, xStart ),
+		                            maxWidth - (std::min)( maxWidth, xStart ),
 		                            &fit,
 		                            &layoutData.xOffsets.front() + run.textStart,
 		                            &size ) )

@@ -3,9 +3,6 @@
 #include "TextViewMetrics.h"
 #include <algorithm>
 
-#undef min
-#undef max
-
 TextViewMetrics::TextViewMetrics()
 	: caretWidth( GetSystemMetrics( SM_CXBORDER ) )
 	, marginWidth( 0 )

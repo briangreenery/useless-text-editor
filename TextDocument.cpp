@@ -5,9 +5,6 @@
 #include "Assert.h"
 #include <Windows.h>
 
-#undef min
-#undef max
-
 TextDocument::TextDocument()
 	: m_charErrorStatus( U_ZERO_ERROR )
 	, m_wordErrorStatus( U_ZERO_ERROR )
@@ -20,9 +17,10 @@ TextDocument::TextDocument()
 
 TextDocument::~TextDocument()
 {
-	// TODO: Figure out why this uses ICU's allocator.
+	// Theses deletes use ICU's allocator.
 	delete m_charIter;
 	delete m_wordIter;
+	delete m_lineIter;
 }
 
 size_t TextDocument::SizeWithCRLF( size_t start, size_t count ) const

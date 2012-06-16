@@ -11,9 +11,6 @@
 #include "Error.h"
 #include <algorithm>
 
-#undef min
-#undef max
-
 namespace W = Windows;
 
 static std::vector<SCRIPT_ITEM> Itemize( UTF16Ref text )
@@ -264,7 +261,7 @@ static size_t WrapLine( UniscribeLayoutData& layoutData,
 		lineEnd = args.doc.PrevCharStop( estimate + 1 );
 
 	if ( lineEnd <= args.textStart + lineStart )
-		lineEnd = std::max( estimate, args.textStart + lineStart + 1 );
+		lineEnd = (std::max)( estimate, args.textStart + lineStart + 1 );
 
 	lineEnd -= args.textStart;
 
