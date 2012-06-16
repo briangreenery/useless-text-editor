@@ -139,7 +139,6 @@
     <ClInclude Include="TextChangeTest.h" />
     <ClInclude Include="TextFontRun.h" />
     <ClInclude Include="TextLayoutArgs.h" />
-    <ClInclude Include="Require.h" />
     <ClInclude Include="SimpleLayout.h" />
     <ClInclude Include="SimpleLayoutData.h" />
     <ClInclude Include="SimpleTextRun.h" />

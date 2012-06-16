@@ -165,9 +165,6 @@
     <ClInclude Include="Integers.h">
       <Filter>Universe</Filter>
     </ClInclude>
-    <ClInclude Include="Require.h">
-      <Filter>Universe</Filter>
-    </ClInclude>
     <ClInclude Include="UString.h">
       <Filter>Universe</Filter>
     </ClInclude>
