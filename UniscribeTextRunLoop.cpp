@@ -1,7 +1,7 @@
 // UniscribeTextRunLoop.cpp
 
 #include "UniscribeTextRunLoop.h"
-#include "Assert.h"
+#include <cassert>
 #include <algorithm>
 
 UniscribeTextRunLoop::UniscribeTextRunLoop( UTF16Ref text, const std::vector<SCRIPT_ITEM>& items, ArrayOf<const TextFontRun> fonts )

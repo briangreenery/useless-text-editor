@@ -4,7 +4,7 @@
 #define TextBuffer_h
 
 #include "UString.h"
-#include "Assert.h"
+#include <cassert>
 #include <algorithm>
 #include <vector>
 
@@ -40,7 +40,7 @@ private:
 
 inline UTF16::Unit TextBuffer::operator[]( size_t pos ) const
 {
-	Assert( pos <= m_size );
+	assert( pos <= m_size );
 
 	if ( pos >= m_gapPos )
 		pos += GapLength();

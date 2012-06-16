@@ -2,7 +2,7 @@
 
 #include "TextDocument.h"
 #include "DocumentCharIter.h"
-#include "Assert.h"
+#include <cassert>
 #include <Windows.h>
 
 TextDocument::TextDocument()

@@ -2,7 +2,7 @@
 
 #include "TextDocumentReader.h"
 #include "TextDocument.h"
-#include "Assert.h"
+#include <cassert>
 
 TextDocumentReader::TextDocumentReader( const TextDocument& doc )
 	: m_doc( doc )
@@ -22,6 +22,6 @@ UTF16Ref TextDocumentReader::WeakRange( size_t textStart, size_t textCount )
 UTF16Ref TextDocumentReader::StrictRange( size_t textStart, size_t textCount )
 {
 	UTF16Ref result = WeakRange( textStart, textCount );
-	Assert( result.size() == textCount );
+	assert( result.size() == textCount );
 	return result;
 }

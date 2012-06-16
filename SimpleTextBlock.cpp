@@ -203,14 +203,14 @@ size_t SimpleTextBlock::LineContaining( size_t pos ) const
 size_t SimpleTextBlock::LineStart( int y ) const
 {
 	int line = y / m_styleRegistry.lineHeight;
-	Assert( line >= 0 && size_t( line ) < m_data->lines.size() );
+	assert( line >= 0 && size_t( line ) < m_data->lines.size() );
 	return TextStart( line );
 }
 
 size_t SimpleTextBlock::LineEnd( int y ) const
 {
 	int line = y / m_styleRegistry.lineHeight;
-	Assert( line >= 0 && size_t( line ) < m_data->lines.size() );
+	assert( line >= 0 && size_t( line ) < m_data->lines.size() );
 	return TextEnd( line );
 }
 
@@ -228,7 +228,7 @@ POINT SimpleTextBlock::PointFromChar( size_t pos, bool advancing ) const
 		--pos;
 
 	size_t line = LineContaining( pos );
-	Assert( line < m_data->lines.size() );
+	assert( line < m_data->lines.size() );
 
 	result.x = CPtoX( line, pos, trailingEdge );
 	result.y = line * m_styleRegistry.lineHeight;
@@ -264,7 +264,7 @@ bool SimpleTextBlock::EndsWithNewline() const
 
 ArrayOf<const SimpleTextRun> SimpleTextBlock::LineRuns( size_t line ) const
 {
-	Assert( line < m_data->lines.size() );
+	assert( line < m_data->lines.size() );
 	const SimpleTextRun* runStart = &m_data->runs[line == 0 ? 0 : m_data->lines[line - 1]];
 	return ArrayOf<const SimpleTextRun>( runStart, &m_data->runs.front() + m_data->lines[line] );
 }
@@ -309,14 +309,14 @@ int SimpleTextBlock::CPtoX( size_t line, size_t cp, bool trailingEdge ) const
 		run++;
 	}
 
-	Assert( run != runs.end() );
+	assert( run != runs.end() );
 	return x + RunCPtoX( *run, cp, trailingEdge );
 }
 
 int SimpleTextBlock::RunCPtoX( const SimpleTextRun& run, size_t cp, bool trailingEdge ) const
 {
-	Assert( cp >= run.textStart );
-	Assert( cp < run.textStart + run.textCount );
+	assert( cp >= run.textStart );
+	assert( cp < run.textStart + run.textCount );
 
 	if ( trailingEdge )
 		return m_data->xOffsets[cp];

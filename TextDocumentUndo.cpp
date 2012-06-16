@@ -2,7 +2,7 @@
 
 #include "TextDocumentUndo.h"
 #include "TextDocument.h"
-#include "Assert.h"
+#include <cassert>
 
 TextUndoAction::TextUndoAction( Type type, size_t pos, size_t length, size_t savedTextPos )
 	: type( type )
@@ -27,7 +27,7 @@ void TextUndoGroup::RecordInsertion( TextDocument&, size_t pos, size_t length, s
 	}
 	else
 	{
-		Assert( m_actions.back().savedTextPos + m_actions.back().length == savedTextPos );
+		assert( m_actions.back().savedTextPos + m_actions.back().length == savedTextPos );
 		m_actions.back().length += length;
 	}
 }

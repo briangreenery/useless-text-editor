@@ -113,7 +113,7 @@ public:
 private:
 	void AddToken( Relevance::LexerToken token, uint32_t pos, uint32_t length )
 	{
-		Assert( pos >= m_lastEnd );
+		assert( pos >= m_lastEnd );
 
 		if ( pos > m_lastEnd )
 			m_runs.push_back( RelevanceTokenRun( Relevance::t_default, m_lastEnd, pos - m_lastEnd ) );
@@ -380,7 +380,7 @@ size_t RelevanceAnnotator::TokenAt( size_t position ) const
 	TextRange textRange( position, 1 );
 	RelevanceTokenRuns::const_iterator it = std::lower_bound( m_tokens.begin(), m_tokens.end(), textRange, TokenRunCompare() );
 
-	Assert( it != m_tokens.end() );
+	assert( it != m_tokens.end() );
 	return it - m_tokens.begin();
 }
 

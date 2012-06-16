@@ -12,7 +12,7 @@ void TextBuffer::MoveGapTo( size_t pos )
 {
 	if ( m_gapPos != pos )
 	{
-		Assert( m_buffer.size() >= pos + GapLength() );
+		assert( m_buffer.size() >= pos + GapLength() );
 
 		if ( pos > m_gapPos )
 		{
@@ -61,14 +61,14 @@ void TextBuffer::insert( size_t pos, const UTF16::Unit* units, size_t count )
 
 void TextBuffer::erase( size_t pos, size_t count )
 {
-	Assert( pos + count <= m_size );
+	assert( pos + count <= m_size );
 	MoveGapTo( pos );
 	m_size -= count;
 }
 
 size_t TextBuffer::count( size_t pos, size_t num, UTF16::Unit unit ) const
 {
-	Assert( pos + num <= m_size );
+	assert( pos + num <= m_size );
 
 	size_t unitCount  = 0;
 	size_t numScanned = 0;

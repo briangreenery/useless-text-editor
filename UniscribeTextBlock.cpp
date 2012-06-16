@@ -3,7 +3,7 @@
 #include "UniscribeTextBlock.h"
 #include "VisualPainter.h"
 #include "TextStyleRegistry.h"
-#include "Assert.h"
+#include <cassert>
 #include "Error.h"
 #include <algorithm>
 
@@ -284,7 +284,7 @@ POINT UniscribeTextBlock::PointFromChar( size_t pos, bool advancing ) const
 		--pos;
 
 	size_t line = LineContaining( pos );
-	Assert( line < m_data->lines.size() );
+	assert( line < m_data->lines.size() );
 
 	result.x = CPtoX( line, pos, trailingEdge );
 	result.y = line * m_styleRegistry.lineHeight;
@@ -306,14 +306,14 @@ size_t UniscribeTextBlock::CharFromPoint( POINT* point ) const
 size_t UniscribeTextBlock::LineStart( int y ) const
 {
 	int line = y / m_styleRegistry.lineHeight;
-	Assert( line >= 0 && size_t( line ) < m_data->lines.size() );
+	assert( line >= 0 && size_t( line ) < m_data->lines.size() );
 	return TextStart( line );
 }
 
 size_t UniscribeTextBlock::LineEnd( int y ) const
 {
 	int line = y / m_styleRegistry.lineHeight;
-	Assert( line >= 0 && size_t( line ) < m_data->lines.size() );
+	assert( line >= 0 && size_t( line ) < m_data->lines.size() );
 	return TextEnd( line );
 }
 
@@ -339,7 +339,7 @@ bool UniscribeTextBlock::EndsWithNewline() const
 
 ArrayOf<const UniscribeTextRun> UniscribeTextBlock::LineRuns( size_t line ) const
 {
-	Assert( line < m_data->lines.size() );
+	assert( line < m_data->lines.size() );
 	const UniscribeTextRun* runStart = &m_data->runs[line == 0 ? 0 : m_data->lines[line - 1]];
 	return ArrayOf<const UniscribeTextRun>( runStart, &m_data->runs.front() + m_data->lines[line] );
 }
@@ -347,14 +347,14 @@ ArrayOf<const UniscribeTextRun> UniscribeTextBlock::LineRuns( size_t line ) cons
 size_t UniscribeTextBlock::TextStart( size_t line ) const
 {
 	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
-	Assert( !runs.empty() );
+	assert( !runs.empty() );
 	return runs[0].textStart;
 }
 
 size_t UniscribeTextBlock::TextEnd( size_t line ) const
 {
 	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
-	Assert( !runs.empty() );
+	assert( !runs.empty() );
 	return runs[runs.size() - 1].textStart + runs[runs.size() - 1].textCount;
 }
 
@@ -406,7 +406,7 @@ int UniscribeTextBlock::CPtoX( size_t line, size_t cp, bool trailingEdge ) const
 
 	int xStart;
 	const UniscribeTextRun* run = RunContaining( runs, cp, &xStart );
-	Assert( run != runs.end() );
+	assert( run != runs.end() );
 
 	return xStart + RunCPtoX( *run, cp - run->textStart, trailingEdge );
 }
@@ -414,7 +414,7 @@ int UniscribeTextBlock::CPtoX( size_t line, size_t cp, bool trailingEdge ) const
 size_t UniscribeTextBlock::XtoCP( size_t line, LONG* x ) const
 {
 	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
-	Assert( !runs.empty() );
+	assert( !runs.empty() );
 
 	int xStart;
 	const UniscribeTextRun* run = RunContaining( runs, *x, &xStart );

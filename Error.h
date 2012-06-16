@@ -3,7 +3,7 @@
 #ifndef Error_h
 #define Error_h
 
-#include "Assert.h"
+#include <cassert>
 
 namespace Windows
 {
@@ -14,7 +14,7 @@ inline void ThrowHRESULT( HRESULT hResult )
 {
 	if ( hResult != S_OK )
 	{
-		Assert( false );
+		assert( false );
 		throw BadHRESULT();
 	}
 }

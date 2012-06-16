@@ -11,7 +11,7 @@
 #include "UniscribeLayout.h"
 #include "SimpleLayout.h"
 #include "EmptyTextBlock.h"
-#include "Assert.h"
+#include <cassert>
 
 VisualDocument::VisualDocument( const TextDocument& doc, TextStyleRegistry& styleRegistry )
 	: m_doc( doc )
@@ -134,7 +134,7 @@ size_t VisualDocument::LineCount() const
 size_t VisualDocument::LineStart( int y ) const
 {
 	BlockContaining_Result block = BlockContaining( y );
-	Assert( block.it != m_blocks.end() );
+	assert( block.it != m_blocks.end() );
 
 	return block.textStart + block->LineStart( y - block.yStart );
 }
@@ -142,7 +142,7 @@ size_t VisualDocument::LineStart( int y ) const
 size_t VisualDocument::LineEnd( int y ) const
 {
 	BlockContaining_Result block = BlockContaining( y );
-	Assert( block.it != m_blocks.end() );
+	assert( block.it != m_blocks.end() );
 
 	return block.textStart + block->LineEnd( y - block.yStart );
 }
@@ -150,7 +150,7 @@ size_t VisualDocument::LineEnd( int y ) const
 POINT VisualDocument::PointFromChar( size_t pos, bool advancing ) const
 {
 	BlockContaining_Result block = BlockContaining( pos );
-	Assert( block.it != m_blocks.end() );
+	assert( block.it != m_blocks.end() );
 
 	POINT result = block->PointFromChar( pos - block.textStart, advancing );
 	result.y += block.yStart;
@@ -166,7 +166,7 @@ size_t VisualDocument::CharFromPoint( POINT* point ) const
 
 	if ( block.it == m_blocks.end() )
 	{
-		Assert( block.it != m_blocks.begin() );
+		assert( block.it != m_blocks.begin() );
 
 		--block.it;
 		block.textStart -= block->Length();

@@ -26,7 +26,7 @@ TextStyleRegistry::TextStyleRegistry()
 	AddFont( L"Courier New" );
 	AddFallbackFonts();
 
-	Assert( nextFont > 1 );
+	assert( nextFont > 1 );
 	SetDefaultFont( 1 );
 }
 

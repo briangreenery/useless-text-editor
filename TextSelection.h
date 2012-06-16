@@ -3,7 +3,7 @@
 #ifndef TextSelection_h
 #define TextSelection_h
 
-#include "Assert.h"
+#include <cassert>
 #include <Windows.h>
 #include <vector>
 #include <algorithm>

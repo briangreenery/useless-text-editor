@@ -196,7 +196,7 @@ void TextView::OnTimer( UINT_PTR id )
 	if ( id != m_mouseSelTimer )
 		return;
 
-	Assert( m_isDoingMouseSel );
+	assert( m_isDoingMouseSel );
 
 	POINT point;
 	GetCursorPos( &point );

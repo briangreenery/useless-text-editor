@@ -7,7 +7,7 @@
 #include "TextLayoutArgs.h"
 #include "TextDocument.h"
 #include "TextStyleRegistry.h"
-#include "Assert.h"
+#include <cassert>
 #include <algorithm>
 
 class DebuggableException {};
@@ -43,7 +43,7 @@ static size_t LayoutRun( SimpleTextRun run,
 		                            &layoutData.xOffsets.front() + run.textStart,
 		                            &size ) )
 		{
-			Assert( false );
+			assert( false );
 			throw SimpleLayoutFailed();
 		}
 	}

@@ -1,7 +1,7 @@
 // TextChange.cpp
 
 #include "TextChange.h"
-#include "Assert.h"
+#include <cassert>
 #include <algorithm>
 
 TextChange::TextChange()

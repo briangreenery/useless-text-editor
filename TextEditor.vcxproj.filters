@@ -156,9 +156,6 @@
     <ClInclude Include="ArrayOf.h">
       <Filter>Universe</Filter>
     </ClInclude>
-    <ClInclude Include="Assert.h">
-      <Filter>Universe</Filter>
-    </ClInclude>
     <ClInclude Include="DebuggableException.h">
       <Filter>Universe</Filter>
     </ClInclude>
