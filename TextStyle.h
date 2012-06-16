@@ -3,18 +3,18 @@
 #ifndef TextStyle_h
 #define TextStyle_h
 
-#include "Integers.h"
+#include <stdint.h>
 #include <Windows.h>
 
 class TextStyle
 {
 public:
 	TextStyle();
-	TextStyle( uint32   fontid,
+	TextStyle( uint32_t   fontid,
 	           COLORREF textColor,
 	           COLORREF bkColor );
 
-	uint32   fontid;
+	uint32_t   fontid;
 	COLORREF textColor;
 	COLORREF bkColor;
 

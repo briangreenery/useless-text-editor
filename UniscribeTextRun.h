@@ -3,13 +3,13 @@
 #ifndef UniscribeTextRun_h
 #define UniscribeTextRun_h
 
-#include "Integers.h"
+#include <stdint.h>
 
 class UniscribeTextRun
 {
 public:
 	UniscribeTextRun() {}
-	UniscribeTextRun( size_t item, size_t textStart, size_t textCount, uint32 fontid );
+	UniscribeTextRun( size_t item, size_t textStart, size_t textCount, uint32_t fontid );
 
 	size_t item;
 
@@ -18,7 +18,7 @@ public:
 
 	size_t textStart;
 	size_t textCount;
-	uint32 fontid;
+	uint32_t fontid;
 
 	int width;
 };

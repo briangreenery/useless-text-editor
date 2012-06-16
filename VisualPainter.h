@@ -6,7 +6,7 @@
 #include "TextSelection.h"
 #include "TextDocumentReader.h"
 #include "TextStyleReader.h"
-#include "Integers.h"
+#include <stdint.h>
 #include <Windows.h>
 #include <usp10.h>
 

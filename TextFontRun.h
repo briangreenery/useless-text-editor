@@ -3,16 +3,16 @@
 #ifndef TextFontRun_h
 #define TextFontRun_h
 
-#include "Integers.h"
+#include <stdint.h>
 #include <vector>
 
 class TextFontRun
 {
 public:
 	TextFontRun() {}
-	TextFontRun( uint32 fontid, size_t count );
+	TextFontRun( uint32_t fontid, size_t count );
 
-	uint32 fontid;
+	uint32_t fontid;
 	size_t count;
 };
 

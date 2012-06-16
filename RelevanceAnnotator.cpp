@@ -16,7 +16,7 @@ RelevanceAnnotator::RelevanceAnnotator( const TextDocument& doc, TextStyleRegist
 	m_string   = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,  128,128 ), TextStyle::useDefault ) );
 }
 
-uint32 RelevanceAnnotator::TokenStyle( size_t token ) const
+uint32_t RelevanceAnnotator::TokenStyle( size_t token ) const
 {
 	switch ( m_tokens[token].token )
 	{
@@ -399,7 +399,7 @@ void RelevanceAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t 
 		size_t overlapStart = (std::max)( start, it->start );
 		size_t overlapEnd   = (std::min)( start + count, it->start + it->count );
 
-		uint32 styleid = TokenStyle( it - m_tokens.begin() );
+		uint32_t styleid = TokenStyle( it - m_tokens.begin() );
 
 		if ( !styles.empty() && styles.back().styleid == styleid )
 			styles.back().count += overlapEnd - overlapStart;

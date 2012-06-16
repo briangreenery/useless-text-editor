@@ -7,7 +7,7 @@
 #include "TextStyleRun.h"
 #include "TextBlock.h"
 #include "ArrayOf.h"
-#include "Integers.h"
+#include <stdint.h>
 #include <vector>
 
 class TextStyleRegistry;

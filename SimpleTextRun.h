@@ -3,7 +3,7 @@
 #ifndef SimpleTextRun_h
 #define SimpleTextRun_h
 
-#include "Integers.h"
+#include <stdint.h>
 
 class SimpleTextRun
 {
@@ -13,7 +13,7 @@ public:
 	
 	size_t textStart;
 	size_t textCount;
-	uint32 fontid;
+	uint32_t fontid;
 };
 
 #endif

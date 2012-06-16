@@ -47,7 +47,7 @@ static std::vector<SCRIPT_ITEM> Itemize( UTF16Ref text )
 	return items;
 }
 
-static bool HasMissingGlyphs( uint32 fontid, const std::vector<WORD>& glyphs, TextStyleRegistry& styleRegistry )
+static bool HasMissingGlyphs( uint32_t fontid, const std::vector<WORD>& glyphs, TextStyleRegistry& styleRegistry )
 {
 	WORD missingGlyph = styleRegistry.Font( fontid ).fontProps.wgDefault;
 	return std::find( glyphs.begin(), glyphs.end(), missingGlyph ) != glyphs.end();

@@ -26,7 +26,7 @@ public:
 
 private:
 	size_t TokenAt( size_t position ) const;
-	uint32 TokenStyle( size_t token ) const;
+	uint32_t TokenStyle( size_t token ) const;
 
 	void MatchOpenParen ( size_t position );
 	void MatchCloseParen( size_t position );
@@ -42,9 +42,9 @@ private:
 	const TextDocument& m_doc;
 	TextStyleRegistry& m_styleRegistry;
 
-	uint32 m_keyword;
-	uint32 m_string;
-	uint32 m_constant;
+	uint32_t m_keyword;
+	uint32_t m_string;
+	uint32_t m_constant;
 
 	std::vector<size_t> m_matchingTokens;
 	RelevanceTokenRuns m_tokens;

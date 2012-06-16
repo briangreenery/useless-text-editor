@@ -14,16 +14,16 @@ class TextStyleRegistry
 public:
 	TextStyleRegistry();
 
-	uint32 AddFont( LPCWSTR name );
-	void RemoveFont( uint32 );
-	void SetDefaultFont( uint32 );
+	uint32_t AddFont( LPCWSTR name );
+	void RemoveFont( uint32_t );
+	void SetDefaultFont( uint32_t );
 
-	uint32 AddStyle( const TextStyle& );
-	void RemoveStyle( uint32 );
-	void SetDefaultStyle( uint32 );
+	uint32_t AddStyle( const TextStyle& );
+	void RemoveStyle( uint32_t );
+	void SetDefaultStyle( uint32_t );
 
-	const TextStyle& Style( uint32 styleid ) const;
-	const TextFont& Font( uint32 fontid ) const;
+	const TextStyle& Style( uint32_t styleid ) const;
+	const TextFont& Font( uint32_t fontid ) const;
 
 	int fontSize;
 	int lineHeight;
@@ -35,11 +35,11 @@ public:
 	COLORREF defaultBkColor;
 	COLORREF defaultTextColor;
 
-	const uint32 defaultFontid;
-	const uint32 defaultStyleid;
+	const uint32_t defaultFontid;
+	const uint32_t defaultStyleid;
 
-	typedef std::map<uint32,TextStyle> StyleMap;
-	typedef std::map<uint32,TextFontPtr> FontMap;
+	typedef std::map<uint32_t,TextStyle> StyleMap;
+	typedef std::map<uint32_t,TextFontPtr> FontMap;
 
 	StyleMap styles;
 	FontMap fonts;
@@ -53,8 +53,8 @@ private:
 	TextFontPtr defaultFont;
 	TextStyle defaultStyle;
 
-	uint32 nextStyle;
-	uint32 nextFont;
+	uint32_t nextStyle;
+	uint32_t nextFont;
 };
 
 #endif
