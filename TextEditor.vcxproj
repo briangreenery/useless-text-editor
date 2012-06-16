@@ -95,7 +95,6 @@
     <ClCompile Include="SimpleTextRun.cpp" />
     <ClCompile Include="SimpleTextRunLoop.cpp" />
     <ClCompile Include="SimpleTextBlock.cpp" />
-    <ClCompile Include="SizedAutoArray.cpp" />
     <ClCompile Include="TextDocumentReader.cpp" />
     <ClCompile Include="TextBuffer.cpp" />
     <ClCompile Include="TextBlock.cpp" />
@@ -147,7 +146,6 @@
     <ClInclude Include="SimpleTextRun.h" />
     <ClInclude Include="SimpleTextRunLoop.h" />
     <ClInclude Include="SimpleTextBlock.h" />
-    <ClInclude Include="SizedAutoArray.h" />
     <ClInclude Include="TextBlock.h" />
     <ClInclude Include="TextFont.h" />
     <ClInclude Include="TextRange.h" />

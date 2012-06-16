@@ -7,6 +7,7 @@
 #include "TextBuffer.h"
 #include "UString.h"
 #include "TextDocumentUndo.h"
+#include "ArrayOf.h"
 #include <unicode/brkiter.h>
 #include <utility>
 #include <vector>

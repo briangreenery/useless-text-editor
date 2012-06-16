@@ -34,11 +34,11 @@ void TextBuffer::MoveGapTo( size_t pos )
 void TextBuffer::GrowByAtLeast( size_t amount )
 {
 	size_t newCapacity = m_buffer.size() + (std::max)( amount, m_buffer.size() );
-	SizedAutoArray<UTF16::Unit> newBuffer = CreateArray<UTF16::Unit>( newCapacity );
+	std::vector<UTF16::Unit> newBuffer( newCapacity );
 
-	copy( newBuffer.begin(), m_size, 0 );
+	copy( &newBuffer.front(), m_size, 0 );
 
-	m_buffer = newBuffer;
+	m_buffer.swap( newBuffer );
 	m_gapPos = m_size;
 }
 
@@ -77,7 +77,7 @@ size_t TextBuffer::count( size_t pos, size_t num, UTF16::Unit unit ) const
 	{
 		size_t numToScan = (std::min)( num, m_gapPos - pos );
 
-		const UTF16::Unit* start = m_buffer.begin() + pos;
+		const UTF16::Unit* start = &m_buffer.front() + pos;
 		unitCount  += std::count( start, start + numToScan, unit );
 		numScanned += numToScan;
 	}
@@ -86,7 +86,7 @@ size_t TextBuffer::count( size_t pos, size_t num, UTF16::Unit unit ) const
 	{
 		size_t numToScan = (std::min)( m_size - m_gapPos, num - numScanned );
 
-		const UTF16::Unit* start = m_buffer.begin() + pos + numScanned + GapLength();
+		const UTF16::Unit* start = &m_buffer.front() + pos + numScanned + GapLength();
 		unitCount += std::count( start, start + numToScan, unit );
 	}
 
@@ -104,7 +104,7 @@ size_t TextBuffer::copy( UTF16::Unit* buffer, size_t num, size_t pos ) const
 	{
 		size_t numToCopy = (std::min)( num, m_gapPos - pos );
 
-		const UTF16::Unit* start = m_buffer.begin() + pos;
+		const UTF16::Unit* start = &m_buffer.front() + pos;
 		std::copy( start, start + numToCopy, buffer );
 		numCopied += numToCopy;
 	}
@@ -113,7 +113,7 @@ size_t TextBuffer::copy( UTF16::Unit* buffer, size_t num, size_t pos ) const
 	{
 		size_t numToCopy = (std::min)( m_size - ( pos + numCopied ), num - numCopied );
 
-		const UTF16::Unit* start = m_buffer.begin() + pos + numCopied + GapLength();
+		const UTF16::Unit* start = &m_buffer.front() + pos + numCopied + GapLength();
 		std::copy( start, start + numToCopy, buffer + numCopied );
 		numCopied += numToCopy;
 	}

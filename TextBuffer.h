@@ -4,9 +4,9 @@
 #define TextBuffer_h
 
 #include "UString.h"
-#include "SizedAutoArray.h"
 #include "Assert.h"
 #include <algorithm>
+#include <vector>
 
 class TextBuffer
 {
@@ -35,7 +35,7 @@ private:
 
 	size_t m_size;
 	size_t m_gapPos;
-	SizedAutoArray<UTF16::Unit> m_buffer;
+	std::vector<UTF16::Unit> m_buffer;
 };
 
 inline UTF16::Unit TextBuffer::operator[]( size_t pos ) const
