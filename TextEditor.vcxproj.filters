@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Universe">
-      <UniqueIdentifier>{0d0accc7-2dc3-4276-9a70-40d856baa633}</UniqueIdentifier>
-    </Filter>
     <Filter Include="TextView">
       <UniqueIdentifier>{e0c88b8e-b27a-4ca0-b69c-c0a8f57e5d53}</UniqueIdentifier>
     </Filter>
@@ -31,10 +28,13 @@
     <Filter Include="Relevance\Lexer">
       <UniqueIdentifier>{506c0249-6adf-41f7-b4a2-3296cb608810}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{0d0accc7-2dc3-4276-9a70-40d856baa633}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ArrayOf.cpp">
-      <Filter>Universe</Filter>
+      <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="TextSelection.cpp">
       <Filter>TextView</Filter>
@@ -154,16 +154,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayOf.h">
-      <Filter>Universe</Filter>
+      <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="DebuggableException.h">
-      <Filter>Universe</Filter>
+      <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="Error.h">
-      <Filter>Universe</Filter>
+      <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="UString.h">
-      <Filter>Universe</Filter>
+      <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="TextSelection.h">
       <Filter>TextView</Filter>

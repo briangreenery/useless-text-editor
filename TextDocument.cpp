@@ -8,6 +8,7 @@
 TextDocument::TextDocument()
 	: m_charErrorStatus( U_ZERO_ERROR )
 	, m_wordErrorStatus( U_ZERO_ERROR )
+	, m_lineErrorStatus( U_ZERO_ERROR )
 	, m_charIter( icu::BreakIterator::createCharacterInstance( icu::Locale::getUS(), m_charErrorStatus ) )
 	, m_wordIter( icu::BreakIterator::createWordInstance     ( icu::Locale::getUS(), m_wordErrorStatus ) )
 	, m_lineIter( icu::BreakIterator::createLineInstance( icu::Locale::getDefault(), m_lineErrorStatus ) )
@@ -156,6 +157,8 @@ void TextDocument::ResetIterators() const
 	if ( m_needIterReset )
 	{
 		m_needIterReset = false;
+
+		// adoptText takes ownership of the character iterator
 		m_charIter->adoptText( new DocumentCharIter( *this ) );
 		m_wordIter->adoptText( new DocumentCharIter( *this ) );
 		m_lineIter->adoptText( new DocumentCharIter( *this ) );
