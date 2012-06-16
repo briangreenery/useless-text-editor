@@ -128,6 +128,11 @@ private:
 	RelevanceTokenRuns& m_runs;
 };
 
+static inline bool IsAscii( wchar_t c )
+{
+	return 0 < c && c < 128;
+}
+
 void RelevanceAnnotator::TextChanged( TextChange change )
 {
 	m_tokens.clear();
@@ -144,7 +149,7 @@ void RelevanceAnnotator::TextChanged( TextChange change )
 		UTF16Ref text = reader.WeakRange( start, 512 );
 
 		for ( size_t i = 0; i < text.size(); ++i )
-			buffer[i] = text[i] < 128 ? text[i] : -1;
+			buffer[i] = IsAscii( text[i] ) ? text[i] : -1;
 
 		lexer.Receive( buffer, text.size() );
 	}
