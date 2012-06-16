@@ -4,9 +4,9 @@
 #include "Assert.h"
 #include <numeric>
 
-SimpleLayoutData::SimpleLayoutData( UTF16Ref text, bool _endsWithNewline )
+SimpleLayoutData::SimpleLayoutData( UTF16Ref text, bool endsWithNewline )
 	: length( text.size() )
-	, endsWithNewline( _endsWithNewline )
+	, endsWithNewline( endsWithNewline )
 {
 	if ( endsWithNewline )
 		length++;

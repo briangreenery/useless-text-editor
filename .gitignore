@@ -5,3 +5,5 @@ TextEditor.sdf
 TextEditor.opensdf
 TextEditor.idc
 ipch/*
+*.cl.cfg
+*.cl.cmd

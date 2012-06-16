@@ -3,9 +3,9 @@
 #include "UniscribeLayoutData.h"
 #include "Assert.h"
 
-UniscribeLayoutData::UniscribeLayoutData( UTF16Ref text, bool _endsWithNewline )
+UniscribeLayoutData::UniscribeLayoutData( UTF16Ref text, bool endsWithNewline )
 	: length( text.size() )
-	, endsWithNewline( _endsWithNewline )
+	, endsWithNewline( endsWithNewline )
 {
 	if ( endsWithNewline )
 		length++;

@@ -2,9 +2,9 @@
 
 #include "TextFont.h"
 
-TextFont::TextFont( LPCWSTR _name, HFONT _hfont, HDC hdc )
-	: name( _name )
-	, hfont( _hfont )
+TextFont::TextFont( LPCWSTR name, HFONT hfont, HDC hdc )
+	: name( name )
+	, hfont( hfont )
 	, fontCache( 0 )
 {
 	ZeroMemory( &fontProps, sizeof( fontProps ) );

@@ -9,9 +9,9 @@ TextStyle::TextStyle()
 {
 }
 
-TextStyle::TextStyle( uint32 _fontid, COLORREF _textColor, COLORREF _bkColor )
-	: fontid( _fontid )
-	, textColor( _textColor )
-	, bkColor( _bkColor )
+TextStyle::TextStyle( uint32 fontid, COLORREF textColor, COLORREF bkColor )
+	: fontid( fontid )
+	, textColor( textColor )
+	, bkColor( bkColor )
 {
 }

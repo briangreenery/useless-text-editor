@@ -8,8 +8,8 @@ TextRange::TextRange()
 {
 }
 
-TextRange::TextRange( size_t _start, size_t _count )
-	: start( _start )
-	, count( _count )
+TextRange::TextRange( size_t start, size_t count )
+	: start( start )
+	, count( count )
 {
 }

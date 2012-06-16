@@ -2,9 +2,9 @@
 
 #include "SimpleTextRun.h"
 
-SimpleTextRun::SimpleTextRun( size_t _textStart, size_t _textCount, uint32 _fontid )
-	: textStart( _textStart )
-	, textCount( _textCount )
-	, fontid( _fontid )
+SimpleTextRun::SimpleTextRun( size_t textStart, size_t textCount, uint32 fontid )
+	: textStart( textStart )
+	, textCount( textCount )
+	, fontid( fontid )
 {
 }
