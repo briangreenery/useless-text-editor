@@ -12,6 +12,7 @@
 #include "SimpleLayout.h"
 #include "EmptyTextBlock.h"
 #include <cassert>
+#include <stdio.h>
 
 VisualDocument::VisualDocument( const TextDocument& doc, TextStyleRegistry& styleRegistry )
 	: m_doc( doc )
@@ -21,7 +22,7 @@ VisualDocument::VisualDocument( const TextDocument& doc, TextStyleRegistry& styl
 	m_blocks.push_back( TextBlockPtr( new EmptyTextBlock( false, m_styleRegistry ) ) );
 }
 
-void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection ) const
+void VisualDocument::DrawText( HDC hdc, RECT rect, TextSelection selection ) const
 {
 	VisualPainter painter( hdc, m_doc, m_styleRegistry, m_squiggle, selection );
 
@@ -30,6 +31,37 @@ void VisualDocument::Draw( HDC hdc, RECT rect, TextSelection selection ) const
 
 	Draw( block, painter, rect, &TextBlock::DrawBackground );
 	Draw( block, painter, rect, &TextBlock::DrawText );
+}
+
+void VisualDocument::DrawLineNumbers( HDC hdc, RECT rect ) const
+{
+	VisualPainter painter( hdc, m_doc, m_styleRegistry, m_squiggle, TextSelection() );
+
+	BlockContaining_Result block = BlockContaining( rect.top );
+	//OffsetRect( &rect, 0, -block.yStart );
+
+	UINT oldAlign = SetTextAlign( hdc, TA_RIGHT );
+
+	while ( block.it != m_blocks.end() && !IsRectEmpty( &rect ) )
+	{
+		painter.SetOrigin( block.textStart, block.yStart );
+
+		wchar_t buffer[20];
+		int length = swprintf_s( buffer, L"%d", block.logicalLine );
+
+		if ( length > 0 )
+			ExtTextOutW( painter.hdc, rect.right - m_styleRegistry.avgCharWidth / 2, 0, ETO_CLIPPED, &rect, buffer, length, NULL );
+
+		rect.bottom -= block->Height() - rect.top;
+		rect.top = 0;
+
+		block.yStart += block->Height();
+		block.textStart += block->Length();
+		block.logicalLine++;
+		++block.it;
+	}
+
+	SetTextAlign( hdc, oldAlign );
 }
 
 void VisualDocument::Draw( BlockContaining_Result block, VisualPainter& painter, RECT rect, DrawFunction drawFunction ) const
@@ -189,8 +221,9 @@ VisualDocument::BlockContaining_Result VisualDocument::BlockContaining( size_t p
 {
 	BlockContaining_Result result;
 
-	result.textStart = 0;
-	result.yStart    = 0;
+	result.textStart   = 0;
+	result.yStart      = 0;
+	result.logicalLine = 1;
 
 	for ( result.it = m_blocks.begin(); result.it != m_blocks.end(); ++result.it )
 	{
@@ -199,6 +232,7 @@ VisualDocument::BlockContaining_Result VisualDocument::BlockContaining( size_t p
 
 		result.textStart += result->Length();
 		result.yStart    += result->Height();
+		result.logicalLine++;
 	}
 
 	--result.it;
@@ -212,8 +246,9 @@ VisualDocument::BlockContaining_Result VisualDocument::BlockContaining( int y ) 
 {
 	BlockContaining_Result result;
 
-	result.textStart = 0;
-	result.yStart    = 0;
+	result.textStart   = 0;
+	result.yStart      = 0;
+	result.logicalLine = 1;
 
 	for ( result.it = m_blocks.begin(); result.it != m_blocks.end(); ++result.it )
 	{
@@ -222,6 +257,7 @@ VisualDocument::BlockContaining_Result VisualDocument::BlockContaining( int y ) 
 
 		result.textStart += result->Length();
 		result.yStart    += result->Height();
+		result.logicalLine++;
 	}
 
 	return result;

@@ -19,7 +19,8 @@ class VisualDocument
 public:
 	VisualDocument( const TextDocument&, TextStyleRegistry& );
 
-	void Draw( HDC hdc, RECT rect, TextSelection ) const;
+	void DrawText( HDC hdc, RECT rect, TextSelection ) const;
+	void DrawLineNumbers( HDC hdc, RECT rect ) const;
 
 	size_t LineCount() const;
 	size_t LineStart( int y ) const;
@@ -39,6 +40,7 @@ private:
 	struct BlockContaining_Result
 	{
 		size_t textStart;
+		size_t logicalLine;
 		int yStart;
 		TextBlockList::const_iterator it;
 

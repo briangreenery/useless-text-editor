@@ -92,7 +92,7 @@ RECT TextViewMetrics::ClientToGutter( RECT rect ) const
 
 POINT TextViewMetrics::ClientToGutter( POINT pt ) const
 {
-	pt.y += -yOffset;
+	pt.y += yOffset;
 	return pt;
 }
 

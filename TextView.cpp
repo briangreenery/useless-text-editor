@@ -20,8 +20,8 @@ TextView::TextView( HWND hwnd )
 	, m_lastUndoTick( 0 )
 	, m_lastEditOperation( lastWasNothing )
 {
-	m_metrics.gutterWidth = 25;
-	m_metrics.marginWidth = 5;
+	m_metrics.gutterWidth = m_styleRegistry.avgCharWidth * 4;
+	m_metrics.marginWidth = m_styleRegistry.avgCharWidth;
 
 	m_styleRegistry.annotator = new RelevanceAnnotator( m_doc, m_styleRegistry );
 }
@@ -57,15 +57,16 @@ void TextView::OnPaint()
 	HPAINTBUFFER hpb = BeginBufferedPaint( ps.hdc, &ps.rcPaint, BPBF_COMPATIBLEBITMAP, NULL, &hdc );
 
 	PaintGutter( hdc, ps.rcPaint );
+	m_blocks.DrawLineNumbers( hdc, m_metrics.ClientToGutter( m_metrics.IntersectWithGutter( ps.rcPaint, m_hwnd ) ) );
 
 	RECT fillRect = m_metrics.IntersectWithTextOrMargin( ps.rcPaint, m_hwnd );
 	SetBkColor( hdc, m_styleRegistry.defaultBkColor );
 	ExtTextOut( hdc, 0, 0, ETO_OPAQUE, &fillRect, L"", 0, NULL );
 
 	POINT oldOrigin;
-	m_blocks.Draw( m_metrics.ClientToText( hdc, &oldOrigin ),
-	               m_metrics.ClientToText( m_metrics.IntersectWithText( ps.rcPaint, m_hwnd ) ),
-	               m_selection );
+	m_blocks.DrawText( m_metrics.ClientToText( hdc, &oldOrigin ),
+	                   m_metrics.ClientToText( m_metrics.IntersectWithText( ps.rcPaint, m_hwnd ) ),
+	                   m_selection );
 
 	SetWindowOrgEx( hdc, oldOrigin.x, oldOrigin.y, NULL );
 
@@ -76,8 +77,14 @@ void TextView::OnPaint()
 void TextView::PaintGutter( HDC hdc, RECT rect )
 {
 	RECT gutterRect = m_metrics.IntersectWithGutter( rect, m_hwnd );
+
 	COLORREF oldBkColor = SetBkColor( hdc, m_styleRegistry.gutterColor );
 	ExtTextOut( hdc, 0, 0, ETO_OPAQUE|ETO_CLIPPED, &gutterRect, L"", 0, NULL );
+
+	gutterRect.left = gutterRect.right - 1;
+	SetBkColor( hdc, m_styleRegistry.gutterLineColor );
+	ExtTextOut( hdc, 0, 0, ETO_OPAQUE|ETO_CLIPPED, &gutterRect, L"", 0, NULL );
+
 	SetBkColor( hdc, oldBkColor );
 }
 

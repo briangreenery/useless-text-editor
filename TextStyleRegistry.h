@@ -31,6 +31,7 @@ public:
 	int tabSize;
 
 	COLORREF gutterColor;
+	COLORREF gutterLineColor;
 	COLORREF selectionColor;
 	COLORREF defaultBkColor;
 	COLORREF defaultTextColor;
