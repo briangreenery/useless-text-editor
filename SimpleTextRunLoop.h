@@ -5,7 +5,7 @@
 
 #include "SimpleTextRun.h"
 #include "TextFontRun.h"
-#include "UString.h"
+#include "UTF16Ref.h"
 #include "ArrayRef.h"
 #include <vector>
 

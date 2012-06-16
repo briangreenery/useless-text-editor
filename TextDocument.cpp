@@ -29,17 +29,17 @@ size_t TextDocument::SizeWithCRLF( size_t start, size_t count ) const
 	return count + m_buffer.count( start, count, 0x0A );
 }
 
-void TextDocument::ReadWithCRLF( size_t start, size_t count, ArrayRef<UTF16::Unit> out ) const
+void TextDocument::ReadWithCRLF( size_t start, size_t count, ArrayRef<wchar_t> out ) const
 {
 	size_t numCopied = m_buffer.copy( out.begin(), count, start );
 
-	UTF16::Unit* read  = out.begin() + numCopied - 1;
-	UTF16::Unit* write = out.end() - 1;
-	UTF16::Unit* rend  = out.begin() - 1;
+	wchar_t* read  = out.begin() + numCopied - 1;
+	wchar_t* write = out.end() - 1;
+	wchar_t* rend  = out.begin() - 1;
 
 	for ( ; rend != read && read != write; --read )
 	{
-		UTF16::Unit unit = *read;
+		wchar_t unit = *read;
 
 		*write-- = unit;
 
@@ -48,7 +48,7 @@ void TextDocument::ReadWithCRLF( size_t start, size_t count, ArrayRef<UTF16::Uni
 	}
 }
 
-static const UTF16::Unit* NextLineBreak( const UTF16::Unit* it, const UTF16::Unit* end )
+static const wchar_t* NextLineBreak( const wchar_t* it, const wchar_t* end )
 {
 	for ( ; it != end; ++it )
 		if ( *it == 0x0A || *it == 0x0D )
@@ -57,7 +57,7 @@ static const UTF16::Unit* NextLineBreak( const UTF16::Unit* it, const UTF16::Uni
 	return end;
 }
 
-static const UTF16::Unit* SkipLineBreak( const UTF16::Unit* lineBreak, const UTF16::Unit* end )
+static const wchar_t* SkipLineBreak( const wchar_t* lineBreak, const wchar_t* end )
 {
 	if ( lineBreak == end )
 		return end;
@@ -84,9 +84,9 @@ TextChange TextDocument::Insert( size_t pos, UTF16Ref text )
 
 	size_t count = 0;
 
-	for ( const UTF16::Unit* it = text.begin(); it != text.end(); )
+	for ( const wchar_t* it = text.begin(); it != text.end(); )
 	{
-		const UTF16::Unit* lineBreak = NextLineBreak( it, text.end() );
+		const wchar_t* lineBreak = NextLineBreak( it, text.end() );
 
 		if ( lineBreak != it )
 		{
@@ -179,7 +179,7 @@ size_t TextDocument::PrevBreak( icu::BreakIterator* iter, size_t pos ) const
 	return ( result == icu::BreakIterator::DONE ) ? pos : result;
 }
 
-static bool IsWhitespace( UTF16::Unit unit )
+static bool IsWhitespace( wchar_t unit )
 {
 	return unit == ' ' || unit == '\t' || unit == '\n' || unit == '\r';
 }

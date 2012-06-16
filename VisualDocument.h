@@ -5,7 +5,7 @@
 
 #include "TextBlock.h"
 #include "TextChange.h"
-#include "UString.h"
+#include "UTF16Ref.h"
 #include "TextSquiggle.h"
 #include <Windows.h>
 #include <list>

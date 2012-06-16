@@ -27,7 +27,7 @@ UniscribeTextRun UniscribeTextRunLoop::NextRun()
 	size_t fontSize = m_font->count - ( m_position - m_fontStart );
 
 	if ( m_nextTab <= m_position )
-		m_nextTab = std::find( m_text.begin() + m_position, m_text.end(), UTF16::Unit( '\t' ) ) - m_text.begin();
+		m_nextTab = std::find( m_text.begin() + m_position, m_text.end(), wchar_t( '\t' ) ) - m_text.begin();
 
 	UniscribeTextRun run( m_item - m_items.begin(), m_position, (std::min)( itemSize, (std::min)( fontSize, m_nextTab - m_position ) ), m_font->fontid );
 

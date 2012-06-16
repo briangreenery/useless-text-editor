@@ -90,7 +90,7 @@ void TextView::OnChar( UINT keyCode, UINT repCnt, UINT flags )
 
 	while ( repCnt-- > 0 )
 	{
-		UTF16::Unit unit = ( keyCode == VK_RETURN ) ? 0x0A : keyCode;
+		wchar_t unit = ( keyCode == VK_RETURN ) ? 0x0A : keyCode;
 		Insert( UTF16Ref( &unit, 1 ) );
 	}
 }
@@ -488,16 +488,16 @@ void TextView::Copy()
 	EmptyClipboard();
 
 	size_t sizeWithCRLF = m_doc.SizeWithCRLF( m_selection.Min(), m_selection.Size() );
-	HGLOBAL hGlobal = GlobalAlloc( GMEM_MOVEABLE, ( sizeWithCRLF + 1 ) * sizeof( UTF16::Unit ) );
+	HGLOBAL hGlobal = GlobalAlloc( GMEM_MOVEABLE, ( sizeWithCRLF + 1 ) * sizeof( wchar_t ) );
 
 	if ( hGlobal != 0 )
 	{
-		UTF16::Unit* dest = static_cast<UTF16::Unit*>( GlobalLock( hGlobal ) );
+		wchar_t* dest = static_cast<wchar_t*>( GlobalLock( hGlobal ) );
 
 		if ( dest != 0 )
 		{
-			m_doc.ReadWithCRLF( m_selection.Min(), m_selection.Size(), ArrayRef<UTF16::Unit>( dest, dest + sizeWithCRLF ) );
-			dest[sizeWithCRLF] = UTF16::Unit( 0 );
+			m_doc.ReadWithCRLF( m_selection.Min(), m_selection.Size(), ArrayRef<wchar_t>( dest, dest + sizeWithCRLF ) );
+			dest[sizeWithCRLF] = wchar_t( 0 );
 
 			GlobalUnlock( hGlobal );
 
@@ -523,7 +523,7 @@ void TextView::Paste()
 
 	if ( hClipboardData != 0 )
 	{
-		UTF16::Unit* clipboardString = static_cast<UTF16::Unit*>( GlobalLock( hClipboardData ) );
+		wchar_t* clipboardString = static_cast<wchar_t*>( GlobalLock( hClipboardData ) );
 
 		if ( clipboardString != 0 )
 			Insert( UTF16Ref( clipboardString, wcslen( clipboardString ) ) );

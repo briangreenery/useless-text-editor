@@ -71,7 +71,7 @@ void VisualDocument::Update( HDC hdc, int maxWidth, TextChange change )
 
 bool VisualDocument::IsSimpleText( UTF16Ref text ) const
 {
-	for ( const UTF16::Unit* it = text.begin(); it != text.end(); ++it )
+	for ( const wchar_t* it = text.begin(); it != text.end(); ++it )
 		if ( *it >= 128 )
 			return ScriptIsComplex( text.begin(), text.size(), SIC_COMPLEX ) != S_OK;
 
@@ -93,7 +93,7 @@ void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start,
 		size_t lineEnd;
 
 		for ( lineEnd = start; lineEnd < end; ++lineEnd )
-			if ( m_doc[lineEnd] == UTF16::Unit( 0x0A ) )
+			if ( m_doc[lineEnd] == wchar_t( 0x0A ) )
 				break;
 
 		if ( lineEnd == start )

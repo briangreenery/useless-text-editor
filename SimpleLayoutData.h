@@ -4,7 +4,7 @@
 #define SimpleLayoutData_h
 
 #include "SimpleTextRun.h"
-#include "UString.h"
+#include "UTF16Ref.h"
 #include <Windows.h>
 #include <vector>
 #include <memory>

@@ -3,7 +3,7 @@
 #ifndef TextLayoutArgs_h
 #define TextLayoutArgs_h
 
-#include "UString.h"
+#include "UTF16Ref.h"
 #include "ArrayRef.h"
 #include <Windows.h>
 

@@ -14,7 +14,7 @@ UTF16Ref TextDocumentReader::WeakRange( size_t textStart, size_t textCount )
 	m_text.resize( textCount + 1 );
 
 	size_t unitsRead = m_doc.Read( textStart, textCount, &m_text.front() );
-	m_text[unitsRead] = UTF16::Unit( 0 );
+	m_text[unitsRead] = wchar_t( 0 );
 
 	return UTF16Ref( &m_text.front(), &m_text.front() + unitsRead );
 }

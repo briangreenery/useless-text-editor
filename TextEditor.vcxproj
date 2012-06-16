@@ -152,7 +152,7 @@
     <ClInclude Include="TextDocumentUndo.h" />
     <ClInclude Include="VisualPainter.h" />
     <ClInclude Include="TextStyle.h" />
-    <ClInclude Include="UString.h" />
+    <ClInclude Include="UTF16Ref.h" />
     <ClInclude Include="TextDocumentReader.h" />
     <ClInclude Include="TextBuffer.h" />
     <ClInclude Include="UniscribeTextBlock.h" />

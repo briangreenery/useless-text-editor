@@ -3,7 +3,7 @@
 #ifndef TextDocumentUndo_h
 #define TextDocumentUndo_h
 
-#include "UString.h"
+#include "UTF16Ref.h"
 #include "TextChange.h"
 #include "TextSelection.h"
 #include <vector>
@@ -67,7 +67,7 @@ private:
 	size_t m_index;
 	std::vector<TextUndoGroup> m_groups;
 
-	std::vector<UTF16::Unit> m_savedText;
+	std::vector<wchar_t> m_savedText;
 };
 
 #endif

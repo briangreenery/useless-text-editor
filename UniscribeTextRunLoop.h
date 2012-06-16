@@ -5,7 +5,7 @@
 
 #include "UniscribeLayoutData.h"
 #include "ArrayRef.h"
-#include "UString.h"
+#include "UTF16Ref.h"
 #include "TextFontRun.h"
 #include <windows.h>
 #include <usp10.h>

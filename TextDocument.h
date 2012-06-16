@@ -5,7 +5,7 @@
 
 #include "TextChange.h"
 #include "TextBuffer.h"
-#include "UString.h"
+#include "UTF16Ref.h"
 #include "TextDocumentUndo.h"
 #include "ArrayRef.h"
 #include <unicode/brkiter.h>
@@ -21,8 +21,8 @@ public:
 	size_t Length() const;
 	bool Empty() const;
 
-	UTF16::Unit operator[]( size_t pos ) const;
-	size_t Read( size_t start, size_t count, UTF16::Unit* dest ) const;
+	wchar_t operator[]( size_t pos ) const;
+	size_t Read( size_t start, size_t count, wchar_t* dest ) const;
 
 	TextChange Insert( size_t pos, UTF16Ref );
 	TextChange Delete( size_t pos, size_t count );
@@ -42,7 +42,7 @@ public:
 	std::pair<size_t, size_t> WordAt( size_t pos ) const;
 
 	size_t SizeWithCRLF( size_t start, size_t count ) const;
-	void ReadWithCRLF( size_t start, size_t count, ArrayRef<UTF16::Unit> out ) const;
+	void ReadWithCRLF( size_t start, size_t count, ArrayRef<wchar_t> out ) const;
 
 	std::pair<TextChange,TextSelection> Undo();
 	TextChange                          Redo();
@@ -80,12 +80,12 @@ inline bool TextDocument::Empty() const
 	return m_buffer.empty();
 }
 
-inline UTF16::Unit TextDocument::operator[]( size_t pos ) const
+inline wchar_t TextDocument::operator[]( size_t pos ) const
 {
 	return m_buffer[pos];
 }
 
-inline size_t TextDocument::Read( size_t start, size_t count, UTF16::Unit* dest ) const
+inline size_t TextDocument::Read( size_t start, size_t count, wchar_t* dest ) const
 {
 	return m_buffer.copy( dest, count, start );
 }

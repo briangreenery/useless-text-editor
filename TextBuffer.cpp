@@ -34,7 +34,7 @@ void TextBuffer::MoveGapTo( size_t pos )
 void TextBuffer::GrowByAtLeast( size_t amount )
 {
 	size_t newCapacity = m_buffer.size() + (std::max)( amount, m_buffer.size() );
-	std::vector<UTF16::Unit> newBuffer( newCapacity );
+	std::vector<wchar_t> newBuffer( newCapacity );
 
 	copy( &newBuffer.front(), m_size, 0 );
 
@@ -42,12 +42,12 @@ void TextBuffer::GrowByAtLeast( size_t amount )
 	m_gapPos = m_size;
 }
 
-void TextBuffer::insert( size_t pos, UTF16::Unit unit )
+void TextBuffer::insert( size_t pos, wchar_t unit )
 {
 	insert( pos, &unit, 1 );
 }
 
-void TextBuffer::insert( size_t pos, const UTF16::Unit* units, size_t count )
+void TextBuffer::insert( size_t pos, const wchar_t* units, size_t count )
 {
 	if ( GapLength() < count )
 		GrowByAtLeast( count - GapLength() );
@@ -66,7 +66,7 @@ void TextBuffer::erase( size_t pos, size_t count )
 	m_size -= count;
 }
 
-size_t TextBuffer::count( size_t pos, size_t num, UTF16::Unit unit ) const
+size_t TextBuffer::count( size_t pos, size_t num, wchar_t unit ) const
 {
 	assert( pos + num <= m_size );
 
@@ -77,7 +77,7 @@ size_t TextBuffer::count( size_t pos, size_t num, UTF16::Unit unit ) const
 	{
 		size_t numToScan = (std::min)( num, m_gapPos - pos );
 
-		const UTF16::Unit* start = &m_buffer.front() + pos;
+		const wchar_t* start = &m_buffer.front() + pos;
 		unitCount  += std::count( start, start + numToScan, unit );
 		numScanned += numToScan;
 	}
@@ -86,14 +86,14 @@ size_t TextBuffer::count( size_t pos, size_t num, UTF16::Unit unit ) const
 	{
 		size_t numToScan = (std::min)( m_size - m_gapPos, num - numScanned );
 
-		const UTF16::Unit* start = &m_buffer.front() + pos + numScanned + GapLength();
+		const wchar_t* start = &m_buffer.front() + pos + numScanned + GapLength();
 		unitCount += std::count( start, start + numToScan, unit );
 	}
 
 	return unitCount;
 }
 
-size_t TextBuffer::copy( UTF16::Unit* buffer, size_t num, size_t pos ) const
+size_t TextBuffer::copy( wchar_t* buffer, size_t num, size_t pos ) const
 {
 	if ( pos >= m_size )
 		return 0;
@@ -104,7 +104,7 @@ size_t TextBuffer::copy( UTF16::Unit* buffer, size_t num, size_t pos ) const
 	{
 		size_t numToCopy = (std::min)( num, m_gapPos - pos );
 
-		const UTF16::Unit* start = &m_buffer.front() + pos;
+		const wchar_t* start = &m_buffer.front() + pos;
 		std::copy( start, start + numToCopy, buffer );
 		numCopied += numToCopy;
 	}
@@ -113,7 +113,7 @@ size_t TextBuffer::copy( UTF16::Unit* buffer, size_t num, size_t pos ) const
 	{
 		size_t numToCopy = (std::min)( m_size - ( pos + numCopied ), num - numCopied );
 
-		const UTF16::Unit* start = &m_buffer.front() + pos + numCopied + GapLength();
+		const wchar_t* start = &m_buffer.front() + pos + numCopied + GapLength();
 		std::copy( start, start + numToCopy, buffer + numCopied );
 		numCopied += numToCopy;
 	}

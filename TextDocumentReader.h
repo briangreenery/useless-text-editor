@@ -3,7 +3,7 @@
 #ifndef TextDocumentReader_h
 #define TextDocumentReader_h
 
-#include "UString.h"
+#include "UTF16Ref.h"
 #include <vector>
 
 class TextDocument;
@@ -19,7 +19,7 @@ public:
 
 private:
 	const TextDocument& m_doc;
-	std::vector<UTF16::Unit> m_text;
+	std::vector<wchar_t> m_text;
 };
 
 #endif

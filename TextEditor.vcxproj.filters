@@ -156,9 +156,6 @@
     <ClInclude Include="Error.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="UString.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
     <ClInclude Include="TextSelection.h">
       <Filter>TextView</Filter>
     </ClInclude>
@@ -286,6 +283,9 @@
       <Filter>TextView</Filter>
     </ClInclude>
     <ClInclude Include="ArrayRef.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="UTF16Ref.h">
       <Filter>Utility</Filter>
     </ClInclude>
   </ItemGroup>

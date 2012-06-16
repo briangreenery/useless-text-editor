@@ -23,7 +23,7 @@ SimpleTextRun SimpleTextRunLoop::NextRun()
 	size_t fontRunSize = m_font->count - ( m_position - m_fontStart );
 
 	if ( m_nextTab <= m_position )
-		m_nextTab = std::find( m_text.begin() + m_position, m_text.end(), UTF16::Unit( '\t' ) ) - m_text.begin();
+		m_nextTab = std::find( m_text.begin() + m_position, m_text.end(), wchar_t( '\t' ) ) - m_text.begin();
 
 	SimpleTextRun run( m_position, std::min( fontRunSize, m_nextTab - m_position ), m_font->fontid );
 

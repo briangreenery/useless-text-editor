@@ -4,7 +4,7 @@
 #define UniscribeLayoutData_h
 
 #include "UniscribeTextRun.h"
-#include "UString.h"
+#include "UTF16Ref.h"
 #include <memory>
 #include <vector>
 #include <windows.h>

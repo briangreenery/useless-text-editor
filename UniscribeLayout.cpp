@@ -7,7 +7,7 @@
 #include "TextLayoutArgs.h"
 #include "TextDocument.h"
 #include "TextStyleRegistry.h"
-#include "UString.h"
+#include "UTF16Ref.h"
 #include "Error.h"
 #include <algorithm>
 
