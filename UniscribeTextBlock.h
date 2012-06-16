@@ -39,11 +39,11 @@ public:
 	virtual bool EndsWithNewline() const;
 
 private:
-	void DrawLineBackground( size_t line, VisualPainter&, RECT ) const;
-	void DrawLineSelection ( size_t line, VisualPainter&, RECT ) const;
-	void DrawLineSquiggles ( size_t line, VisualPainter&, RECT ) const;
-	void DrawLineHighlights( size_t line, VisualPainter&, RECT ) const;
-	void DrawLineText      ( size_t line, VisualPainter&, RECT ) const;
+	void DrawLineBackground( size_t line, const std::vector<int>&, VisualPainter&, RECT ) const;
+	void DrawLineSelection ( size_t line, const std::vector<int>&, VisualPainter&, RECT ) const;
+	void DrawLineSquiggles ( size_t line, const std::vector<int>&, VisualPainter&, RECT ) const;
+	void DrawLineHighlights( size_t line, const std::vector<int>&, VisualPainter&, RECT ) const;
+	void DrawLineText      ( size_t line, const std::vector<int>&, VisualPainter&, RECT ) const;
 
 	void DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, COLORREF color ) const;
 

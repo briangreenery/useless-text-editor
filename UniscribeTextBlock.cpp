@@ -22,10 +22,12 @@ void UniscribeTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) con
 
 	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &rect ); ++line )
 	{
-		DrawLineBackground( line, painter, rect );
-		DrawLineSelection ( line, painter, rect );
-		DrawLineSquiggles ( line, painter, rect );
-		DrawLineHighlights( line, painter, rect );
+		std::vector<int> visualToLogical = VisualToLogicalMapping( LineRuns( line ) );
+
+		DrawLineBackground( line, visualToLogical, painter, rect );
+		DrawLineSelection ( line, visualToLogical, painter, rect );
+		DrawLineSquiggles ( line, visualToLogical, painter, rect );
+		DrawLineHighlights( line, visualToLogical, painter, rect );
 		rect.top += m_styleRegistry.lineHeight;
 	}
 }
@@ -37,20 +39,20 @@ void UniscribeTextBlock::DrawText( VisualPainter& painter, RECT rect ) const
 
 	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &rect ); ++line )
 	{
-		DrawLineText( line, painter, rect );
+		std::vector<int> visualToLogical = VisualToLogicalMapping( LineRuns( line ) );
+
+		DrawLineText( line, visualToLogical, painter, rect );
 		rect.top += m_styleRegistry.lineHeight;
 	}
 }
 
-void UniscribeTextBlock::DrawLineBackground( size_t line, VisualPainter& painter, RECT rect ) const
+void UniscribeTextBlock::DrawLineBackground( size_t line, const std::vector<int>& visualToLogical, VisualPainter& painter, RECT rect ) const
 {
 	size_t lineStart = TextStart( line );
 	size_t lineEnd   = TextEnd( line );
 
 	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
 	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + lineStart, lineEnd - lineStart );
-
-	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
 
 	int xStart = 0;
 	for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
@@ -76,10 +78,9 @@ void UniscribeTextBlock::DrawLineBackground( size_t line, VisualPainter& painter
 	}
 }
 
-void UniscribeTextBlock::DrawLineSelection( size_t line, VisualPainter& painter, RECT rect ) const
+void UniscribeTextBlock::DrawLineSelection( size_t line, const std::vector<int>& visualToLogical, VisualPainter& painter, RECT rect ) const
 {
 	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
-	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
 
 	if ( painter.selection.Intersects( TextStart( line ), TextEnd( line ) ) )
 	{
@@ -112,7 +113,7 @@ void UniscribeTextBlock::DrawLineSelection( size_t line, VisualPainter& painter,
 	}
 }
 
-void UniscribeTextBlock::DrawLineSquiggles( size_t line, VisualPainter& painter, RECT rect ) const
+void UniscribeTextBlock::DrawLineSquiggles( size_t line, const std::vector<int>& visualToLogical, VisualPainter& painter, RECT rect ) const
 {
 	size_t lineStart = TextStart( line );
 	size_t lineEnd   = TextEnd( line );
@@ -122,8 +123,6 @@ void UniscribeTextBlock::DrawLineSquiggles( size_t line, VisualPainter& painter,
 
 	if ( squiggles.empty() )
 		return;
-
-	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
 
 	int xStart = 0;
 	for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
@@ -145,7 +144,7 @@ void UniscribeTextBlock::DrawLineSquiggles( size_t line, VisualPainter& painter,
 	}
 }
 
-void UniscribeTextBlock::DrawLineHighlights( size_t line, VisualPainter& painter, RECT rect ) const
+void UniscribeTextBlock::DrawLineHighlights( size_t line, const std::vector<int>& visualToLogical, VisualPainter& painter, RECT rect ) const
 {
 	size_t lineStart = TextStart( line );
 	size_t lineEnd   = TextEnd( line );
@@ -155,8 +154,6 @@ void UniscribeTextBlock::DrawLineHighlights( size_t line, VisualPainter& painter
 
 	if ( highlights.empty() )
 		return;
-
-	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
 
 	int xStart = 0;
 	for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
@@ -178,15 +175,13 @@ void UniscribeTextBlock::DrawLineHighlights( size_t line, VisualPainter& painter
 	}
 }
 
-void UniscribeTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT rect ) const
+void UniscribeTextBlock::DrawLineText( size_t line, const std::vector<int>& visualToLogical, VisualPainter& painter, RECT rect ) const
 {
 	size_t lineStart = TextStart( line );
 	size_t lineEnd   = TextEnd( line );
 
 	ArrayOf<const UniscribeTextRun> runs = LineRuns( line );
 	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + lineStart, lineEnd - lineStart );
-
-	std::vector<int> visualToLogical = VisualToLogicalMapping( runs );
 
 	int xStart = 0;
 	for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
