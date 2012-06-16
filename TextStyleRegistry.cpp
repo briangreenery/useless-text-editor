@@ -1,10 +1,8 @@
 // TextStyleRegistry.cpp
 
 #include "TextStyleRegistry.h"
-#include "Error.h"
 #include <algorithm>
-
-namespace W = Windows;
+#include <cassert>
 
 TextStyleRegistry::TextStyleRegistry()
 	: fontSize( 10 )

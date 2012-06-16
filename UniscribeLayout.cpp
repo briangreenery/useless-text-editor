@@ -8,10 +8,8 @@
 #include "TextDocument.h"
 #include "TextStyleRegistry.h"
 #include "UTF16Ref.h"
-#include "Error.h"
+#include "ThrowHRESULT.h"
 #include <algorithm>
-
-namespace W = Windows;
 
 static std::vector<SCRIPT_ITEM> Itemize( UTF16Ref text )
 {
@@ -40,7 +38,7 @@ static std::vector<SCRIPT_ITEM> Itemize( UTF16Ref text )
 		if ( result == E_OUTOFMEMORY )
 			items.resize( items.size() * 2 );
 		else
-			W::ThrowHRESULT( result );
+			ThrowHRESULT( result );
 	}
 
 	items.resize( numItems + 1 );
@@ -100,7 +98,7 @@ static bool ShapePlaceRun( UniscribeTextRun run,
 			return false;
 
 		default:
-			W::ThrowHRESULT( result );
+			ThrowHRESULT( result );
 		}
 	}
 
@@ -137,7 +135,7 @@ static bool ShapePlaceRun( UniscribeTextRun run,
 		}
 		else
 		{
-			W::ThrowHRESULT( result );
+			ThrowHRESULT( result );
 		}
 	}
 
@@ -227,13 +225,13 @@ static size_t EstimateLineWrap( UniscribeLayoutData& layoutData,
 	const UniscribeTextRun& run = layoutData.runs.back();
 
 	std::vector<int> logWidths( run.textCount );
-	W::ThrowHRESULT( ScriptGetLogicalWidths( &layoutData.items[run.item].a,
-	                                         run.textCount,
-	                                         run.glyphCount,
-	                                         &layoutData.advanceWidths.front() + run.glyphStart,
-	                                         &layoutData.logClusters  .front() + run.textStart,
-	                                         &layoutData.visAttrs     .front() + run.glyphStart,
-	                                         &logWidths.front() ) );
+	ThrowHRESULT( ScriptGetLogicalWidths( &layoutData.items[run.item].a,
+	                                      run.textCount,
+	                                      run.glyphCount,
+	                                      &layoutData.advanceWidths.front() + run.glyphStart,
+	                                      &layoutData.logClusters  .front() + run.textStart,
+	                                      &layoutData.visAttrs     .front() + run.glyphStart,
+	                                      &logWidths.front() ) );
 
 	size_t estimate = 0;
 	while ( estimate < logWidths.size() && lineWidth + logWidths[estimate] <= args.maxWidth )

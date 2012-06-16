@@ -3,11 +3,9 @@
 #include "UniscribeTextBlock.h"
 #include "VisualPainter.h"
 #include "TextStyleRegistry.h"
+#include "ThrowHRESULT.h"
 #include <cassert>
-#include "Error.h"
 #include <algorithm>
-
-namespace W = Windows;
 
 UniscribeTextBlock::UniscribeTextBlock( UniscribeLayoutDataPtr data, const TextStyleRegistry& styleRegistry )
 	: m_data( std::move( data ) )
@@ -206,20 +204,20 @@ void UniscribeTextBlock::DrawLineText( size_t line, const std::vector<int>& visu
 			                  rect.top + 2*m_styleRegistry.lineHeight };
 
 			painter.SetTextColor( m_styleRegistry.Style( style->styleid ).textColor );
-			W::ThrowHRESULT( ScriptTextOut( painter.hdc,
-			                                &font.fontCache,
-			                                xStart,
-			                                rect.top,
-			                                ETO_CLIPPED,
-			                                &textRect,
-			                                &m_data->items[run.item].a,
-			                                0,
-			                                0,
-			                                &m_data->glyphs[run.glyphStart],
-			                                run.glyphCount,
-			                                &m_data->advanceWidths[run.glyphStart],
-			                                NULL,
-			                                &m_data->offsets[run.glyphStart] ) );
+			ThrowHRESULT( ScriptTextOut( painter.hdc,
+			                             &font.fontCache,
+			                             xStart,
+			                             rect.top,
+			                             ETO_CLIPPED,
+			                             &textRect,
+			                             &m_data->items[run.item].a,
+			                             0,
+			                             0,
+			                             &m_data->glyphs[run.glyphStart],
+			                             run.glyphCount,
+			                             &m_data->advanceWidths[run.glyphStart],
+			                             NULL,
+			                             &m_data->offsets[run.glyphStart] ) );
 		}
 
 		xStart += run.width;
@@ -371,15 +369,15 @@ int UniscribeTextBlock::LineWidth( size_t line ) const
 int UniscribeTextBlock::RunCPtoX( const UniscribeTextRun& run, size_t cp, bool trailingEdge ) const
 {
 	int x;
-	W::ThrowHRESULT( ScriptCPtoX( cp,
-	                              trailingEdge,
-	                              run.textCount,
-	                              run.glyphCount,
-	                              &m_data->logClusters[run.textStart],
-	                              &m_data->visAttrs[run.glyphStart],
-	                              &m_data->advanceWidths[run.glyphStart],
-	                              &m_data->items[run.item].a,
-	                              &x ) );
+	ThrowHRESULT( ScriptCPtoX( cp,
+	                           trailingEdge,
+	                           run.textCount,
+	                           run.glyphCount,
+	                           &m_data->logClusters[run.textStart],
+	                           &m_data->visAttrs[run.glyphStart],
+	                           &m_data->advanceWidths[run.glyphStart],
+	                           &m_data->items[run.item].a,
+	                           &x ) );
 	return x;
 }
 
@@ -428,15 +426,15 @@ size_t UniscribeTextBlock::XtoCP( size_t line, LONG* x ) const
 
 	int cp;
 	int trailing;
-	W::ThrowHRESULT( ScriptXtoCP( *x - xStart,
-	                              run->textCount,
-	                              run->glyphCount,
-	                              &m_data->logClusters[run->textStart],
-	                              &m_data->visAttrs[run->glyphStart],
-	                              &m_data->advanceWidths[run->glyphStart],
-	                              &m_data->items[run->item].a,
-	                              &cp,
-	                              &trailing ) );
+	ThrowHRESULT( ScriptXtoCP( *x - xStart,
+	                           run->textCount,
+	                           run->glyphCount,
+	                           &m_data->logClusters[run->textStart],
+	                           &m_data->visAttrs[run->glyphStart],
+	                           &m_data->advanceWidths[run->glyphStart],
+	                           &m_data->items[run->item].a,
+	                           &cp,
+	                           &trailing ) );
 
 	*x = xStart + RunCPtoX( *run, cp, trailing ? true : false );
 	return run->textStart + cp + trailing;
@@ -454,7 +452,7 @@ std::vector<int> UniscribeTextBlock::VisualToLogicalMapping( ArrayRef<const Unis
 	for ( size_t i = 0; i < runs.size(); ++i )
 		bidiLevel[i] = m_data->items[runs[i].item].a.s.uBidiLevel;
 
-	W::ThrowHRESULT( ScriptLayout( runs.size(), &bidiLevel.front(), &visualToLogical.front(), NULL ) );
+	ThrowHRESULT( ScriptLayout( runs.size(), &bidiLevel.front(), &visualToLogical.front(), NULL ) );
 	return visualToLogical;
 }
 

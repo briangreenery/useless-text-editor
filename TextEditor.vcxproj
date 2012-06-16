@@ -128,7 +128,7 @@
     <ClInclude Include="ArrayRef.h" />
     <ClInclude Include="DocumentCharIter.h" />
     <ClInclude Include="EmptyTextBlock.h" />
-    <ClInclude Include="Error.h" />
+    <ClInclude Include="ThrowHRESULT.h" />
     <ClInclude Include="RelevanceAnnotator.h" />
     <ClInclude Include="RelevanceTokenRun.h" />
     <ClInclude Include="AccessibleTextView.h" />
