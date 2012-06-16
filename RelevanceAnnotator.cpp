@@ -422,7 +422,6 @@ void RelevanceAnnotator::GetSquiggles( TextRanges& squiggles, size_t start, size
 		  || it->token == Relevance::e_number_too_big
 		  || it->token == Relevance::e_comment_not_terminated
 		  || it->token == Relevance::e_bad_percent_sequence
-		  || it->token == Relevance::e_string_too_long
 		  || it->token == Relevance::e_string_not_terminated
 		  || it->token == Relevance::e_illegal_character )
 		{
