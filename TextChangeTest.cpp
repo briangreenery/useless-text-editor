@@ -124,6 +124,60 @@ static void ComplicatedTests()
 		assert( change.end == 12 );
 		assert( change.delta == -10 );
 	}
+
+	{
+		TextChange change;
+		change.AddChange( TextChange( 0, 1,   TextChange::insertion ) );
+		change.AddChange( TextChange( 0, 100, TextChange::modification ) );
+		assert( change.start == 0 );
+		assert( change.end   == 99 );
+		assert( change.delta == 1 );
+	}
+
+	{
+		TextChange change;
+		change.AddChange( TextChange( 99,  1, TextChange::insertion ) );
+		change.AddChange( TextChange( 0, 100, TextChange::modification ) );
+		assert( change.start == 0 );
+		assert( change.end   == 99 );
+		assert( change.delta == 1 );
+	}
+
+	{
+		TextChange change;
+		change.AddChange( TextChange( 10, 10, TextChange::insertion ) );
+		change.AddChange( TextChange( 0,  20, TextChange::modification ) );
+		assert( change.start == 0 );
+		assert( change.end   == 10 );
+		assert( change.delta == 10 );
+	}
+
+	{
+		TextChange change;
+		change.AddChange( TextChange( 0, 1,  TextChange::deletion ) );
+		change.AddChange( TextChange( 0, 99, TextChange::modification ) );
+		assert( change.start == 0 );
+		assert( change.end == 100 );
+		assert( change.delta == -1 );
+	}
+
+	{
+		TextChange change;
+		change.AddChange( TextChange( 99, 1,  TextChange::deletion ) );
+		change.AddChange( TextChange( 0, 99, TextChange::modification ) );
+		assert( change.start == 0 );
+		assert( change.end == 100 );
+		assert( change.delta == -1 );
+	}
+
+	{
+		TextChange change;
+		change.AddChange( TextChange( 10, 10, TextChange::deletion ) );
+		change.AddChange( TextChange( 0,  20, TextChange::modification ) );
+		assert( change.start == 0 );
+		assert( change.end   == 30 );
+		assert( change.delta == -10 );
+	}
 }
 
 void TextChangeTest()

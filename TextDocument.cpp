@@ -13,6 +13,7 @@ TextDocument::TextDocument()
 	, m_wordIter( icu::BreakIterator::createWordInstance     ( icu::Locale::getUS(), m_wordErrorStatus ) )
 	, m_lineIter( icu::BreakIterator::createLineInstance( icu::Locale::getDefault(), m_lineErrorStatus ) )
 	, m_needIterReset( true )
+	, m_lineCount( 1 )
 {
 }
 
@@ -46,6 +47,28 @@ void TextDocument::ReadWithCRLF( size_t start, size_t count, ArrayRef<wchar_t> o
 		if ( unit == 0x0A )
 			*write-- = 0x0D;
 	}
+}
+
+size_t TextDocument::CountLineBreaks( size_t pos, size_t count )
+{
+	size_t lineBreakCount = 0;
+
+	wchar_t buffer[512];
+	for ( size_t i = pos; i < pos + count; i += _countof( buffer ) )
+	{
+		size_t amountToRead = (std::min)( _countof( buffer ), pos + count - i );
+		size_t amountRead   = Read( i, amountToRead, buffer );
+		assert( amountToRead == amountRead );
+
+		lineBreakCount += std::count( buffer, buffer + amountRead, 0x0A );
+	}
+
+	return lineBreakCount;
+}
+
+size_t TextDocument::LineCount() const
+{
+	return m_lineCount;
 }
 
 static const wchar_t* NextLineBreak( const wchar_t* it, const wchar_t* end )
@@ -97,11 +120,14 @@ TextChange TextDocument::Insert( size_t pos, UTF16Ref text )
 		if ( lineBreak != text.end() )
 		{
 			m_buffer.insert( pos + count, 0x0A );
+			m_lineCount++;
 			count++;
 		}
 
 		it = SkipLineBreak( lineBreak, text.end() );
 	}
+
+	assert( m_lineCount == CountLineBreaks( 0, Length() ) + 1 );
 
 	m_undo.RecordInsertion( *this, pos, count );
 
@@ -114,9 +140,12 @@ TextChange TextDocument::Delete( size_t pos, size_t count )
 	if ( count == 0 )
 		return TextChange();
 
-	m_undo.RecordDeletion( *this, pos, count );
+	m_lineCount -= CountLineBreaks( pos, count );
 
+	m_undo.RecordDeletion( *this, pos, count );
 	m_buffer.erase( pos, count );
+
+	assert( m_lineCount == CountLineBreaks( 0, Length() ) + 1 );
 
 	m_needIterReset = true;
 	return TextChange( pos, count, TextChange::deletion );

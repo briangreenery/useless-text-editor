@@ -75,6 +75,9 @@ private:
 	void UpdateLayout( TextChange, TextSelection );
 	void UpdateLayout();
 
+	size_t LineNumberDigits();
+	bool AdjustGutterWidth();
+
 	void HideCaret();
 	void ShowCaret();
 	void MoveSelection( TextSelection, bool scrollToCaret );

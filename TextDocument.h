@@ -53,13 +53,18 @@ public:
 	void SetBeforeSelection( const TextSelection& );
 	void EndUndoGroup();
 
+	size_t LineCount() const;
+
 private:
 	void ResetIterators() const;
 	size_t NextBreak( icu::BreakIterator*, size_t ) const;
 	size_t PrevBreak( icu::BreakIterator*, size_t ) const;
 
+	size_t CountLineBreaks( size_t pos, size_t count );
+
 	TextBuffer m_buffer;
 	TextDocumentUndo m_undo;
+	size_t m_lineCount;
 
 	mutable bool m_needIterReset;
 	UErrorCode m_charErrorStatus;

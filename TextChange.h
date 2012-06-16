@@ -3,6 +3,9 @@
 #ifndef TextChange_h
 #define TextChange_h
 
+// TextChange collects a group of changes, and calculates the start, end, and delta
+// of those changes in the **original document before any changes were applied**.
+
 class TextChange
 {
 public:

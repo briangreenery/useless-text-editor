@@ -566,6 +566,28 @@ void TextView::Redo()
 	UpdateLayout( change, selection );
 }
 
+size_t TextView::LineNumberDigits()
+{
+	size_t power = 10;
+
+	for ( size_t digits = 1; digits < 10; ++digits )
+	{
+		if ( m_doc.LineCount() < power )
+			return digits;
+
+		power *= 10;
+	}
+
+	return 1;
+}
+
+bool TextView::AdjustGutterWidth()
+{
+	int oldGutterWidth = m_metrics.gutterWidth;
+	m_metrics.gutterWidth = std::max<int>( 5, LineNumberDigits() + 2 ) * m_styleRegistry.avgCharWidth;
+	return oldGutterWidth != m_metrics.gutterWidth;
+}
+
 void TextView::UpdateLayout( TextChange change, TextSelection selection )
 {
 	if ( m_styleRegistry.annotator )
@@ -575,6 +597,9 @@ void TextView::UpdateLayout( TextChange change, TextSelection selection )
 		if ( m_selection != selection )
 			m_styleRegistry.annotator->SelectionChanged( selection.start, selection.end );
 	}
+
+	if ( AdjustGutterWidth() )
+		change.AddChange( TextChange( 0, m_doc.Length(), TextChange::modification ) );
 
 	RECT rect = m_metrics.TextRect( m_hwnd );
 
