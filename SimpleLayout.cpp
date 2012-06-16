@@ -10,8 +10,7 @@
 #include <cassert>
 #include <algorithm>
 
-class DebuggableException {};
-class SimpleLayoutFailed : public DebuggableException {};
+class SimpleLayoutFailed {};
 
 static size_t LayoutRun( SimpleTextRun run,
                          SimpleLayoutData& layoutData,

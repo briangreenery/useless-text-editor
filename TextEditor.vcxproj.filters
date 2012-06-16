@@ -150,9 +150,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DebuggableException.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
     <ClInclude Include="Error.h">
       <Filter>Utility</Filter>
     </ClInclude>
