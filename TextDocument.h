@@ -7,7 +7,7 @@
 #include "TextBuffer.h"
 #include "UString.h"
 #include "TextDocumentUndo.h"
-#include "ArrayOf.h"
+#include "ArrayRef.h"
 #include <unicode/brkiter.h>
 #include <utility>
 #include <vector>
@@ -42,7 +42,7 @@ public:
 	std::pair<size_t, size_t> WordAt( size_t pos ) const;
 
 	size_t SizeWithCRLF( size_t start, size_t count ) const;
-	void ReadWithCRLF( size_t start, size_t count, ArrayOf<UTF16::Unit> out ) const;
+	void ReadWithCRLF( size_t start, size_t count, ArrayRef<UTF16::Unit> out ) const;
 
 	std::pair<TextChange,TextSelection> Undo();
 	TextChange                          Redo();

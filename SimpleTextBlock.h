@@ -6,7 +6,7 @@
 #include "SimpleLayoutData.h"
 #include "TextStyleRun.h"
 #include "TextBlock.h"
-#include "ArrayOf.h"
+#include "ArrayRef.h"
 #include <stdint.h>
 #include <vector>
 
@@ -42,14 +42,14 @@ private:
 
 	void DrawLineRect( VisualPainter&, RECT, int start, int end, COLORREF ) const;
 
-	ArrayOf<const TextStyleRun> RunStyles( size_t blockStart, const SimpleTextRun&, ArrayOf<const TextStyleRun> ) const;
+	ArrayRef<const TextStyleRun> RunStyles( size_t blockStart, const SimpleTextRun&, ArrayRef<const TextStyleRun> ) const;
 
 	size_t TextStart( size_t line ) const;
 	size_t TextEnd  ( size_t line ) const;
 	int    LineWidth( size_t line ) const;
 	int    RunWidth ( const SimpleTextRun* ) const;
 
-	ArrayOf<const SimpleTextRun> LineRuns( size_t line ) const;
+	ArrayRef<const SimpleTextRun> LineRuns( size_t line ) const;
 
 	int    CPtoX( size_t line, size_t cp, bool trailingEdge ) const;
 	size_t XtoCP( size_t line, LONG* x ) const;

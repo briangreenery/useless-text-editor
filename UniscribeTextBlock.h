@@ -7,7 +7,7 @@
 #include "UniscribeLayoutData.h"
 #include "TextStyleRun.h"
 #include "TextRange.h"
-#include "ArrayOf.h"
+#include "ArrayRef.h"
 #include <Windows.h>
 #include <usp10.h>
 #include <vector>
@@ -47,10 +47,10 @@ private:
 
 	void DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, COLORREF color ) const;
 
-	ArrayOf<const UniscribeTextRun> LineRuns( size_t line ) const;
+	ArrayRef<const UniscribeTextRun> LineRuns( size_t line ) const;
 
-	ArrayOf<const TextStyleRun> RunStyles   ( size_t blockStart, const UniscribeTextRun&, ArrayOf<const TextStyleRun> ) const;
-	ArrayOf<const TextRange>    RunSquiggles( size_t blockStart, const UniscribeTextRun&, ArrayOf<const TextRange>    ) const;
+	ArrayRef<const TextStyleRun> RunStyles   ( size_t blockStart, const UniscribeTextRun&, ArrayRef<const TextStyleRun> ) const;
+	ArrayRef<const TextRange>    RunSquiggles( size_t blockStart, const UniscribeTextRun&, ArrayRef<const TextRange>    ) const;
 
 	size_t TextStart( size_t line ) const;
 	size_t TextEnd  ( size_t line ) const;
@@ -62,10 +62,10 @@ private:
 	int    CPtoX( size_t line, size_t cp, bool trailingEdge ) const;
 	size_t XtoCP( size_t line, LONG* x ) const;
 
-	std::vector<int> VisualToLogicalMapping( ArrayOf<const UniscribeTextRun> ) const;
+	std::vector<int> VisualToLogicalMapping( ArrayRef<const UniscribeTextRun> ) const;
 
-	const UniscribeTextRun* RunContaining( ArrayOf<const UniscribeTextRun>, size_t pos, int* xStart ) const;
-	const UniscribeTextRun* RunContaining( ArrayOf<const UniscribeTextRun>, int    x,   int* xStart ) const;
+	const UniscribeTextRun* RunContaining( ArrayRef<const UniscribeTextRun>, size_t pos, int* xStart ) const;
+	const UniscribeTextRun* RunContaining( ArrayRef<const UniscribeTextRun>, int    x,   int* xStart ) const;
 
 	UniscribeLayoutDataPtr m_data;
 	const TextStyleRegistry& m_styleRegistry;

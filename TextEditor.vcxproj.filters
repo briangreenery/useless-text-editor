@@ -33,9 +33,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ArrayOf.cpp">
-      <Filter>Utility</Filter>
-    </ClCompile>
     <ClCompile Include="TextSelection.cpp">
       <Filter>TextView</Filter>
     </ClCompile>
@@ -153,9 +150,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ArrayOf.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
     <ClInclude Include="DebuggableException.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -290,6 +284,9 @@
     </ClInclude>
     <ClInclude Include="AccessibleTextView.h">
       <Filter>TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayRef.h">
+      <Filter>Utility</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

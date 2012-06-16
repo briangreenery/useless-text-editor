@@ -3,7 +3,7 @@
 #include "SimpleTextRunLoop.h"
 #include <algorithm>
 
-SimpleTextRunLoop::SimpleTextRunLoop( UTF16Ref text, ArrayOf<const TextFontRun> fonts )
+SimpleTextRunLoop::SimpleTextRunLoop( UTF16Ref text, ArrayRef<const TextFontRun> fonts )
 	: m_position( 0 )
 	, m_nextTab( 0 )
 	, m_text( text )

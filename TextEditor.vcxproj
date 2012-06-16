@@ -81,7 +81,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\RelevanceLexer\RelevanceLexer.cpp" />
-    <ClCompile Include="ArrayOf.cpp" />
     <ClCompile Include="DocumentCharIter.cpp" />
     <ClCompile Include="EmptyTextBlock.cpp" />
     <ClCompile Include="RelevanceAnnotator.cpp" />
@@ -126,7 +125,7 @@
     <ClInclude Include="..\RelevanceLexer\RelevanceLexerOutput.h" />
     <ClInclude Include="..\RelevanceLexer\RelevanceLexerToken.h" />
     <ClInclude Include="..\RelevanceLexer\RelevanceTextRef.h" />
-    <ClInclude Include="ArrayOf.h" />
+    <ClInclude Include="ArrayRef.h" />
     <ClInclude Include="DebuggableException.h" />
     <ClInclude Include="DocumentCharIter.h" />
     <ClInclude Include="EmptyTextBlock.h" />

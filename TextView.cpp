@@ -496,7 +496,7 @@ void TextView::Copy()
 
 		if ( dest != 0 )
 		{
-			m_doc.ReadWithCRLF( m_selection.Min(), m_selection.Size(), ArrayOf<UTF16::Unit>( dest, dest + sizeWithCRLF ) );
+			m_doc.ReadWithCRLF( m_selection.Min(), m_selection.Size(), ArrayRef<UTF16::Unit>( dest, dest + sizeWithCRLF ) );
 			dest[sizeWithCRLF] = UTF16::Unit( 0 );
 
 			GlobalUnlock( hGlobal );

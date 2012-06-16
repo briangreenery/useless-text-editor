@@ -9,7 +9,7 @@ TextStyleReader::TextStyleReader( const TextStyleRegistry& styleRegistry )
 {
 }
 
-ArrayOf<const TextFontRun> TextStyleReader::Fonts( size_t start, size_t count )
+ArrayRef<const TextFontRun> TextStyleReader::Fonts( size_t start, size_t count )
 {
 	m_fonts.clear();
 
@@ -22,10 +22,10 @@ ArrayOf<const TextFontRun> TextStyleReader::Fonts( size_t start, size_t count )
 		m_fonts.push_back( TextFontRun( m_styleRegistry.defaultFontid, count ) );
 	}
 
-	return ArrayOf<const TextFontRun>( &m_fonts.front(), &m_fonts.back() + 1 );
+	return ArrayRef<const TextFontRun>( &m_fonts.front(), &m_fonts.back() + 1 );
 }
 
-ArrayOf<const TextStyleRun> TextStyleReader::Styles( size_t start, size_t count )
+ArrayRef<const TextStyleRun> TextStyleReader::Styles( size_t start, size_t count )
 {
 	m_styles.clear();
 
@@ -38,10 +38,10 @@ ArrayOf<const TextStyleRun> TextStyleReader::Styles( size_t start, size_t count 
 		m_styles.push_back( TextStyleRun( m_styleRegistry.defaultStyleid, start, count ) );
 	}
 
-	return ArrayOf<const TextStyleRun>( &m_styles.front(), &m_styles.back() + 1 );
+	return ArrayRef<const TextStyleRun>( &m_styles.front(), &m_styles.back() + 1 );
 }
 
-ArrayOf<const TextRange> TextStyleReader::Squiggles( size_t start, size_t count )
+ArrayRef<const TextRange> TextStyleReader::Squiggles( size_t start, size_t count )
 {
 	m_squiggles.clear();
 
@@ -49,12 +49,12 @@ ArrayOf<const TextRange> TextStyleReader::Squiggles( size_t start, size_t count 
 		m_styleRegistry.annotator->GetSquiggles( m_squiggles, start, count );
 
 	if ( m_squiggles.empty() )
-		return ArrayOf<const TextRange>();
+		return ArrayRef<const TextRange>();
 
-	return ArrayOf<const TextRange>( &m_squiggles.front(), &m_squiggles.back() + 1 );
+	return ArrayRef<const TextRange>( &m_squiggles.front(), &m_squiggles.back() + 1 );
 }
 
-ArrayOf<const TextRange> TextStyleReader::Highlights( size_t start, size_t count )
+ArrayRef<const TextRange> TextStyleReader::Highlights( size_t start, size_t count )
 {
 	m_highlights.clear();
 
@@ -62,7 +62,7 @@ ArrayOf<const TextRange> TextStyleReader::Highlights( size_t start, size_t count
 		m_styleRegistry.annotator->GetHighlights( m_highlights, start, count );
 
 	if ( m_highlights.empty() )
-		return ArrayOf<const TextRange>();
+		return ArrayRef<const TextRange>();
 
-	return ArrayOf<const TextRange>( &m_highlights.front(), &m_highlights.back() + 1 );
+	return ArrayRef<const TextRange>( &m_highlights.front(), &m_highlights.back() + 1 );
 }

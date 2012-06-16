@@ -45,7 +45,7 @@ void SimpleTextBlock::DrawLineBackground( size_t line, VisualPainter& painter, R
 	size_t pos = TextStart( line );
 	int xStart = 0;
 
-	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + pos, TextEnd( line ) - pos );
+	ArrayRef<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + pos, TextEnd( line ) - pos );
 	for ( const TextStyleRun* it = styles.begin(); it != styles.end() && xStart < rect.right; ++it )
 	{
 		int xEnd = CPtoX( line, pos + it->count - 1, true );
@@ -86,7 +86,7 @@ void SimpleTextBlock::DrawLineSquiggles( size_t line, VisualPainter& painter, RE
 	size_t textStart = TextStart( line );
 	size_t textEnd   = TextEnd  ( line );
 
-	ArrayOf<const TextRange> squiggles = painter.styleReader.Squiggles( painter.textStart + textStart, textEnd - textStart );
+	ArrayRef<const TextRange> squiggles = painter.styleReader.Squiggles( painter.textStart + textStart, textEnd - textStart );
 	for ( const TextRange* it = squiggles.begin(); it != squiggles.end(); ++it )
 	{
 		int xStart = CPtoX( line, it->start - painter.textStart,                 false );
@@ -104,7 +104,7 @@ void SimpleTextBlock::DrawLineHighlights( size_t line, VisualPainter& painter, R
 	size_t textStart = TextStart( line );
 	size_t textEnd   = TextEnd( line );
 
-	ArrayOf<const TextRange> highlights = painter.styleReader.Highlights( painter.textStart + textStart, textEnd - textStart );
+	ArrayRef<const TextRange> highlights = painter.styleReader.Highlights( painter.textStart + textStart, textEnd - textStart );
 	for ( const TextRange* it = highlights.begin(); it != highlights.end(); ++it )
 	{
 		int xStart = CPtoX( line, it->start - painter.textStart,                 false );
@@ -122,8 +122,8 @@ void SimpleTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT re
 	size_t lineStart = TextStart( line );
 	size_t lineEnd = TextEnd( line );
 
-	ArrayOf<const SimpleTextRun> runs = LineRuns( line );
-	ArrayOf<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + lineStart, lineEnd - lineStart );
+	ArrayRef<const SimpleTextRun> runs = LineRuns( line );
+	ArrayRef<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + lineStart, lineEnd - lineStart );
 
 	int xRunStart = 0;
 	for ( const SimpleTextRun* run = runs.begin(); run != runs.end() && xRunStart < rect.right; ++run )
@@ -132,7 +132,7 @@ void SimpleTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT re
 
 		SelectObject( painter.hdc, m_styleRegistry.Font( run->fontid ).hfont );
 
-		ArrayOf<const TextStyleRun> runStyles = RunStyles( painter.textStart, *run, styles );
+		ArrayRef<const TextStyleRun> runStyles = RunStyles( painter.textStart, *run, styles );
 		for ( const TextStyleRun* style = runStyles.begin(); style != runStyles.end(); ++style )
 		{
 			size_t overlapStart = (std::max)( style->start - painter.textStart,                run->textStart );
@@ -157,7 +157,7 @@ void SimpleTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT re
 	}
 }
 
-ArrayOf<const TextStyleRun> SimpleTextBlock::RunStyles( size_t blockStart, const SimpleTextRun& run, ArrayOf<const TextStyleRun> styles ) const
+ArrayRef<const TextStyleRun> SimpleTextBlock::RunStyles( size_t blockStart, const SimpleTextRun& run, ArrayRef<const TextStyleRun> styles ) const
 {
 	struct StyleRunEqual
 	{
@@ -170,7 +170,7 @@ ArrayOf<const TextStyleRun> SimpleTextBlock::RunStyles( size_t blockStart, const
 
 	std::pair<const TextStyleRun*, const TextStyleRun*> range = std::equal_range( styles.begin(), styles.end(), run, StyleRunEqual( blockStart ) );
 
-	return ArrayOf<const TextStyleRun>( range.first, range.second );
+	return ArrayRef<const TextStyleRun>( range.first, range.second );
 }
 
 void SimpleTextBlock::DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, COLORREF color ) const
@@ -262,28 +262,28 @@ bool SimpleTextBlock::EndsWithNewline() const
 	return m_data->endsWithNewline;
 }
 
-ArrayOf<const SimpleTextRun> SimpleTextBlock::LineRuns( size_t line ) const
+ArrayRef<const SimpleTextRun> SimpleTextBlock::LineRuns( size_t line ) const
 {
 	assert( line < m_data->lines.size() );
 	const SimpleTextRun* runStart = &m_data->runs[line == 0 ? 0 : m_data->lines[line - 1]];
-	return ArrayOf<const SimpleTextRun>( runStart, &m_data->runs.front() + m_data->lines[line] );
+	return ArrayRef<const SimpleTextRun>( runStart, &m_data->runs.front() + m_data->lines[line] );
 }
 
 size_t SimpleTextBlock::TextStart( size_t line ) const
 {
-	ArrayOf<const SimpleTextRun> runs = LineRuns( line );
+	ArrayRef<const SimpleTextRun> runs = LineRuns( line );
 	return runs[0].textStart;
 }
 
 size_t SimpleTextBlock::TextEnd( size_t line ) const
 {
-	ArrayOf<const SimpleTextRun> runs = LineRuns( line );
+	ArrayRef<const SimpleTextRun> runs = LineRuns( line );
 	return runs[runs.size() - 1].textStart + runs[runs.size() - 1].textCount;
 }
 
 int SimpleTextBlock::LineWidth( size_t line ) const
 {
-	ArrayOf<const SimpleTextRun> runs = LineRuns( line );
+	ArrayRef<const SimpleTextRun> runs = LineRuns( line );
 
 	int width = 0;
 	for ( const SimpleTextRun* run = runs.begin(); run != runs.end(); ++run )
@@ -298,7 +298,7 @@ int SimpleTextBlock::RunWidth( const SimpleTextRun* run ) const
 
 int SimpleTextBlock::CPtoX( size_t line, size_t cp, bool trailingEdge ) const
 {
-	ArrayOf<const SimpleTextRun> runs = LineRuns( line );
+	ArrayRef<const SimpleTextRun> runs = LineRuns( line );
 
 	int x = 0;
 	const SimpleTextRun* run = runs.begin();
@@ -327,7 +327,7 @@ int SimpleTextBlock::RunCPtoX( const SimpleTextRun& run, size_t cp, bool trailin
 
 size_t SimpleTextBlock::XtoCP( size_t line, LONG* x ) const
 {
-	ArrayOf<const SimpleTextRun> runs = LineRuns( line );
+	ArrayRef<const SimpleTextRun> runs = LineRuns( line );
 
 	int xStart = 0;
 	const SimpleTextRun* run = runs.begin();

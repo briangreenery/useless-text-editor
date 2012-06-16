@@ -29,7 +29,7 @@ size_t TextDocument::SizeWithCRLF( size_t start, size_t count ) const
 	return count + m_buffer.count( start, count, 0x0A );
 }
 
-void TextDocument::ReadWithCRLF( size_t start, size_t count, ArrayOf<UTF16::Unit> out ) const
+void TextDocument::ReadWithCRLF( size_t start, size_t count, ArrayRef<UTF16::Unit> out ) const
 {
 	size_t numCopied = m_buffer.copy( out.begin(), count, start );
 

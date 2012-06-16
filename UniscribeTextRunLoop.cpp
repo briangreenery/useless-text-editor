@@ -4,7 +4,7 @@
 #include <cassert>
 #include <algorithm>
 
-UniscribeTextRunLoop::UniscribeTextRunLoop( UTF16Ref text, const std::vector<SCRIPT_ITEM>& items, ArrayOf<const TextFontRun> fonts )
+UniscribeTextRunLoop::UniscribeTextRunLoop( UTF16Ref text, const std::vector<SCRIPT_ITEM>& items, ArrayRef<const TextFontRun> fonts )
 	: m_text( text )
 	, m_position( 0 )
 	, m_nextTab( 0 )
