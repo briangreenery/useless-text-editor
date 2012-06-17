@@ -18,21 +18,41 @@ TextMateAnnotator::TextMateAnnotator( const TextDocument& doc, TextStyleRegistry
 	m_keyword  = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,    0,255 ), TextStyle::useDefault ) );
 	m_constant = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 128,  0,128 ), TextStyle::useDefault ) );
 	m_string   = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,  128,128 ), TextStyle::useDefault ) );
+	m_name     = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 128,  0,128 ), TextStyle::useDefault ) );
 }
 
 static xml_node<char>* GetKeyValue( xml_node<char>* node, const char* keyName )
 {
-	xml_node<char>* key = node->first_node( "key" );
-
-	while ( key != 0 )
-	{
+	for ( xml_node<char>* key = node->first_node( "key" ); key != 0; key = key = key->next_sibling( "key" ) )
 		if ( strcmp( key->value(), keyName ) == 0 )
 			return key->next_sibling();
 
-		key = key->next_sibling( "key" );
+	return 0;
+}
+
+static std::vector<TextMateCapture> ReadCaptures( xml_node<char>* node )
+{
+	std::vector<TextMateCapture> captures;
+
+	for ( xml_node<char>* key = node->first_node( "key" ); key != 0; key = key->next_sibling( "key" ) )
+	{
+		int index = atoi( key->value() );
+
+		if ( index <= 0 )
+			continue;
+
+		xml_node<char>* dict = key->next_sibling();
+		if ( dict == 0 )
+			continue;
+
+		xml_node<char>* name = GetKeyValue( dict, "name" );
+		if ( name == 0 )
+			continue;
+
+		captures.push_back( TextMateCapture( index, name->value() ) );
 	}
 
-	return 0;
+	return captures;
 }
 
 void TextMateAnnotator::SetLanguageFile( const char* path )
@@ -57,25 +77,30 @@ void TextMateAnnotator::SetLanguageFile( const char* path )
 
 	for ( xml_node<char>* dict = patterns->first_node( "dict" ); dict != 0; dict = dict->next_sibling( "dict" ) )
 	{
-		xml_node<char>* name = GetKeyValue( dict, "name" );
-		xml_node<char>* match = GetKeyValue( dict, "match" );
-
-		if ( GetKeyValue( dict, "begin" ) || GetKeyValue( dict, "end" ) || GetKeyValue( dict, "captures" ) )
+		if ( GetKeyValue( dict, "begin" ) || GetKeyValue( dict, "end" ) )
 			continue;
 
-		if ( name && match )
+		xml_node<char>* nameNode  = GetKeyValue( dict, "name" );
+		xml_node<char>* matchNode = GetKeyValue( dict, "match" );
+
+		if ( nameNode == 0 || matchNode == 0 )
+			continue;
+
+		std::vector<TextMateCapture> captures;
+
+		xml_node<char>* capturesNode = GetKeyValue( dict, "captures" );
+
+		if ( capturesNode )
+			captures = ReadCaptures( capturesNode );
+
+		try
 		{
-			try
-			{
-				m_patterns.push_back( TextMatePattern( name->value(), match->value() ) );
-			}
-			catch (...)
-			{
-			}
+			m_patterns.push_back( TextMatePattern( nameNode->value(), matchNode->value(), captures ) );
+		}
+		catch (...)
+		{
 		}
 	}
-
-	int x = 1;
 }
 
 static inline bool IsAscii( wchar_t c )
@@ -93,15 +118,13 @@ void TextMateAnnotator::TokenizeLine( size_t offset, size_t lineEnd, std::string
 
 		for ( size_t i = 0; i < m_patterns.size(); ++i )
 		{
-			std::cmatch m;
-
-			if ( std::regex_search( line.c_str(), line.c_str() + line.size(), m, m_patterns[i].regex ) )
+			if ( std::regex_search( line.c_str(), line.c_str() + line.size(), m_patterns[i].match, m_patterns[i].regex ) )
 			{
-				size_t start = m.position();
+				size_t start = m_patterns[i].match.position();
 				if ( start > bestStart )
 					continue;
 
-				size_t length = m.length();
+				size_t length = m_patterns[i].match.length();
 				if ( start == bestStart && length < bestLength )
 					continue;
 
@@ -114,13 +137,45 @@ void TextMateAnnotator::TokenizeLine( size_t offset, size_t lineEnd, std::string
 		if ( best == m_patterns.size() )
 			break;
 
-		line = line.substr( bestStart + bestLength );
+		size_t nextStart = bestStart + bestLength;
 		bestStart += offset;
 
-		if ( bestStart != offset )
-			m_tokens.push_back( TextMateTokenRun( "default", offset, bestStart - offset ) );
+		if ( m_patterns[best].captures.empty() )
+		{
+			if ( bestStart != offset )
+				m_tokens.push_back( TextMateTokenRun( "default", offset, bestStart - offset ) );
 
-		m_tokens.push_back( TextMateTokenRun( m_patterns[best].name, bestStart, bestLength ) );
+			m_tokens.push_back( TextMateTokenRun( m_patterns[best].name, bestStart, bestLength ) );
+		}
+		else
+		{
+			size_t lastEnd = offset;
+
+			const TextMatePattern& pattern = m_patterns[best];
+
+			for ( size_t i = 0; i < pattern.captures.size(); ++i )
+			{
+				if ( pattern.captures[i].index > pattern.match.size() )
+					break;
+
+				size_t start  = pattern.match[pattern.captures[i].index].first - line.c_str() + offset;
+				size_t length = pattern.match[pattern.captures[i].index].length();
+
+				if ( length == 0 )
+					continue;
+
+				if ( start != lastEnd )
+					m_tokens.push_back( TextMateTokenRun( "default", lastEnd, start - lastEnd ) );
+
+				m_tokens.push_back( TextMateTokenRun( pattern.captures[i].name, start, length ) );
+				lastEnd = start + length;
+			}
+
+			if ( lastEnd != bestStart + bestLength )
+				m_tokens.push_back( TextMateTokenRun( "default", lastEnd, bestStart + bestLength - lastEnd ) );
+		}
+
+		line = line.substr( nextStart );
 		offset = bestStart + bestLength;
 	}
 
@@ -191,6 +246,9 @@ uint32_t TextMateAnnotator::TokenStyle( size_t pos ) const
 
 	if ( run.name.find( "constant." ) == 0 )
 		return m_constant;
+
+	if ( run.name.find( "entity.name." ) == 0 )
+		return m_name;
 
 	return m_styleRegistry.defaultStyleid;
 }

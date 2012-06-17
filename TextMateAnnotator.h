@@ -40,6 +40,7 @@ private:
 	uint32_t m_keyword;
 	uint32_t m_constant;
 	uint32_t m_string;
+	uint32_t m_name;
 };
 
 #endif

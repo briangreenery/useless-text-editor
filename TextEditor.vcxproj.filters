@@ -22,20 +22,23 @@
     <Filter Include="Tests">
       <UniqueIdentifier>{2dd1b87f-2fbf-4c3d-9da7-f1ee81a0c4f5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Relevance">
-      <UniqueIdentifier>{01e98e77-53bd-4c5a-8737-e385986223a2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Relevance\Lexer">
-      <UniqueIdentifier>{506c0249-6adf-41f7-b4a2-3296cb608810}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Utility">
       <UniqueIdentifier>{0d0accc7-2dc3-4276-9a70-40d856baa633}</UniqueIdentifier>
     </Filter>
-    <Filter Include="rapidxml">
-      <UniqueIdentifier>{1471a63e-78a2-4dad-97b7-8e18a242f4e4}</UniqueIdentifier>
+    <Filter Include="Annotators">
+      <UniqueIdentifier>{4cb6e6d6-fa87-454c-b469-c90089c3073c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Textmate">
+    <Filter Include="Annotators\Textmate">
       <UniqueIdentifier>{7e76a81f-193d-4f3a-9b8c-7b753b4a805c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Annotators\Relevance">
+      <UniqueIdentifier>{01e98e77-53bd-4c5a-8737-e385986223a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Annotators\Relevance\Lexer">
+      <UniqueIdentifier>{506c0249-6adf-41f7-b4a2-3296cb608810}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\rapidxml">
+      <UniqueIdentifier>{1471a63e-78a2-4dad-97b7-8e18a242f4e4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -134,7 +137,7 @@
       <Filter>TextStyle</Filter>
     </ClCompile>
     <ClCompile Include="RelevanceAnnotator.cpp">
-      <Filter>Relevance</Filter>
+      <Filter>Annotators\Relevance</Filter>
     </ClCompile>
     <ClCompile Include="TextSquiggle.cpp">
       <Filter>TextView</Filter>
@@ -146,22 +149,22 @@
       <Filter>TextDocument</Filter>
     </ClCompile>
     <ClCompile Include="..\RelevanceLexer\RelevanceLexer.cpp">
-      <Filter>Relevance\Lexer</Filter>
+      <Filter>Annotators\Relevance\Lexer</Filter>
     </ClCompile>
     <ClCompile Include="RelevanceTokenRun.cpp">
-      <Filter>Relevance</Filter>
+      <Filter>Annotators\Relevance</Filter>
     </ClCompile>
     <ClCompile Include="AccessibleTextView.cpp">
       <Filter>TextView</Filter>
     </ClCompile>
     <ClCompile Include="TextMateAnnotator.cpp">
-      <Filter>Textmate</Filter>
+      <Filter>Annotators\Textmate</Filter>
     </ClCompile>
     <ClCompile Include="TextMatePattern.cpp">
-      <Filter>Textmate</Filter>
+      <Filter>Annotators\Textmate</Filter>
     </ClCompile>
     <ClCompile Include="TextMateTokenRun.cpp">
-      <Filter>Textmate</Filter>
+      <Filter>Annotators\Textmate</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -262,7 +265,7 @@
       <Filter>TextStyle</Filter>
     </ClInclude>
     <ClInclude Include="RelevanceAnnotator.h">
-      <Filter>Relevance</Filter>
+      <Filter>Annotators\Relevance</Filter>
     </ClInclude>
     <ClInclude Include="TextSquiggle.h">
       <Filter>TextView</Filter>
@@ -274,19 +277,19 @@
       <Filter>TextDocument</Filter>
     </ClInclude>
     <ClInclude Include="..\RelevanceLexer\RelevanceLexer.h">
-      <Filter>Relevance\Lexer</Filter>
+      <Filter>Annotators\Relevance\Lexer</Filter>
     </ClInclude>
     <ClInclude Include="..\RelevanceLexer\RelevanceLexerOutput.h">
-      <Filter>Relevance\Lexer</Filter>
+      <Filter>Annotators\Relevance\Lexer</Filter>
     </ClInclude>
     <ClInclude Include="..\RelevanceLexer\RelevanceLexerToken.h">
-      <Filter>Relevance\Lexer</Filter>
+      <Filter>Annotators\Relevance\Lexer</Filter>
     </ClInclude>
     <ClInclude Include="..\RelevanceLexer\RelevanceTextRef.h">
-      <Filter>Relevance\Lexer</Filter>
+      <Filter>Annotators\Relevance\Lexer</Filter>
     </ClInclude>
     <ClInclude Include="RelevanceTokenRun.h">
-      <Filter>Relevance</Filter>
+      <Filter>Annotators\Relevance</Filter>
     </ClInclude>
     <ClInclude Include="AccessibleTextView.h">
       <Filter>TextView</Filter>
@@ -301,25 +304,25 @@
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="rapidxml\rapidxml_iterators.hpp">
-      <Filter>rapidxml</Filter>
+      <Filter>Utility\rapidxml</Filter>
     </ClInclude>
     <ClInclude Include="rapidxml\rapidxml_print.hpp">
-      <Filter>rapidxml</Filter>
+      <Filter>Utility\rapidxml</Filter>
     </ClInclude>
     <ClInclude Include="rapidxml\rapidxml_utils.hpp">
-      <Filter>rapidxml</Filter>
+      <Filter>Utility\rapidxml</Filter>
     </ClInclude>
     <ClInclude Include="rapidxml\rapidxml.hpp">
-      <Filter>rapidxml</Filter>
+      <Filter>Utility\rapidxml</Filter>
     </ClInclude>
     <ClInclude Include="TextMateAnnotator.h">
-      <Filter>Textmate</Filter>
+      <Filter>Annotators\Textmate</Filter>
     </ClInclude>
     <ClInclude Include="TextMatePattern.h">
-      <Filter>Textmate</Filter>
+      <Filter>Annotators\Textmate</Filter>
     </ClInclude>
     <ClInclude Include="TextMateTokenRun.h">
-      <Filter>Textmate</Filter>
+      <Filter>Annotators\Textmate</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
