@@ -29,6 +29,7 @@ public:
 
 private:
 	uint32_t TokenStyle( size_t token ) const;
+	void TokenizeLine( size_t offset, size_t lineEnd, std::string line );
 
 	const TextDocument& m_doc;
 	const TextStyleRegistry& m_styleRegistry;

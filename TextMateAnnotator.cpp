@@ -83,6 +83,51 @@ static inline bool IsAscii( wchar_t c )
 	return 0 < c && c < 128;
 }
 
+void TextMateAnnotator::TokenizeLine( size_t offset, size_t lineEnd, std::string line )
+{
+	while ( !line.empty() )
+	{
+		size_t best       = m_patterns.size();
+		size_t bestStart  = line.size();
+		size_t bestLength = 0;
+
+		for ( size_t i = 0; i < m_patterns.size(); ++i )
+		{
+			std::cmatch m;
+
+			if ( std::regex_search( line.c_str(), line.c_str() + line.size(), m, m_patterns[i].regex ) )
+			{
+				size_t start = m.position();
+				if ( start > bestStart )
+					continue;
+
+				size_t length = m.length();
+				if ( start == bestStart && length < bestLength )
+					continue;
+
+				best = i;
+				bestStart = start;
+				bestLength = length;
+			}
+		}
+
+		if ( best == m_patterns.size() )
+			break;
+
+		line = line.substr( bestStart + bestLength );
+		bestStart += offset;
+
+		if ( bestStart != offset )
+			m_tokens.push_back( TextMateTokenRun( "default", offset, bestStart - offset ) );
+
+		m_tokens.push_back( TextMateTokenRun( m_patterns[best].name, bestStart, bestLength ) );
+		offset = bestStart + bestLength;
+	}
+
+	if ( offset != lineEnd )
+		m_tokens.push_back( TextMateTokenRun( "default", offset, lineEnd - offset ) );
+}
+
 void TextMateAnnotator::TextChanged( TextChange )
 {
 	m_tokens.clear();
@@ -99,47 +144,19 @@ void TextMateAnnotator::TextChanged( TextChange )
 
 	size_t offset = 0;
 
-	while ( !text.empty() )
+	while ( true )
 	{
-		size_t best       = m_patterns.size();
-		size_t bestStart  = text.size();
-		size_t bestLength = 0;
+		std::string::const_iterator lineBreak = std::find( text.begin() + offset, text.end(), 0x0A );
 
-		for ( size_t i = 0; i < m_patterns.size(); ++i )
-		{
-			std::cmatch m;
+		std::string line = std::string( text.begin() + offset, lineBreak );
+		TokenizeLine( offset, offset + line.size(), line );
 
-			if ( std::regex_search( text.c_str(), text.c_str() + text.size(), m, m_patterns[i].regex ) )
-			{
-				size_t start = m.position();
-				if ( start > bestStart )
-					continue;
-
-				size_t length = m.length();
-				if ( length < bestLength )
-					continue;
-
-				best = i;
-				bestStart = start;
-				bestLength = length;
-			}
-		}
-
-		if ( best == m_patterns.size() )
+		if ( lineBreak == text.end() )
 			break;
 
-		text = text.substr( bestStart + bestLength );
-		bestStart += offset;
-
-		if ( bestStart != offset )
-			m_tokens.push_back( TextMateTokenRun( "default", offset, bestStart - offset ) );
-
-		m_tokens.push_back( TextMateTokenRun( m_patterns[best].name, bestStart, bestLength ) );
-		offset = bestStart + bestLength;
+		m_tokens.push_back( TextMateTokenRun( "default", offset + line.size(), 1 ) );
+		offset += line.size() + 1;
 	}
-
-	if ( offset != m_doc.Length() )
-		m_tokens.push_back( TextMateTokenRun( "default", offset, m_doc.Length() - offset ) );
 }
 
 void TextMateAnnotator::SelectionChanged( size_t start, size_t end )
@@ -169,11 +186,11 @@ uint32_t TextMateAnnotator::TokenStyle( size_t pos ) const
 	if ( run.name == "storage.type.js" )
 		return m_keyword;
 
-	if ( run.name == "constant.language.boolean.false.js" || run.name == "constant.language.boolean.true.js" )
-		return m_constant;
-
-	if ( run.name == "keyword.operator.js" )
+	if ( run.name.find( "keyword." ) == 0 )
 		return m_keyword;
+
+	if ( run.name.find( "constant." ) == 0 )
+		return m_constant;
 
 	return m_styleRegistry.defaultStyleid;
 }
