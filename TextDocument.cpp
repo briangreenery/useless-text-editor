@@ -49,23 +49,6 @@ void TextDocument::ReadWithCRLF( size_t start, size_t count, ArrayRef<wchar_t> o
 	}
 }
 
-size_t TextDocument::CountLineBreaks( size_t pos, size_t count )
-{
-	size_t lineBreakCount = 0;
-
-	wchar_t buffer[512];
-	for ( size_t i = pos; i < pos + count; i += _countof( buffer ) )
-	{
-		size_t amountToRead = (std::min)( _countof( buffer ), pos + count - i );
-		size_t amountRead   = Read( i, amountToRead, buffer );
-		assert( amountToRead == amountRead );
-
-		lineBreakCount += std::count( buffer, buffer + amountRead, 0x0A );
-	}
-
-	return lineBreakCount;
-}
-
 size_t TextDocument::LineCount() const
 {
 	return m_lineCount;
@@ -127,7 +110,7 @@ TextChange TextDocument::Insert( size_t pos, UTF16Ref text )
 		it = SkipLineBreak( lineBreak, text.end() );
 	}
 
-	assert( m_lineCount == CountLineBreaks( 0, Length() ) + 1 );
+	assert( m_lineCount == m_buffer.count( 0, Length(), 0x0A ) + 1 );
 
 	m_undo.RecordInsertion( *this, pos, count );
 
@@ -140,12 +123,12 @@ TextChange TextDocument::Delete( size_t pos, size_t count )
 	if ( count == 0 )
 		return TextChange();
 
-	m_lineCount -= CountLineBreaks( pos, count );
+	m_lineCount -= m_buffer.count( pos, count, 0x0A );
 
 	m_undo.RecordDeletion( *this, pos, count );
 	m_buffer.erase( pos, count );
 
-	assert( m_lineCount == CountLineBreaks( 0, Length() ) + 1 );
+	assert( m_lineCount == m_buffer.count( 0, Length(), 0x0A ) + 1 );
 
 	m_needIterReset = true;
 	return TextChange( pos, count, TextChange::deletion );

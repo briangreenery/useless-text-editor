@@ -14,13 +14,10 @@ ArrayRef<const TextFontRun> TextStyleReader::Fonts( size_t start, size_t count )
 	m_fonts.clear();
 
 	if ( m_styleRegistry.annotator )
-	{
 		m_styleRegistry.annotator->GetFonts( m_fonts, start, count );
-	}
-	else
-	{
+
+	if ( m_fonts.empty() )
 		m_fonts.push_back( TextFontRun( m_styleRegistry.defaultFontid, count ) );
-	}
 
 	return ArrayRef<const TextFontRun>( &m_fonts.front(), &m_fonts.back() + 1 );
 }
@@ -30,13 +27,10 @@ ArrayRef<const TextStyleRun> TextStyleReader::Styles( size_t start, size_t count
 	m_styles.clear();
 
 	if ( m_styleRegistry.annotator )
-	{
 		m_styleRegistry.annotator->GetStyles( m_styles, start, count );
-	}
-	else
-	{
+
+	if ( m_styles.empty() )
 		m_styles.push_back( TextStyleRun( m_styleRegistry.defaultStyleid, start, count ) );
-	}
 
 	return ArrayRef<const TextStyleRun>( &m_styles.front(), &m_styles.back() + 1 );
 }

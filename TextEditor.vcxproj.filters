@@ -31,6 +31,12 @@
     <Filter Include="Utility">
       <UniqueIdentifier>{0d0accc7-2dc3-4276-9a70-40d856baa633}</UniqueIdentifier>
     </Filter>
+    <Filter Include="rapidxml">
+      <UniqueIdentifier>{1471a63e-78a2-4dad-97b7-8e18a242f4e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Textmate">
+      <UniqueIdentifier>{7e76a81f-193d-4f3a-9b8c-7b753b4a805c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TextSelection.cpp">
@@ -147,6 +153,15 @@
     </ClCompile>
     <ClCompile Include="AccessibleTextView.cpp">
       <Filter>TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="TextMateAnnotator.cpp">
+      <Filter>Textmate</Filter>
+    </ClCompile>
+    <ClCompile Include="TextMatePattern.cpp">
+      <Filter>Textmate</Filter>
+    </ClCompile>
+    <ClCompile Include="TextMateTokenRun.cpp">
+      <Filter>Textmate</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -284,6 +299,27 @@
     </ClInclude>
     <ClInclude Include="ThrowHRESULT.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidxml\rapidxml_iterators.hpp">
+      <Filter>rapidxml</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidxml\rapidxml_print.hpp">
+      <Filter>rapidxml</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidxml\rapidxml_utils.hpp">
+      <Filter>rapidxml</Filter>
+    </ClInclude>
+    <ClInclude Include="rapidxml\rapidxml.hpp">
+      <Filter>rapidxml</Filter>
+    </ClInclude>
+    <ClInclude Include="TextMateAnnotator.h">
+      <Filter>Textmate</Filter>
+    </ClInclude>
+    <ClInclude Include="TextMatePattern.h">
+      <Filter>Textmate</Filter>
+    </ClInclude>
+    <ClInclude Include="TextMateTokenRun.h">
+      <Filter>Textmate</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

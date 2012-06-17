@@ -98,6 +98,9 @@
     <ClCompile Include="TextBuffer.cpp" />
     <ClCompile Include="TextBlock.cpp" />
     <ClCompile Include="TextFont.cpp" />
+    <ClCompile Include="TextMateAnnotator.cpp" />
+    <ClCompile Include="TextMatePattern.cpp" />
+    <ClCompile Include="TextMateTokenRun.cpp" />
     <ClCompile Include="TextRange.cpp" />
     <ClCompile Include="TextSquiggle.cpp" />
     <ClCompile Include="TextStyleReader.cpp" />
@@ -128,6 +131,13 @@
     <ClInclude Include="ArrayRef.h" />
     <ClInclude Include="DocumentCharIter.h" />
     <ClInclude Include="EmptyTextBlock.h" />
+    <ClInclude Include="rapidxml\rapidxml.hpp" />
+    <ClInclude Include="rapidxml\rapidxml_iterators.hpp" />
+    <ClInclude Include="rapidxml\rapidxml_print.hpp" />
+    <ClInclude Include="rapidxml\rapidxml_utils.hpp" />
+    <ClInclude Include="TextMateAnnotator.h" />
+    <ClInclude Include="TextMatePattern.h" />
+    <ClInclude Include="TextMateTokenRun.h" />
     <ClInclude Include="ThrowHRESULT.h" />
     <ClInclude Include="RelevanceAnnotator.h" />
     <ClInclude Include="RelevanceTokenRun.h" />

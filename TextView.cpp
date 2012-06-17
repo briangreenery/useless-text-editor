@@ -1,11 +1,12 @@
 // TextView.cpp
 
 #include "TextView.h"
-#include "TextAnnotator.h"
-#include "RelevanceAnnotator.h"
 #include <Windows.h>
 #include <Windowsx.h>
 #include <uxtheme.h>
+
+#include "RelevanceAnnotator.h"
+#include "TextMateAnnotator.h"
 
 TextView::TextView( HWND hwnd )
 	: m_hwnd( hwnd )
@@ -23,7 +24,11 @@ TextView::TextView( HWND hwnd )
 	m_metrics.gutterWidth = m_styleRegistry.avgCharWidth * 5;
 	m_metrics.marginWidth = m_styleRegistry.avgCharWidth;
 
-	m_styleRegistry.annotator = new RelevanceAnnotator( m_doc, m_styleRegistry );
+	//m_styleRegistry.annotator = new RelevanceAnnotator( m_doc, m_styleRegistry );
+
+	TextMateAnnotator* annotator = new TextMateAnnotator( m_doc, m_styleRegistry );;
+	annotator->SetLanguageFile( "C:\\Users\\Brian\\Desktop\\JavaScript.tmLanguage" );
+	m_styleRegistry.annotator = annotator;
 }
 
 int TextView::OnCreate( LPCREATESTRUCT )
