@@ -15,8 +15,8 @@ SimpleTextBlock::SimpleTextBlock( SimpleLayoutDataPtr data, const TextStyleRegis
 
 void SimpleTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) const
 {
-	size_t firstLine = rect.top / m_styleRegistry.lineHeight;
-	rect.top = firstLine * m_styleRegistry.lineHeight;
+	size_t firstLine = rect.top / m_styleRegistry.LineHeight();
+	rect.top = firstLine * m_styleRegistry.LineHeight();
 
 	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &rect ); ++line )
 	{
@@ -24,19 +24,19 @@ void SimpleTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) const
 		DrawLineSelection ( line, painter, rect );
 		DrawLineSquiggles ( line, painter, rect );
 		DrawLineHighlights( line, painter, rect );
-		rect.top += m_styleRegistry.lineHeight;
+		rect.top += m_styleRegistry.LineHeight();
 	}
 }
 
 void SimpleTextBlock::DrawText( VisualPainter& painter, RECT rect ) const
 {
-	size_t firstLine = rect.top / m_styleRegistry.lineHeight;
-	rect.top = firstLine * m_styleRegistry.lineHeight;
+	size_t firstLine = rect.top / m_styleRegistry.LineHeight();
+	rect.top = firstLine * m_styleRegistry.LineHeight();
 
 	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &rect ); ++line )
 	{
 		DrawLineText( line, painter, rect );
-		rect.top += m_styleRegistry.lineHeight;
+		rect.top += m_styleRegistry.LineHeight();
 	}
 }
 
@@ -67,7 +67,7 @@ void SimpleTextBlock::DrawLineSelection( size_t line, VisualPainter& painter, RE
 		int xStart = CPtoX( line, start, false );
 		int xEnd   = CPtoX( line, end - 1, true );
 
-		DrawLineRect( painter, rect, xStart, xEnd, m_styleRegistry.selectionColor );
+		DrawLineRect( painter, rect, xStart, xEnd, m_styleRegistry.Theme().selectionColor );
 	}
 
 	if ( line == m_data->lines.size() - 1
@@ -75,9 +75,9 @@ void SimpleTextBlock::DrawLineSelection( size_t line, VisualPainter& painter, RE
 	  && m_data->endsWithNewline )
 	{
 		int xStart = LineWidth( line );
-		int xEnd   = LineWidth( line ) + m_styleRegistry.avgCharWidth;
+		int xEnd   = LineWidth( line ) + m_styleRegistry.AvgCharWidth();
 
-		DrawLineRect( painter, rect, xStart, xEnd, m_styleRegistry.selectionColor );
+		DrawLineRect( painter, rect, xStart, xEnd, m_styleRegistry.Theme().selectionColor );
 	}
 }
 
@@ -181,7 +181,7 @@ void SimpleTextBlock::DrawLineRect( VisualPainter& painter, RECT rect, int xStar
 	RECT drawRect = { std::max<int>( xStart, rect.left ),
 	                  rect.top,
 	                  std::min<int>( xEnd, rect.right ),
-	                  rect.top + m_styleRegistry.lineHeight };
+	                  rect.top + m_styleRegistry.LineHeight() };
 
 	if ( !IsRectEmpty( &drawRect ) )
 		painter.FillRect( drawRect, color );
@@ -202,14 +202,14 @@ size_t SimpleTextBlock::LineContaining( size_t pos ) const
 
 size_t SimpleTextBlock::LineStart( int y ) const
 {
-	int line = y / m_styleRegistry.lineHeight;
+	int line = y / m_styleRegistry.LineHeight();
 	assert( line >= 0 && size_t( line ) < m_data->lines.size() );
 	return TextStart( line );
 }
 
 size_t SimpleTextBlock::LineEnd( int y ) const
 {
-	int line = y / m_styleRegistry.lineHeight;
+	int line = y / m_styleRegistry.LineHeight();
 	assert( line >= 0 && size_t( line ) < m_data->lines.size() );
 	return TextEnd( line );
 }
@@ -231,19 +231,19 @@ POINT SimpleTextBlock::PointFromChar( size_t pos, bool advancing ) const
 	assert( line < m_data->lines.size() );
 
 	result.x = CPtoX( line, pos, trailingEdge );
-	result.y = line * m_styleRegistry.lineHeight;
+	result.y = line * m_styleRegistry.LineHeight();
 
 	return result;
 }
 
 size_t SimpleTextBlock::CharFromPoint( POINT* point ) const
 {
-	int line = point->y / m_styleRegistry.lineHeight;
+	int line = point->y / m_styleRegistry.LineHeight();
 
 	if ( line < 0 || size_t( line ) >= m_data->lines.size() )
 		line = m_data->lines.size() - 1;
 
-	point->y = line * m_styleRegistry.lineHeight;
+	point->y = line * m_styleRegistry.LineHeight();
 	return XtoCP( line, &point->x );
 }
 
@@ -254,7 +254,7 @@ size_t SimpleTextBlock::Length() const
 
 int SimpleTextBlock::Height() const
 {
-	return m_data->lines.size() * m_styleRegistry.lineHeight;
+	return m_data->lines.size() * m_styleRegistry.LineHeight();
 }
 
 bool SimpleTextBlock::EndsWithNewline() const

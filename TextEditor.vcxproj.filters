@@ -166,6 +166,9 @@
     <ClCompile Include="TextMateTokenRun.cpp">
       <Filter>Annotators\Textmate</Filter>
     </ClCompile>
+    <ClCompile Include="TextTheme.cpp">
+      <Filter>TextStyle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TextSelection.h">
@@ -323,6 +326,9 @@
     </ClInclude>
     <ClInclude Include="TextMateTokenRun.h">
       <Filter>Annotators\Textmate</Filter>
+    </ClInclude>
+    <ClInclude Include="TextTheme.h">
+      <Filter>TextStyle</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -17,10 +17,10 @@ void EmptyTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) const
 	{
 		RECT drawRect = { 0,
 		                  rect.top,
-		                  m_styleRegistry.avgCharWidth,
-		                  rect.top + m_styleRegistry.lineHeight };
+		                  m_styleRegistry.AvgCharWidth(),
+		                  rect.top + m_styleRegistry.LineHeight() };
 
-		painter.FillRect( drawRect, m_styleRegistry.selectionColor );
+		painter.FillRect( drawRect, m_styleRegistry.Theme().selectionColor );
 	}
 }
 
@@ -68,7 +68,7 @@ size_t EmptyTextBlock::Length() const
 
 int EmptyTextBlock::Height() const
 {
-	return m_styleRegistry.lineHeight;
+	return m_styleRegistry.LineHeight();
 }
 
 bool EmptyTextBlock::EndsWithNewline() const

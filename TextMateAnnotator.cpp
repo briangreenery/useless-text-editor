@@ -14,11 +14,8 @@ using namespace rapidxml;
 TextMateAnnotator::TextMateAnnotator( const TextDocument& doc, TextStyleRegistry& styleRegistry )
 	: m_doc( doc )
 	, m_styleRegistry( styleRegistry )
+	, m_defaultClassID( styleRegistry.ClassID( "default" ) )
 {
-	m_keyword  = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,    0,255 ), TextStyle::useDefault ) );
-	m_constant = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 128,  0,128 ), TextStyle::useDefault ) );
-	m_string   = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,  128,128 ), TextStyle::useDefault ) );
-	m_name     = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 128,  0,128 ), TextStyle::useDefault ) );
 }
 
 static xml_node<char>* GetKeyValue( xml_node<char>* node, const char* keyName )
@@ -30,7 +27,7 @@ static xml_node<char>* GetKeyValue( xml_node<char>* node, const char* keyName )
 	return 0;
 }
 
-static std::vector<TextMateCapture> ReadCaptures( xml_node<char>* node )
+static std::vector<TextMateCapture> ReadCaptures( xml_node<char>* node, TextStyleRegistry& styleRegistry )
 {
 	std::vector<TextMateCapture> captures;
 
@@ -49,7 +46,7 @@ static std::vector<TextMateCapture> ReadCaptures( xml_node<char>* node )
 		if ( name == 0 )
 			continue;
 
-		captures.push_back( TextMateCapture( index, name->value() ) );
+		captures.push_back( TextMateCapture( index, styleRegistry.ClassID( name->value() ) ) );
 	}
 
 	return captures;
@@ -91,11 +88,11 @@ void TextMateAnnotator::SetLanguageFile( const char* path )
 		xml_node<char>* capturesNode = GetKeyValue( dict, "captures" );
 
 		if ( capturesNode )
-			captures = ReadCaptures( capturesNode );
+			captures = ReadCaptures( capturesNode, m_styleRegistry );
 
 		try
 		{
-			m_patterns.push_back( TextMatePattern( nameNode->value(), matchNode->value(), captures ) );
+			m_patterns.push_back( TextMatePattern( m_styleRegistry.ClassID( nameNode->value() ), matchNode->value(), captures ) );
 		}
 		catch (...)
 		{
@@ -143,9 +140,9 @@ void TextMateAnnotator::TokenizeLine( size_t offset, size_t lineEnd, std::string
 		if ( m_patterns[best].captures.empty() )
 		{
 			if ( bestStart != offset )
-				m_tokens.push_back( TextMateTokenRun( "default", offset, bestStart - offset ) );
+				m_tokens.push_back( TextMateTokenRun( m_defaultClassID, offset, bestStart - offset ) );
 
-			m_tokens.push_back( TextMateTokenRun( m_patterns[best].name, bestStart, bestLength ) );
+			m_tokens.push_back( TextMateTokenRun( m_patterns[best].classID, bestStart, bestLength ) );
 		}
 		else
 		{
@@ -165,14 +162,14 @@ void TextMateAnnotator::TokenizeLine( size_t offset, size_t lineEnd, std::string
 					continue;
 
 				if ( start != lastEnd )
-					m_tokens.push_back( TextMateTokenRun( "default", lastEnd, start - lastEnd ) );
+					m_tokens.push_back( TextMateTokenRun( m_defaultClassID, lastEnd, start - lastEnd ) );
 
-				m_tokens.push_back( TextMateTokenRun( pattern.captures[i].name, start, length ) );
+				m_tokens.push_back( TextMateTokenRun( pattern.captures[i].classID, start, length ) );
 				lastEnd = start + length;
 			}
 
 			if ( lastEnd != bestStart + bestLength )
-				m_tokens.push_back( TextMateTokenRun( "default", lastEnd, bestStart + bestLength - lastEnd ) );
+				m_tokens.push_back( TextMateTokenRun( m_defaultClassID, lastEnd, bestStart + bestLength - lastEnd ) );
 		}
 
 		line = line.substr( nextStart );
@@ -180,7 +177,7 @@ void TextMateAnnotator::TokenizeLine( size_t offset, size_t lineEnd, std::string
 	}
 
 	if ( offset != lineEnd )
-		m_tokens.push_back( TextMateTokenRun( "default", offset, lineEnd - offset ) );
+		m_tokens.push_back( TextMateTokenRun( m_defaultClassID, offset, lineEnd - offset ) );
 }
 
 void TextMateAnnotator::TextChanged( TextChange )
@@ -209,7 +206,7 @@ void TextMateAnnotator::TextChanged( TextChange )
 		if ( lineBreak == text.end() )
 			break;
 
-		m_tokens.push_back( TextMateTokenRun( "default", offset + line.size(), 1 ) );
+		m_tokens.push_back( TextMateTokenRun( m_defaultClassID, offset + line.size(), 1 ) );
 		offset += line.size() + 1;
 	}
 }
@@ -231,28 +228,6 @@ struct TokenRunCompare
 	bool operator()( const TextRange&        a, const TextMateTokenRun&  b ) const { return a.start + a.count <= b.start; }
 };
 
-uint32_t TextMateAnnotator::TokenStyle( size_t pos ) const
-{
-	const TextMateTokenRun& run = m_tokens[pos];
-
-	if ( run.name == "default" )
-		return m_styleRegistry.defaultStyleid;
-
-	if ( run.name == "storage.type.js" )
-		return m_keyword;
-
-	if ( run.name.find( "keyword." ) == 0 )
-		return m_keyword;
-
-	if ( run.name.find( "constant." ) == 0 )
-		return m_constant;
-
-	if ( run.name.find( "entity.name." ) == 0 )
-		return m_name;
-
-	return m_styleRegistry.defaultStyleid;
-}
-
 void TextMateAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t count )
 {
 	TextRange textRange( start, count );
@@ -263,12 +238,10 @@ void TextMateAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t c
 		size_t overlapStart = (std::max)( start, it->start );
 		size_t overlapEnd   = (std::min)( start + count, it->start + it->count );
 
-		uint32_t styleid = TokenStyle( it - m_tokens.begin() );
-
-		if ( !styles.empty() && styles.back().styleid == styleid )
+		if ( !styles.empty() && styles.back().styleid == it->classID )
 			styles.back().count += overlapEnd - overlapStart;
 		else
-			styles.push_back( TextStyleRun( styleid, overlapStart, overlapEnd - overlapStart ) );
+			styles.push_back( TextStyleRun( it->classID, overlapStart, overlapEnd - overlapStart ) );
 	}
 }
 

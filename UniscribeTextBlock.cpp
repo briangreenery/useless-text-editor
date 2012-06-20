@@ -15,8 +15,8 @@ UniscribeTextBlock::UniscribeTextBlock( UniscribeLayoutDataPtr data, const TextS
 
 void UniscribeTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) const
 {
-	size_t firstLine = rect.top / m_styleRegistry.lineHeight;
-	rect.top = firstLine * m_styleRegistry.lineHeight;
+	size_t firstLine = rect.top / m_styleRegistry.LineHeight();
+	rect.top = firstLine * m_styleRegistry.LineHeight();
 
 	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &rect ); ++line )
 	{
@@ -26,21 +26,21 @@ void UniscribeTextBlock::DrawBackground( VisualPainter& painter, RECT rect ) con
 		DrawLineSelection ( line, visualToLogical, painter, rect );
 		DrawLineSquiggles ( line, visualToLogical, painter, rect );
 		DrawLineHighlights( line, visualToLogical, painter, rect );
-		rect.top += m_styleRegistry.lineHeight;
+		rect.top += m_styleRegistry.LineHeight();
 	}
 }
 
 void UniscribeTextBlock::DrawText( VisualPainter& painter, RECT rect ) const
 {
-	size_t firstLine = rect.top / m_styleRegistry.lineHeight;
-	rect.top = firstLine * m_styleRegistry.lineHeight;
+	size_t firstLine = rect.top / m_styleRegistry.LineHeight();
+	rect.top = firstLine * m_styleRegistry.LineHeight();
 
 	for ( size_t line = firstLine; line < m_data->lines.size() && !IsRectEmpty( &rect ); ++line )
 	{
 		std::vector<int> visualToLogical = VisualToLogicalMapping( LineRuns( line ) );
 
 		DrawLineText( line, visualToLogical, painter, rect );
-		rect.top += m_styleRegistry.lineHeight;
+		rect.top += m_styleRegistry.LineHeight();
 	}
 }
 
@@ -93,7 +93,7 @@ void UniscribeTextBlock::DrawLineSelection( size_t line, const std::vector<int>&
 			              rect,
 			              xStart + range.first,
 			              xStart + range.second,
-			              m_styleRegistry.selectionColor );
+			              m_styleRegistry.Theme().selectionColor );
 
 			xStart += run.width;
 		}
@@ -106,8 +106,8 @@ void UniscribeTextBlock::DrawLineSelection( size_t line, const std::vector<int>&
 		DrawLineRect( painter,
 		              rect,
 		              LineWidth( line ),
-		              LineWidth( line ) + m_styleRegistry.avgCharWidth,
-		              m_styleRegistry.selectionColor );
+		              LineWidth( line ) + m_styleRegistry.AvgCharWidth(),
+		              m_styleRegistry.Theme().selectionColor );
 	}
 }
 
@@ -199,9 +199,9 @@ void UniscribeTextBlock::DrawLineText( size_t line, const std::vector<int>& visu
 
 			// textRect has an extra 'lineHeight' in each direction to show overhangs and underhangs without clipping.
 			RECT textRect = { std::max<int>( rect.left, xStart + range.first ),
-			                  rect.top - m_styleRegistry.lineHeight,
+			                  rect.top - m_styleRegistry.LineHeight(),
 			                  std::min<int>( rect.right, xStart + range.second ),
-			                  rect.top + 2*m_styleRegistry.lineHeight };
+			                  rect.top + 2*m_styleRegistry.LineHeight() };
 
 			painter.SetTextColor( m_styleRegistry.Style( style->styleid ).textColor );
 			ThrowHRESULT( ScriptTextOut( painter.hdc,
@@ -262,7 +262,7 @@ void UniscribeTextBlock::DrawLineRect( VisualPainter& painter, RECT rect, int xS
 	RECT drawRect = { std::max<int>( xStart, rect.left ),
 	                  rect.top,
 	                  std::min<int>( xEnd, rect.right ),
-	                  rect.top + m_styleRegistry.lineHeight };
+	                  rect.top + m_styleRegistry.LineHeight() };
 
 	if ( !IsRectEmpty( &drawRect ) )
 		painter.FillRect( drawRect, color );
@@ -285,32 +285,32 @@ POINT UniscribeTextBlock::PointFromChar( size_t pos, bool advancing ) const
 	assert( line < m_data->lines.size() );
 
 	result.x = CPtoX( line, pos, trailingEdge );
-	result.y = line * m_styleRegistry.lineHeight;
+	result.y = line * m_styleRegistry.LineHeight();
 
 	return result;
 }
 
 size_t UniscribeTextBlock::CharFromPoint( POINT* point ) const
 {
-	int line = point->y / m_styleRegistry.lineHeight;
+	int line = point->y / m_styleRegistry.LineHeight();
 
 	if ( line < 0 || size_t( line ) >= m_data->lines.size() )
 		line = m_data->lines.size() - 1;
 
-	point->y = line * m_styleRegistry.lineHeight;
+	point->y = line * m_styleRegistry.LineHeight();
 	return XtoCP( line, &point->x );
 }
 
 size_t UniscribeTextBlock::LineStart( int y ) const
 {
-	int line = y / m_styleRegistry.lineHeight;
+	int line = y / m_styleRegistry.LineHeight();
 	assert( line >= 0 && size_t( line ) < m_data->lines.size() );
 	return TextStart( line );
 }
 
 size_t UniscribeTextBlock::LineEnd( int y ) const
 {
-	int line = y / m_styleRegistry.lineHeight;
+	int line = y / m_styleRegistry.LineHeight();
 	assert( line >= 0 && size_t( line ) < m_data->lines.size() );
 	return TextEnd( line );
 }
@@ -327,7 +327,7 @@ size_t UniscribeTextBlock::Length() const
 
 int UniscribeTextBlock::Height() const
 {
-	return m_data->lines.size() * m_styleRegistry.lineHeight;
+	return m_data->lines.size() * m_styleRegistry.LineHeight();
 }
 
 bool UniscribeTextBlock::EndsWithNewline() const

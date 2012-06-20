@@ -2,8 +2,8 @@
 
 #include "TextMateTokenRun.h"
 
-TextMateTokenRun::TextMateTokenRun( const std::string& name, size_t start, size_t count )
-	: name( name )
+TextMateTokenRun::TextMateTokenRun( uint32_t classID, size_t start, size_t count )
+	: classID( classID )
 	, start( start )
 	, count( count )
 {

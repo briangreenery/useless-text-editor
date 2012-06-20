@@ -23,9 +23,9 @@ static size_t LayoutRun( SimpleTextRun run,
 
 	int maxWidth = ( forceFit || args.maxWidth == 0 ) ? (std::numeric_limits<int>::max)() : args.maxWidth;
 
-	if ( run.textCount == 1 && args.text[run.textStart] == '\t' && args.styleRegistry.tabSize > 0 )
+	if ( run.textCount == 1 && args.text[run.textStart] == '\t' && args.styleRegistry.TabWidth() > 0 )
 	{
-		int tabWidth = args.styleRegistry.tabSize - ( xStart % args.styleRegistry.tabSize );
+		int tabWidth = args.styleRegistry.TabWidth() - ( xStart % args.styleRegistry.TabWidth() );
 		layoutData.xOffsets[run.textStart] = tabWidth;
 		fit = ( tabWidth < maxWidth ? 1 : 0 );
 	}

@@ -44,7 +44,8 @@ private:
 
 	uint32_t m_keyword;
 	uint32_t m_string;
-	uint32_t m_constant;
+	uint32_t m_number;
+	uint32_t m_default;
 
 	std::vector<size_t> m_matchingTokens;
 	RelevanceTokenRuns m_tokens;

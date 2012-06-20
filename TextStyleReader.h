@@ -14,7 +14,7 @@ class TextAnnotator;
 class TextStyleReader
 {
 public:
-	TextStyleReader( const TextStyleRegistry& styleRegistry );
+	TextStyleReader( TextStyleRegistry& styleRegistry );
 
 	ArrayRef<const TextFontRun>  Fonts     ( size_t start, size_t count );
 	ArrayRef<const TextStyleRun> Styles    ( size_t start, size_t count );
@@ -23,6 +23,8 @@ public:
 
 private:
 	const TextStyleRegistry& m_styleRegistry;
+	uint32_t m_defaultClassID;
+
 	TextFontRuns m_fonts;
 	TextStyleRuns m_styles;
 	TextRanges m_squiggles;

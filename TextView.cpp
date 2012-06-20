@@ -21,14 +21,14 @@ TextView::TextView( HWND hwnd )
 	, m_lastUndoTick( 0 )
 	, m_lastEditOperation( lastWasNothing )
 {
-	m_metrics.gutterWidth = m_styleRegistry.avgCharWidth * 5;
-	m_metrics.marginWidth = m_styleRegistry.avgCharWidth;
+	m_metrics.gutterWidth = m_styleRegistry.AvgCharWidth() * 5;
+	m_metrics.marginWidth = m_styleRegistry.AvgCharWidth();
 
 	//m_styleRegistry.annotator = new RelevanceAnnotator( m_doc, m_styleRegistry );
 
 	TextMateAnnotator* annotator = new TextMateAnnotator( m_doc, m_styleRegistry );;
 	annotator->SetLanguageFile( "C:\\Users\\Brian\\Desktop\\JavaScript.tmLanguage" );
-	m_styleRegistry.annotator = annotator;
+	m_styleRegistry.SetAnnotator( annotator );
 }
 
 int TextView::OnCreate( LPCREATESTRUCT )
@@ -46,7 +46,7 @@ void TextView::OnSize( UINT state, int cx, int cy )
 	GetClientRect( m_hwnd, &m_metrics.clientRect );
 
 	if ( cy != ( oldClientRect.bottom - oldClientRect.top ) )
-		m_metrics.linesPerPage = cy / m_styleRegistry.lineHeight;
+		m_metrics.linesPerPage = cy / m_styleRegistry.LineHeight();
 
 	if ( cx != ( oldClientRect.right - oldClientRect.left ) )
 		UpdateLayout();
@@ -69,7 +69,7 @@ void TextView::OnPaint()
 	SetWindowOrgEx( hdc, oldOrigin.x, oldOrigin.y, NULL );
 
 	RECT fillRect = m_metrics.IntersectWithTextOrMargin( ps.rcPaint, m_hwnd );
-	SetBkColor( hdc, m_styleRegistry.defaultBkColor );
+	SetBkColor( hdc, m_styleRegistry.DefaultStyle().bkColor );
 	ExtTextOut( hdc, 0, 0, ETO_OPAQUE, &fillRect, L"", 0, NULL );
 
 	m_blocks.DrawText( m_metrics.ClientToText( hdc, &oldOrigin ),
@@ -85,11 +85,11 @@ void TextView::PaintGutter( HDC hdc, RECT rect )
 {
 	RECT gutterRect = m_metrics.IntersectWithGutter( rect, m_hwnd );
 
-	COLORREF oldBkColor = SetBkColor( hdc, m_styleRegistry.gutterColor );
+	COLORREF oldBkColor = SetBkColor( hdc, m_styleRegistry.Theme().gutterBkColor );
 	ExtTextOut( hdc, 0, 0, ETO_OPAQUE|ETO_CLIPPED, &gutterRect, L"", 0, NULL );
 
 	gutterRect.left = gutterRect.right - 1;
-	SetBkColor( hdc, m_styleRegistry.gutterLineColor );
+	SetBkColor( hdc, m_styleRegistry.Theme().gutterLineColor );
 	ExtTextOut( hdc, 0, 0, ETO_OPAQUE|ETO_CLIPPED, &gutterRect, L"", 0, NULL );
 
 	SetBkColor( hdc, oldBkColor );
@@ -188,9 +188,9 @@ void TextView::OnMouseMove( POINT point )
 	if ( currentTick - m_lastMouseScrollTick >= m_mouseScrollInterval )
 	{
 		if ( point.y < m_metrics.clientRect.top )
-			ScrollDelta( 0, 3*-m_styleRegistry.lineHeight );
+			ScrollDelta( 0, 3*-m_styleRegistry.LineHeight() );
 		else if ( point.y >= m_metrics.clientRect.bottom )
-			ScrollDelta( 0, 3*m_styleRegistry.lineHeight );
+			ScrollDelta( 0, 3*m_styleRegistry.LineHeight() );
 
 		m_lastMouseScrollTick = currentTick;
 	}
@@ -245,7 +245,7 @@ void TextView::OnSetCursor()
 
 void TextView::OnSetFocus( HWND )
 {
-	CreateCaret( m_hwnd, NULL, m_metrics.caretWidth, m_styleRegistry.lineHeight );
+	CreateCaret( m_hwnd, NULL, m_metrics.caretWidth, m_styleRegistry.LineHeight() );
 	::ShowCaret( m_hwnd );
 	UpdateCaretPos();
 }
@@ -341,7 +341,7 @@ void TextView::LineUp( bool moveSelection, bool up )
 	            ? m_lineUpCount + 1
 	            : m_lineUpCount - 1;
 
-	int y = m_lineUpStart.y - ( m_styleRegistry.lineHeight * count );
+	int y = m_lineUpStart.y - ( m_styleRegistry.LineHeight() * count );
 
 	if ( 0 <= y && y < m_blocks.Height() )
 	{
@@ -589,18 +589,18 @@ size_t TextView::LineNumberDigits()
 bool TextView::AdjustGutterWidth()
 {
 	int oldGutterWidth = m_metrics.gutterWidth;
-	m_metrics.gutterWidth = std::max<int>( 5, LineNumberDigits() + 2 ) * m_styleRegistry.avgCharWidth;
+	m_metrics.gutterWidth = std::max<int>( 5, LineNumberDigits() + 2 ) * m_styleRegistry.AvgCharWidth();
 	return oldGutterWidth != m_metrics.gutterWidth;
 }
 
 void TextView::UpdateLayout( TextChange change, TextSelection selection )
 {
-	if ( m_styleRegistry.annotator )
+	if ( m_styleRegistry.Annotator() )
 	{
-		m_styleRegistry.annotator->TextChanged( change );
+		m_styleRegistry.Annotator()->TextChanged( change );
 
 		if ( m_selection != selection )
-			m_styleRegistry.annotator->SelectionChanged( selection.start, selection.end );
+			m_styleRegistry.Annotator()->SelectionChanged( selection.start, selection.end );
 	}
 
 	if ( AdjustGutterWidth() )
@@ -634,8 +634,8 @@ void TextView::MoveSelection( TextSelection selection, bool scroll )
 
 	m_doc.EndUndoGroup();
 
-	if ( m_styleRegistry.annotator )
-		m_styleRegistry.annotator->SelectionChanged( selection.start, selection.end );
+	if ( m_styleRegistry.Annotator() )
+		m_styleRegistry.Annotator()->SelectionChanged( selection.start, selection.end );
 
 	m_selection = selection;
 
@@ -651,13 +651,13 @@ void TextView::ScrollToCaret()
 	RECT textRect = m_metrics.ClientToText( m_metrics.TextRect( m_hwnd ) );
 
 	int textHeight         = textRect.bottom - textRect.top;
-	int adjustedTextHeight = textHeight - textHeight % m_styleRegistry.lineHeight;
+	int adjustedTextHeight = textHeight - textHeight % m_styleRegistry.LineHeight();
 
 	int xOffset = m_metrics.xOffset;
 	int yOffset = m_metrics.yOffset;
 
-	if ( m_selection.endPoint.y + m_styleRegistry.lineHeight > textRect.bottom )
-		yOffset = m_selection.endPoint.y + m_styleRegistry.lineHeight - adjustedTextHeight;
+	if ( m_selection.endPoint.y + m_styleRegistry.LineHeight() > textRect.bottom )
+		yOffset = m_selection.endPoint.y + m_styleRegistry.LineHeight() - adjustedTextHeight;
 	else if ( m_selection.endPoint.y < textRect.top )
 		yOffset = m_selection.endPoint.y;
 
@@ -669,7 +669,7 @@ void TextView::UpdateCaretPos()
 {
 	POINT point = m_metrics.TextToClient( m_selection.endPoint );
 
-	RECT rect = { point.x, point.y, point.x + m_metrics.caretWidth, point.y + m_styleRegistry.lineHeight };
+	RECT rect = { point.x, point.y, point.x + m_metrics.caretWidth, point.y + m_styleRegistry.LineHeight() };
 	RECT intersection = m_metrics.IntersectWithText( rect, m_hwnd );
 
 	if ( IsRectEmpty( &intersection ) )
@@ -707,7 +707,7 @@ void TextView::ShowCaret()
 
 void TextView::ScrollTo( int x, int y )
 {
-	y = (std::min)( y, int( ( m_blocks.LineCount() - m_metrics.linesPerPage ) * m_styleRegistry.lineHeight ) );
+	y = (std::min)( y, int( ( m_blocks.LineCount() - m_metrics.linesPerPage ) * m_styleRegistry.LineHeight() ) );
 	y = (std::max)( y, int( 0 ) );
 
 	ScrollWindowEx( m_hwnd, 0, m_metrics.yOffset - y, NULL, NULL, NULL, NULL, SW_ERASE | SW_INVALIDATE );
@@ -715,9 +715,9 @@ void TextView::ScrollTo( int x, int y )
 
 	SCROLLINFO si = { sizeof si };
 	si.fMask      = SIF_PAGE | SIF_POS | SIF_RANGE | SIF_DISABLENOSCROLL;
-	si.nPage      = m_metrics.linesPerPage * m_styleRegistry.lineHeight;
+	si.nPage      = m_metrics.linesPerPage * m_styleRegistry.LineHeight();
 	si.nMin       = 0;
-	si.nMax       = m_blocks.LineCount() * m_styleRegistry.lineHeight - 1;
+	si.nMax       = m_blocks.LineCount() * m_styleRegistry.LineHeight() - 1;
 	si.nPos       = m_metrics.yOffset;
 
 	SetScrollInfo( m_hwnd, SB_VERT, &si, TRUE );
@@ -746,17 +746,17 @@ void TextView::OnMouseWheel( int zDelta )
 	int dy = zDelta * (int)scrollLines / WHEEL_DELTA;
 	m_mouseWheelRemainder = zDelta - dy * WHEEL_DELTA / (int)scrollLines;
 
-	ScrollDelta( 0, -dy * m_styleRegistry.lineHeight );
+	ScrollDelta( 0, -dy * m_styleRegistry.LineHeight() );
 }
 
 void TextView::OnVScroll( UINT code )
 {
 	switch ( code )
 	{
-	case SB_LINEUP:         ScrollDelta( 0, -m_styleRegistry.lineHeight ); break;
-	case SB_LINEDOWN:       ScrollDelta( 0,  m_styleRegistry.lineHeight ); break;
-	case SB_PAGEUP:         ScrollDelta( 0, -m_metrics.linesPerPage * m_styleRegistry.lineHeight ); break;
-	case SB_PAGEDOWN:       ScrollDelta( 0,  m_metrics.linesPerPage * m_styleRegistry.lineHeight ); break;
+	case SB_LINEUP:         ScrollDelta( 0, -m_styleRegistry.LineHeight() ); break;
+	case SB_LINEDOWN:       ScrollDelta( 0,  m_styleRegistry.LineHeight() ); break;
+	case SB_PAGEUP:         ScrollDelta( 0, -m_metrics.linesPerPage * m_styleRegistry.LineHeight() ); break;
+	case SB_PAGEDOWN:       ScrollDelta( 0,  m_metrics.linesPerPage * m_styleRegistry.LineHeight() ); break;
 	case SB_THUMBPOSITION:  ScrollTo( m_metrics.xOffset, SnapToLine( GetTrackPos( SB_VERT ) ) ); break;
 	case SB_THUMBTRACK:     ScrollTo( m_metrics.xOffset, SnapToLine( GetTrackPos( SB_VERT ) ) ); break;
 	case SB_TOP:            ScrollTo( m_metrics.xOffset, 0 );                      break;
@@ -780,7 +780,7 @@ UINT TextView::GetTrackPos( int scrollBar )
 
 int TextView::SnapToLine( int y )
 {
-	return m_styleRegistry.lineHeight * ( y / m_styleRegistry.lineHeight );
+	return m_styleRegistry.LineHeight() * ( y / m_styleRegistry.LineHeight() );
 }
 
 HWND TextView::WindowHandle() const

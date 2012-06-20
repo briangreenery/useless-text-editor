@@ -14,7 +14,7 @@ public:
 	           COLORREF textColor,
 	           COLORREF bkColor );
 
-	uint32_t   fontid;
+	uint32_t fontid;
 	COLORREF textColor;
 	COLORREF bkColor;
 

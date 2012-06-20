@@ -7,19 +7,24 @@
 #include <usp10.h>
 #include <string>
 #include <memory>
+#include <stdint.h>
 
 class TextFont
 {
 public:
-	TextFont( LPCWSTR name, HFONT hfont, HDC hdc );
+	TextFont( const std::wstring& name, int size, bool bold, bool italic );
 	~TextFont();
 
-	std::wstring          name;
+	std::wstring name;
+	int          size;
+	bool         bold;
+	bool         italic;
+
 	HFONT                 hfont;
 	mutable SCRIPT_CACHE  fontCache;
 	SCRIPT_FONTPROPERTIES fontProps;
 };
 
-typedef std::unique_ptr<TextFont> TextFontPtr;
+typedef std::shared_ptr<TextFont> TextFontPtr;
 
 #endif

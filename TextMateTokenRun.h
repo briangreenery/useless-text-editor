@@ -5,15 +5,16 @@
 
 #include <string>
 #include <vector>
+#include <stdint.h>
 
 class TextMateTokenRun
 {
 public:
-	TextMateTokenRun( const std::string& name, size_t start, size_t count );
+	TextMateTokenRun( uint32_t classID, size_t start, size_t count );
 
-	std::string name;
-	size_t start;
-	size_t count;
+	uint32_t classID;
+	size_t   start;
+	size_t   count;
 };
 
 typedef std::vector<TextMateTokenRun> TextMateTokenRuns;

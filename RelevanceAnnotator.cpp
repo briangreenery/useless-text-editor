@@ -11,9 +11,10 @@ RelevanceAnnotator::RelevanceAnnotator( const TextDocument& doc, TextStyleRegist
 	: m_doc( doc )
 	, m_styleRegistry( styleRegistry )
 {
-	m_keyword  = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,    0,255 ), TextStyle::useDefault ) );
-	m_constant = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 128,  0,128 ), TextStyle::useDefault ) );
-	m_string   = styleRegistry.AddStyle( TextStyle( TextStyle::useDefault, RGB( 0,  128,128 ), TextStyle::useDefault ) );
+	m_default = styleRegistry.ClassID( "default" );
+	m_keyword = styleRegistry.ClassID( "keyword.operator.relevance" );
+	m_number  = styleRegistry.ClassID( "constant.numeric.relevance" );
+	m_string  = styleRegistry.ClassID( "string.quoted.double.relevance" );
 }
 
 uint32_t RelevanceAnnotator::TokenStyle( size_t token ) const
@@ -59,11 +60,11 @@ uint32_t RelevanceAnnotator::TokenStyle( size_t token ) const
 
 	case Relevance::t_comment:
 	case Relevance::e_comment_not_terminated:
-		return m_styleRegistry.defaultStyleid;
-		
+		return m_default;
+
 	case Relevance::t_number:
 	case Relevance::e_number_too_big:
-		return m_constant;
+		return m_number;
 
 	case Relevance::t_string:
 	case Relevance::e_string_too_long:
@@ -74,11 +75,11 @@ uint32_t RelevanceAnnotator::TokenStyle( size_t token ) const
 	case Relevance::t_then:
 	case Relevance::t_else:
 		return ( std::find( m_matchingTokens.begin(), m_matchingTokens.end(), token ) != m_matchingTokens.end() )
-		          ? m_styleRegistry.defaultStyleid
+		          ? m_default
 		          : m_keyword;
 	}
 
-	return m_styleRegistry.defaultStyleid;
+	return m_default;
 }
 
 class LexerOutputReceiver : public Relevance::LexerOutput
@@ -386,7 +387,6 @@ size_t RelevanceAnnotator::TokenAt( size_t position ) const
 
 void RelevanceAnnotator::GetFonts( TextFontRuns& fonts, size_t start, size_t count )
 {
-	fonts.push_back( TextFontRun( m_styleRegistry.defaultFontid, count ) );
 }
 
 void RelevanceAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t count )

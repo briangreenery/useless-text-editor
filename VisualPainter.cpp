@@ -20,8 +20,8 @@ VisualPainter::VisualPainter( HDC hdc, const TextDocument& doc, TextStyleRegistr
 {
 	GetWindowOrgEx( hdc, &oldOrigin );
 
-	const TextStyle& defaultStyle = styleRegistry.Style( styleRegistry.defaultStyleid );
-	const TextFont& defaultFont = styleRegistry.Font( defaultStyle.fontid );
+	const TextStyle& defaultStyle = styleRegistry.DefaultStyle();
+	const TextFont& defaultFont = styleRegistry.DefaultFont();
 
 	oldFont = SelectObject( hdc, defaultFont.hfont );
 	oldTextColor = ::SetTextColor( hdc, defaultStyle.textColor );
@@ -58,15 +58,14 @@ void VisualPainter::FillRect( RECT rect, COLORREF color )
 void VisualPainter::SetTextColor( COLORREF color )
 {
 	if ( color == TextStyle::useDefault )
-		::SetTextColor( hdc, styleRegistry.defaultTextColor );
+		::SetTextColor( hdc, styleRegistry.DefaultStyle().textColor );
 	else
 		::SetTextColor( hdc, color );
 }
 
-
 void VisualPainter::DrawSquiggles( int xStart, int xEnd, RECT rect )
 {
-	squiggle.Draw( hdc, xStart, xEnd, rect.top + styleRegistry.lineHeight );
+	squiggle.Draw( hdc, xStart, xEnd, rect.top + styleRegistry.LineHeight() );
 }
 
 static void RoundRect( HDC hdc, int x, int y, int width, int height, int radius, COLORREF topColorRef, COLORREF bottomColorRef )
@@ -101,6 +100,6 @@ static void RoundRect( HDC hdc, int x, int y, int width, int height, int radius,
 
 void VisualPainter::DrawHighlight( int xStart, int xEnd, RECT rect )
 {
-	RoundRect( hdc, xStart,     rect.top + 1, xEnd - xStart,     styleRegistry.lineHeight, 3, RGB( 190, 190, 190 ), RGB( 190, 190, 190 ) );
-	RoundRect( hdc, xStart - 1, rect.top    , xEnd - xStart + 1, styleRegistry.lineHeight, 3, RGB( 255, 215,  87 ), RGB( 255, 188,  43 ) );
+	RoundRect( hdc, xStart,     rect.top + 1, xEnd - xStart,     styleRegistry.LineHeight(), 3, RGB( 190, 190, 190 ), RGB( 190, 190, 190 ) );
+	RoundRect( hdc, xStart - 1, rect.top    , xEnd - xStart + 1, styleRegistry.LineHeight(), 3, RGB( 255, 215,  87 ), RGB( 255, 188,  43 ) );
 }

@@ -39,7 +39,7 @@ void VisualDocument::DrawLineNumbers( HDC hdc, RECT rect ) const
 
 	BlockContaining_Result block = BlockContaining( rect.top );
 
-	COLORREF oldTextColor = SetTextColor( hdc, m_styleRegistry.gutterTextColor );
+	COLORREF oldTextColor = SetTextColor( hdc, m_styleRegistry.Theme().gutterTextColor );
 	UINT oldAlign = SetTextAlign( hdc, TA_RIGHT );
 
 	while ( block.it != m_blocks.end() && block.yStart < rect.bottom )
@@ -48,7 +48,7 @@ void VisualDocument::DrawLineNumbers( HDC hdc, RECT rect ) const
 		int length = swprintf_s( buffer, L"%d", block.logicalLine );
 
 		if ( length > 0 )
-			ExtTextOutW( painter.hdc, rect.right - m_styleRegistry.avgCharWidth, block.yStart, ETO_CLIPPED, &rect, buffer, length, NULL );
+			ExtTextOutW( painter.hdc, rect.right - m_styleRegistry.AvgCharWidth(), block.yStart, ETO_CLIPPED, &rect, buffer, length, NULL );
 
 		block.yStart += block->Height();
 		block.textStart += block->Length();
@@ -109,7 +109,7 @@ bool VisualDocument::IsSimpleText( UTF16Ref text ) const
 void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start, size_t count, HDC hdc, int maxWidth )
 {
 	if ( maxWidth != 0 )
-		maxWidth = (std::max)( maxWidth, m_styleRegistry.avgCharWidth * 10 );
+		maxWidth = (std::max)( maxWidth, m_styleRegistry.AvgCharWidth() * 10 );
 
 	TextLayoutArgs layoutArgs( m_doc, m_styleRegistry, hdc, maxWidth );
 
@@ -210,7 +210,7 @@ size_t VisualDocument::CharFromPoint( POINT* point ) const
 
 int VisualDocument::Height() const
 {
-	return m_lineCount * m_styleRegistry.lineHeight;
+	return m_lineCount * m_styleRegistry.LineHeight();
 }
 
 VisualDocument::BlockContaining_Result VisualDocument::BlockContaining( size_t pos ) const

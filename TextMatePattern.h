@@ -11,18 +11,18 @@
 class TextMateCapture
 {
 public:
-	TextMateCapture( uint32_t index, const std::string& name );
+	TextMateCapture( uint32_t index, uint32_t classID );
 
 	uint32_t index;
-	std::string name;
+	uint32_t classID;
 };
 
 class TextMatePattern
 {
 public:
-	TextMatePattern( const std::string& name, const std::string& match, const std::vector<TextMateCapture>& captures );
+	TextMatePattern( uint32_t classID, const std::string& match, const std::vector<TextMateCapture>& captures );
 
-	std::string name;
+	uint32_t classID;
 	std::vector<TextMateCapture> captures;
 
 	std::regex regex;

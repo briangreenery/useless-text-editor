@@ -3,9 +3,9 @@
 #include "TextMatePattern.h"
 #include <algorithm>
 
-TextMateCapture::TextMateCapture( uint32_t index, const std::string& name )
+TextMateCapture::TextMateCapture( uint32_t index, uint32_t classID )
 	: index( index )
-	, name( name )
+	, classID( classID )
 {
 }
 
@@ -17,8 +17,8 @@ struct SortCaptureByIndex
 	}
 };
 
-TextMatePattern::TextMatePattern( const std::string& name, const std::string& match, const std::vector<TextMateCapture>& captures )
-	: name( name )
+TextMatePattern::TextMatePattern( uint32_t classID, const std::string& match, const std::vector<TextMateCapture>& captures )
+	: classID( classID )
 	, regex( match, captures.empty() ? std::regex::ECMAScript|std::regex::nosubs : std::regex::ECMAScript )
 	, captures( captures )
 {

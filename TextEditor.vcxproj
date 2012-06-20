@@ -107,6 +107,7 @@
     <ClCompile Include="TextStyleRegistry.cpp" />
     <ClCompile Include="TextStyleRun.cpp" />
     <ClCompile Include="TextDocumentUndo.cpp" />
+    <ClCompile Include="TextTheme.cpp" />
     <ClCompile Include="VisualPainter.cpp" />
     <ClCompile Include="TextStyle.cpp" />
     <ClCompile Include="UniscribeTextBlock.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="TextMateAnnotator.h" />
     <ClInclude Include="TextMatePattern.h" />
     <ClInclude Include="TextMateTokenRun.h" />
+    <ClInclude Include="TextTheme.h" />
     <ClInclude Include="ThrowHRESULT.h" />
     <ClInclude Include="RelevanceAnnotator.h" />
     <ClInclude Include="RelevanceTokenRun.h" />

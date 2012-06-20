@@ -5,7 +5,9 @@
 
 #include "TextFont.h"
 #include "TextStyle.h"
+#include "TextTheme.h"
 #include <map>
+#include <set>
 
 class TextAnnotator;
 
@@ -14,49 +16,48 @@ class TextStyleRegistry
 public:
 	TextStyleRegistry();
 
-	uint32_t AddFont( LPCWSTR name );
-	void RemoveFont( uint32_t );
-	void SetDefaultFont( uint32_t );
+	uint32_t ClassID( const std::string& className );
 
-	uint32_t AddStyle( const TextStyle& );
-	void RemoveStyle( uint32_t );
-	void SetDefaultStyle( uint32_t );
+	void SetAnnotator( TextAnnotator* );
+	TextAnnotator* Annotator() const;
 
-	const TextStyle& Style( uint32_t styleid ) const;
-	const TextFont& Font( uint32_t fontid ) const;
+	void SetTheme( const TextTheme& );
+	const TextTheme& Theme() const;
 
-	int fontSize;
-	int lineHeight;
-	int avgCharWidth;
-	int tabSize;
+	const TextStyle& Style( uint32_t classID ) const;
+	const TextFont&  Font ( uint32_t fontID  ) const;
 
-	COLORREF gutterColor;
-	COLORREF gutterLineColor;
-	COLORREF gutterTextColor;
-	COLORREF selectionColor;
-	COLORREF defaultBkColor;
-	COLORREF defaultTextColor;
+	const TextStyle& DefaultStyle() const;
+	const TextFont&  DefaultFont() const;
 
-	const uint32_t defaultFontid;
-	const uint32_t defaultStyleid;
+	int LineHeight() const   { return m_lineHeight; }
+	int AvgCharWidth() const { return m_avgCharWidth; }
+	int TabWidth() const     { return m_theme.tabWidth * m_avgCharWidth; }
 
-	typedef std::map<uint32_t,TextStyle> StyleMap;
-	typedef std::map<uint32_t,TextFontPtr> FontMap;
-
-	StyleMap styles;
-	FontMap fonts;
-
-	TextAnnotator* annotator;
+	uint32_t AddFallbackFont( const std::wstring& name );
+	void RemoveFallbackFont( uint32_t fontID );
+	const std::set<uint32_t>& FallbackFonts() const;
 
 private:
-	TextFontPtr CreateFont( LPCWSTR name );
-	void AddFallbackFonts();
+	void UpdateFontMetrics();
+	void ResetFallbackFonts();
 
-	TextFontPtr defaultFont;
-	TextStyle defaultStyle;
+	TextTheme m_theme;
+	TextAnnotator* m_annotator;
 
-	uint32_t nextStyle;
-	uint32_t nextFont;
+	int m_lineHeight;
+	int m_avgCharWidth;
+
+	uint32_t m_nextClassID;
+	typedef std::map<std::string,uint32_t> ClassMap;
+	ClassMap m_classes;
+
+	typedef std::map<uint32_t,TextStyle> StyleMap;
+	StyleMap m_styles;
+
+	TextStyle m_defaultStyle;
+
+	std::set<uint32_t> m_fallbackFonts;
 };
 
 #endif

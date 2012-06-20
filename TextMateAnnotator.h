@@ -28,19 +28,15 @@ public:
 	virtual void GetHighlights( TextRanges&,    size_t start, size_t count );
 
 private:
-	uint32_t TokenStyle( size_t token ) const;
 	void TokenizeLine( size_t offset, size_t lineEnd, std::string line );
 
 	const TextDocument& m_doc;
-	const TextStyleRegistry& m_styleRegistry;
+	TextStyleRegistry& m_styleRegistry;
 
 	std::vector<TextMatePattern> m_patterns;
 	TextMateTokenRuns m_tokens;
 
-	uint32_t m_keyword;
-	uint32_t m_constant;
-	uint32_t m_string;
-	uint32_t m_name;
+	uint32_t m_defaultClassID;
 };
 
 #endif

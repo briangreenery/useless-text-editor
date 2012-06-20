@@ -5,155 +5,134 @@
 #include <cassert>
 
 TextStyleRegistry::TextStyleRegistry()
-	: fontSize( 10 )
-	, lineHeight( 0 )
-	, avgCharWidth( 0 )
-	, tabSize( 0 )
-	, annotator( 0 )
-	, defaultStyleid( 0 )
-	, defaultFontid( 0 )
-	, nextFont( 1 )
-	, nextStyle( 1 )
+	: m_annotator( 0 )
+	, m_nextClassID( 1 )
 {
-	gutterColor      = RGB( 255, 255, 255 );
-	gutterLineColor  = RGB( 225, 225, 225 );
-	gutterTextColor  = RGB( 150, 150, 150 );
-	selectionColor   = RGB( 173, 214, 255 );
-	defaultBkColor   = GetSysColor( COLOR_WINDOW );
-	defaultTextColor = GetSysColor( COLOR_WINDOWTEXT );
-
-	AddFont( L"Consolas" );
-	AddFont( L"Courier New" );
-	AddFallbackFonts();
-
-	assert( nextFont > 1 );
-	SetDefaultFont( 1 );
+	SetTheme( TextTheme() );
 }
 
-const TextStyle& TextStyleRegistry::Style( uint32_t styleid ) const
+void TextStyleRegistry::SetAnnotator( TextAnnotator* annotator )
 {
-	StyleMap::const_iterator it = styles.find( styleid );
-	if ( it != styles.end() )
+	m_annotator = annotator;
+}
+
+TextAnnotator* TextStyleRegistry::Annotator() const
+{
+	return m_annotator;
+}
+
+void TextStyleRegistry::SetTheme( const TextTheme& theme )
+{
+	m_theme = theme;
+
+	m_defaultStyle = m_theme.Style( "default" );
+
+	UpdateFontMetrics();
+
+	for ( ClassMap::const_iterator it = m_classes.begin(); it != m_classes.end(); ++it )
+		m_styles[it->second] = m_theme.Style( it->first );
+
+	ResetFallbackFonts();
+}
+
+const TextTheme& TextStyleRegistry::Theme() const
+{
+	return m_theme;
+}
+
+uint32_t TextStyleRegistry::ClassID( const std::string& className )
+{
+	ClassMap::const_iterator it = m_classes.find( className );
+
+	if ( it != m_classes.end() )
 		return it->second;
 
-	return defaultStyle;
+	m_classes[className] = m_nextClassID;
+	m_styles[m_nextClassID] = m_theme.Style( className );
+	return m_nextClassID++;
 }
 
-const TextFont& TextStyleRegistry::Font( uint32_t fontid ) const
+const TextStyle& TextStyleRegistry::Style( uint32_t classID ) const
 {
-	FontMap::const_iterator it = fonts.find( fontid );
-	if ( it != fonts.end() )
-		return *it->second;
+	StyleMap::const_iterator it = m_styles.find( classID );
+	if ( it != m_styles.end() )
+		return it->second;
 
-	return *defaultFont;
+	return m_defaultStyle;
 }
 
-void TextStyleRegistry::SetDefaultFont( uint32_t fontid )
+const TextFont& TextStyleRegistry::Font( uint32_t fontID ) const
 {
-	FontMap::const_iterator it = fonts.find( fontid );
-	if ( it == fonts.end() )
-		return;
+	return m_theme.Font( fontID );
+}
 
-	TextFontPtr font = CreateFont( it->second->name.c_str() );
-	if ( !font )
-		return;
+const TextStyle& TextStyleRegistry::DefaultStyle() const
+{
+	return m_defaultStyle;
+}
 
-	defaultFont = std::move( font );
+const TextFont& TextStyleRegistry::DefaultFont() const
+{
+	return m_theme.Font( m_defaultStyle.fontid );
+}
 
+void TextStyleRegistry::UpdateFontMetrics()
+{
 	HDC hdc = GetDC( NULL );
-	SelectObject( hdc, defaultFont->hfont );
+	SelectObject( hdc, DefaultFont().hfont );
 
 	TEXTMETRIC tm;
 	GetTextMetricsW( hdc, &tm );
 
 	ReleaseDC( NULL, hdc );
 
-	avgCharWidth = tm.tmAveCharWidth;
-	tabSize = 4 * tm.tmAveCharWidth;
-	lineHeight = tm.tmHeight + 1; // The "+1" is to give a little more room for the squiggle.
+	m_avgCharWidth = tm.tmAveCharWidth;
+	m_lineHeight = tm.tmHeight + 1; // The "+1" is to give a little more room for the red squiggle underline.
 }
 
-uint32_t TextStyleRegistry::AddStyle( const TextStyle& style )
+uint32_t TextStyleRegistry::AddFallbackFont( const std::wstring& name )
 {
-	uint32_t styleid = nextStyle++;
-	styles.insert( std::make_pair( styleid, style ) );
-	return styleid;
+	uint32_t id = m_theme.AddFont( name, false, false );
+
+	if ( id == 0 )
+		return m_defaultStyle.fontid;
+
+	m_fallbackFonts.insert( id );
+	return id;
 }
 
-void TextStyleRegistry::RemoveStyle( uint32_t styleid )
+void TextStyleRegistry::RemoveFallbackFont( uint32_t fontID )
 {
-	styles.erase( styleid );
+	m_fallbackFonts.erase( fontID );
 }
 
-void TextStyleRegistry::SetDefaultStyle( uint32_t styleid )
+const std::set<uint32_t>& TextStyleRegistry::FallbackFonts() const
 {
-	StyleMap::const_iterator it = styles.find( styleid );
-	if ( it == styles.end() )
-		return;
-
-	SetDefaultFont( it->second.fontid );
-	defaultBkColor = it->second.bkColor;
-	defaultTextColor = it->second.textColor;
+	return m_fallbackFonts;
 }
 
-TextFontPtr TextStyleRegistry::CreateFont( LPCWSTR name )
+void TextStyleRegistry::ResetFallbackFonts()
 {
-	TextFontPtr font;
+	m_fallbackFonts.clear();
 
-	HDC hdc = GetDC( NULL );
-
-	LOGFONT logFont = {};
-	logFont.lfHeight = -MulDiv( fontSize, GetDeviceCaps( hdc, LOGPIXELSY ), 72 );
-	wcscpy_s( logFont.lfFaceName, name );
-
-	HFONT hfont = CreateFontIndirect( &logFont );
-	if ( hfont )
-	{
-		SelectObject( hdc, hfont );
-		font.reset( new TextFont( name, hfont, hdc ) );
-	}
-
-	ReleaseDC( NULL, hdc );
-	return font;
-}
-
-uint32_t TextStyleRegistry::AddFont( LPCWSTR name )
-{
-	TextFontPtr font = CreateFont( name );
-
-	if ( !font )
-		return defaultFontid;
-
-	uint32_t fontid = nextFont++;
-	fonts.insert( std::make_pair( fontid, std::move( font ) ) );
-	return fontid;
-}
-
-void TextStyleRegistry::RemoveFont( uint32_t fontid )
-{
-	fonts.erase( fontid );
-}
-
-void TextStyleRegistry::AddFallbackFonts()
-{
 	// Japanese
-	AddFont( L"Meiryo" );
+	AddFallbackFont( L"Meiryo" );
 
 	// Chinese
-	AddFont( L"Microsoft JhengHei" );
-	AddFont( L"Microsoft YaHei" );
+	AddFallbackFont( L"Microsoft JhengHei" );
+	AddFallbackFont( L"Microsoft YaHei" );
 
 	// Korean
-	AddFont( L"Malgun Gothic" );
+	AddFallbackFont( L"Malgun Gothic" );
 
 	// Hebrew
-	AddFont( L"Gisha" );
+	AddFallbackFont( L"Gisha" );
 	
 	// Thai
-	AddFont( L"Leelawadee" );
+	AddFallbackFont( L"Leelawadee" );
 
 	// Last ditch
-	AddFont( L"SimSun" );
-	AddFont( L"Batang" );
-	AddFont( L"Arial" );
+	AddFallbackFont( L"SimSun" );
+	AddFallbackFont( L"Batang" );
+	AddFallbackFont( L"Arial" );
 }

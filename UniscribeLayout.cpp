@@ -142,9 +142,9 @@ static bool ShapePlaceRun( UniscribeTextRun run,
 	run.glyphStart = layoutData.glyphs.size();
 	run.glyphCount = glyphCount;
 
-	if ( run.textCount == 1 && args.text[run.textStart] == '\t' && args.styleRegistry.tabSize > 0 )
+	if ( run.textCount == 1 && args.text[run.textStart] == '\t' && args.styleRegistry.TabWidth() > 0 )
 	{
-		run.width        = args.styleRegistry.tabSize - ( xStart % args.styleRegistry.tabSize );
+		run.width        = args.styleRegistry.TabWidth() - ( xStart % args.styleRegistry.TabWidth() );
 		advanceWidths[0] = run.width;
 	}
 	else
@@ -181,12 +181,12 @@ static int CALLBACK TryEveryFontProc( const LOGFONT* logFont, const TEXTMETRIC*,
 
 	TryEveryFontProcData& data = *reinterpret_cast<TryEveryFontProcData*>( lParam );
 
-	data.run.fontid = data.args.styleRegistry.AddFont( logFont->lfFaceName );
+	data.run.fontid = data.args.styleRegistry.AddFallbackFont( logFont->lfFaceName );
 
 	if ( ShapePlaceRun( data.run, data.layoutData, data.args, data.xStart, false ) )
 		return 0;
 
-	data.args.styleRegistry.RemoveFont( data.run.fontid );
+	data.args.styleRegistry.RemoveFallbackFont( data.run.fontid );
 	return 1;
 }
 
@@ -199,9 +199,9 @@ static void LayoutRun( UniscribeTextRun run,
 		return;
 
 	// Try to fallback with the fonts that we already have
-	for ( auto it = args.styleRegistry.fonts.begin(); it != args.styleRegistry.fonts.end(); ++it )
+	for ( auto it = args.styleRegistry.FallbackFonts().begin(); it != args.styleRegistry.FallbackFonts().end(); ++it )
 	{
-		run.fontid = it->first;
+		run.fontid = *it;
 		if ( ShapePlaceRun( run, layoutData, args, xStart, false ) )
 			return;
 	}
@@ -213,7 +213,7 @@ static void LayoutRun( UniscribeTextRun run,
 		return;
 
 	// We can't display this text with any font, just show missing glyphs
-	run.fontid = args.styleRegistry.defaultFontid;
+	run.fontid = args.styleRegistry.DefaultStyle().fontid;
 	layoutData.items[run.item].a.eScript = SCRIPT_UNDEFINED;
 	ShapePlaceRun( run, layoutData, args, xStart, true );
 }
