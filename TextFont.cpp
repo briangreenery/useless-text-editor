@@ -18,6 +18,12 @@ TextFont::TextFont( const std::wstring& name, int size, bool bold, bool italic )
 	logFont.lfHeight = -MulDiv( size, GetDeviceCaps( hdc, LOGPIXELSY ), 72 );
 	wcscpy_s( logFont.lfFaceName, name.c_str() );
 
+	if ( bold )
+		logFont.lfWeight = FW_BOLD;
+
+	if ( italic )
+		logFont.lfItalic = TRUE;
+
 	hfont = CreateFontIndirect( &logFont );
 	if ( hfont == 0 )
 	{

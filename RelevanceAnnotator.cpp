@@ -385,11 +385,7 @@ size_t RelevanceAnnotator::TokenAt( size_t position ) const
 	return it - m_tokens.begin();
 }
 
-void RelevanceAnnotator::GetFonts( TextFontRuns& fonts, size_t start, size_t count )
-{
-}
-
-void RelevanceAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t count )
+void RelevanceAnnotator::GetClasses( TextStyleRuns& classes, size_t start, size_t count )
 {
 	TextRange textRange( start, count );
 	TokenRange range = std::equal_range( m_tokens.begin(), m_tokens.end(), textRange, TokenRunCompare() );
@@ -399,12 +395,7 @@ void RelevanceAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t 
 		size_t overlapStart = (std::max)( start, it->start );
 		size_t overlapEnd   = (std::min)( start + count, it->start + it->count );
 
-		uint32_t styleid = TokenStyle( it - m_tokens.begin() );
-
-		if ( !styles.empty() && styles.back().styleid == styleid )
-			styles.back().count += overlapEnd - overlapStart;
-		else
-			styles.push_back( TextStyleRun( styleid, overlapStart, overlapEnd - overlapStart ) );
+		classes.push_back( TextStyleRun( TokenStyle( it - m_tokens.begin() ), overlapStart, overlapEnd - overlapStart ) );
 	}
 }
 

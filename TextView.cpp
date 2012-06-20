@@ -24,11 +24,45 @@ TextView::TextView( HWND hwnd )
 	m_metrics.gutterWidth = m_styleRegistry.AvgCharWidth() * 5;
 	m_metrics.marginWidth = m_styleRegistry.AvgCharWidth();
 
-	//m_styleRegistry.annotator = new RelevanceAnnotator( m_doc, m_styleRegistry );
+	bool sublimejs = true;
 
-	TextMateAnnotator* annotator = new TextMateAnnotator( m_doc, m_styleRegistry );;
-	annotator->SetLanguageFile( "C:\\Users\\Brian\\Desktop\\JavaScript.tmLanguage" );
-	m_styleRegistry.SetAnnotator( annotator );
+	if ( sublimejs )
+	{
+		TextMateAnnotator* annotator = new TextMateAnnotator( m_doc, m_styleRegistry );
+		annotator->SetLanguageFile( "C:\\Users\\Brian\\Desktop\\JavaScript.tmLanguage" );
+		m_styleRegistry.SetAnnotator( annotator );
+
+		TextTheme theme;
+		theme.gutterBkColor   = RGB( 39, 40, 34 );
+		theme.gutterLineColor = RGB( 39, 40, 34 );
+		theme.selectionColor  = RGB( 73, 72, 62 );
+
+		uint32_t normal  = theme.AddFont( L"Consolas", false, false );
+		uint32_t italics = theme.AddFont( L"Consolas", false, true );
+
+		theme.SetStyle( "default",              TextStyle( normal,  RGB( 255, 255, 255 ), RGB( 39, 40, 34 ) ) );
+		theme.SetStyle( "storage",              TextStyle( italics, RGB( 102, 217, 239 ), TextStyle::useDefault ) );
+		theme.SetStyle( "support",              TextStyle( italics, RGB( 102, 217, 239 ), TextStyle::useDefault ) );
+		theme.SetStyle( "support.function",     TextStyle( normal,  RGB( 102, 217, 239 ), TextStyle::useDefault ) );
+		theme.SetStyle( "entity.name.function", TextStyle( normal,  RGB( 166, 226,  46 ), TextStyle::useDefault ) );
+		theme.SetStyle( "keyword",              TextStyle( normal,  RGB( 249,  38, 114 ), TextStyle::useDefault ) );
+		theme.SetStyle( "constant",             TextStyle( normal,  RGB( 174, 129, 255 ), TextStyle::useDefault ) );
+
+		m_styleRegistry.SetTheme( theme );
+	}
+	else
+	{
+		m_styleRegistry.SetAnnotator( new RelevanceAnnotator( m_doc, m_styleRegistry ) );
+
+		TextTheme theme;
+		uint32_t normal = theme.AddFont( L"Consolas", false, false );
+
+		theme.SetStyle( "string",   TextStyle( normal,  RGB( 0,   128, 128 ), TextStyle::useDefault ) );
+		theme.SetStyle( "constant", TextStyle( normal,  RGB( 128,   0, 128 ), TextStyle::useDefault ) );
+		theme.SetStyle( "keyword",  TextStyle( normal,  RGB( 0,     0, 255 ), TextStyle::useDefault ) );
+
+		m_styleRegistry.SetTheme( theme );
+	}
 }
 
 int TextView::OnCreate( LPCREATESTRUCT )

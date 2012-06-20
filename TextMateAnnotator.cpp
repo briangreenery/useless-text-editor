@@ -14,7 +14,6 @@ using namespace rapidxml;
 TextMateAnnotator::TextMateAnnotator( const TextDocument& doc, TextStyleRegistry& styleRegistry )
 	: m_doc( doc )
 	, m_styleRegistry( styleRegistry )
-	, m_defaultClassID( styleRegistry.ClassID( "default" ) )
 {
 }
 
@@ -139,9 +138,6 @@ void TextMateAnnotator::TokenizeLine( size_t offset, size_t lineEnd, std::string
 
 		if ( m_patterns[best].captures.empty() )
 		{
-			if ( bestStart != offset )
-				m_tokens.push_back( TextMateTokenRun( m_defaultClassID, offset, bestStart - offset ) );
-
 			m_tokens.push_back( TextMateTokenRun( m_patterns[best].classID, bestStart, bestLength ) );
 		}
 		else
@@ -161,23 +157,14 @@ void TextMateAnnotator::TokenizeLine( size_t offset, size_t lineEnd, std::string
 				if ( length == 0 )
 					continue;
 
-				if ( start != lastEnd )
-					m_tokens.push_back( TextMateTokenRun( m_defaultClassID, lastEnd, start - lastEnd ) );
-
 				m_tokens.push_back( TextMateTokenRun( pattern.captures[i].classID, start, length ) );
 				lastEnd = start + length;
 			}
-
-			if ( lastEnd != bestStart + bestLength )
-				m_tokens.push_back( TextMateTokenRun( m_defaultClassID, lastEnd, bestStart + bestLength - lastEnd ) );
 		}
 
 		line = line.substr( nextStart );
 		offset = bestStart + bestLength;
 	}
-
-	if ( offset != lineEnd )
-		m_tokens.push_back( TextMateTokenRun( m_defaultClassID, offset, lineEnd - offset ) );
 }
 
 void TextMateAnnotator::TextChanged( TextChange )
@@ -206,16 +193,11 @@ void TextMateAnnotator::TextChanged( TextChange )
 		if ( lineBreak == text.end() )
 			break;
 
-		m_tokens.push_back( TextMateTokenRun( m_defaultClassID, offset + line.size(), 1 ) );
 		offset += line.size() + 1;
 	}
 }
 
 void TextMateAnnotator::SelectionChanged( size_t start, size_t end )
-{
-}
-
-void TextMateAnnotator::GetFonts( TextFontRuns& runs, size_t start, size_t count )
 {
 }
 
@@ -228,7 +210,7 @@ struct TokenRunCompare
 	bool operator()( const TextRange&        a, const TextMateTokenRun&  b ) const { return a.start + a.count <= b.start; }
 };
 
-void TextMateAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t count )
+void TextMateAnnotator::GetClasses( TextStyleRuns& styles, size_t start, size_t count )
 {
 	TextRange textRange( start, count );
 	TokenRange range = std::equal_range( m_tokens.begin(), m_tokens.end(), textRange, TokenRunCompare() );
@@ -238,10 +220,7 @@ void TextMateAnnotator::GetStyles( TextStyleRuns& styles, size_t start, size_t c
 		size_t overlapStart = (std::max)( start, it->start );
 		size_t overlapEnd   = (std::min)( start + count, it->start + it->count );
 
-		if ( !styles.empty() && styles.back().styleid == it->classID )
-			styles.back().count += overlapEnd - overlapStart;
-		else
-			styles.push_back( TextStyleRun( it->classID, overlapStart, overlapEnd - overlapStart ) );
+		styles.push_back( TextStyleRun( it->classID, overlapStart, overlapEnd - overlapStart ) );
 	}
 }
 

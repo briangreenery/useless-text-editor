@@ -45,7 +45,7 @@ void SimpleTextBlock::DrawLineBackground( size_t line, VisualPainter& painter, R
 	size_t pos = TextStart( line );
 	int xStart = 0;
 
-	ArrayRef<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + pos, TextEnd( line ) - pos );
+	ArrayRef<const TextStyleRun> styles = painter.styleReader.Classes( painter.textStart + pos, TextEnd( line ) - pos );
 	for ( const TextStyleRun* it = styles.begin(); it != styles.end() && xStart < rect.right; ++it )
 	{
 		int xEnd = CPtoX( line, pos + it->count - 1, true );
@@ -123,7 +123,7 @@ void SimpleTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT re
 	size_t lineEnd = TextEnd( line );
 
 	ArrayRef<const SimpleTextRun> runs = LineRuns( line );
-	ArrayRef<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + lineStart, lineEnd - lineStart );
+	ArrayRef<const TextStyleRun> styles = painter.styleReader.Classes( painter.textStart + lineStart, lineEnd - lineStart );
 
 	int xRunStart = 0;
 	for ( const SimpleTextRun* run = runs.begin(); run != runs.end() && xRunStart < rect.right; ++run )

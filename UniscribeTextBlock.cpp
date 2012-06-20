@@ -50,7 +50,7 @@ void UniscribeTextBlock::DrawLineBackground( size_t line, const std::vector<int>
 	size_t lineEnd   = TextEnd( line );
 
 	ArrayRef<const UniscribeTextRun> runs = LineRuns( line );
-	ArrayRef<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + lineStart, lineEnd - lineStart );
+	ArrayRef<const TextStyleRun> styles = painter.styleReader.Classes( painter.textStart + lineStart, lineEnd - lineStart );
 
 	int xStart = 0;
 	for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
@@ -179,7 +179,7 @@ void UniscribeTextBlock::DrawLineText( size_t line, const std::vector<int>& visu
 	size_t lineEnd   = TextEnd( line );
 
 	ArrayRef<const UniscribeTextRun> runs = LineRuns( line );
-	ArrayRef<const TextStyleRun> styles = painter.styleReader.Styles( painter.textStart + lineStart, lineEnd - lineStart );
+	ArrayRef<const TextStyleRun> styles = painter.styleReader.Classes( painter.textStart + lineStart, lineEnd - lineStart );
 
 	int xStart = 0;
 	for ( size_t i = 0; i < visualToLogical.size() && xStart < rect.right; ++i )
