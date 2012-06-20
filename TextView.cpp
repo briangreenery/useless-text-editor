@@ -29,7 +29,7 @@ TextView::TextView( HWND hwnd )
 	if ( sublimejs )
 	{
 		TextMateAnnotator* annotator = new TextMateAnnotator( m_doc, m_styleRegistry );
-		annotator->SetLanguageFile( "C:\\Users\\Brian\\Desktop\\JavaScript.tmLanguage" );
+		annotator->SetLanguageFile( "C:\\Users\\Brian\\Desktop\\Projects\\TextEditor\\JavaScript.tmLanguage" );
 		m_styleRegistry.SetAnnotator( annotator );
 
 		TextTheme theme;
@@ -47,6 +47,8 @@ TextView::TextView( HWND hwnd )
 		theme.SetStyle( "entity.name.function", TextStyle( normal,  RGB( 166, 226,  46 ), TextStyle::useDefault ) );
 		theme.SetStyle( "keyword",              TextStyle( normal,  RGB( 249,  38, 114 ), TextStyle::useDefault ) );
 		theme.SetStyle( "constant",             TextStyle( normal,  RGB( 174, 129, 255 ), TextStyle::useDefault ) );
+		theme.SetStyle( "variable",             TextStyle( italics, RGB( 253, 151,  32 ), TextStyle::useDefault ) );
+		theme.SetStyle( "comment",              TextStyle( normal,  RGB( 117, 113,  94 ), TextStyle::useDefault ) );
 
 		m_styleRegistry.SetTheme( theme );
 	}
