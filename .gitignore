@@ -1,5 +1,8 @@
 Debug/*
 Release/*
+oniguruma/Debug/*
+oniguruma/Release/*
+oniguruma/lib/*
 TextEditor.suo
 TextEditor.sdf
 TextEditor.opensdf

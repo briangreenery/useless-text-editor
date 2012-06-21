@@ -5,11 +5,7 @@
 #include "TextDocumentReader.h"
 #include "TextDocument.h"
 #include "TextStyleRegistry.h"
-#include <streambuf>
-#include <fstream>
 #include <string>
-
-using namespace rapidxml;
 
 TextMateAnnotator::TextMateAnnotator( const TextDocument& doc, TextStyleRegistry& styleRegistry )
 	: m_doc( doc )
@@ -17,86 +13,9 @@ TextMateAnnotator::TextMateAnnotator( const TextDocument& doc, TextStyleRegistry
 {
 }
 
-static xml_node<char>* GetKeyValue( xml_node<char>* node, const char* keyName )
-{
-	for ( xml_node<char>* key = node->first_node( "key" ); key != 0; key = key = key->next_sibling( "key" ) )
-		if ( strcmp( key->value(), keyName ) == 0 )
-			return key->next_sibling();
-
-	return 0;
-}
-
-static std::vector<TextMateCapture> ReadCaptures( xml_node<char>* node, TextStyleRegistry& styleRegistry )
-{
-	std::vector<TextMateCapture> captures;
-
-	for ( xml_node<char>* key = node->first_node( "key" ); key != 0; key = key->next_sibling( "key" ) )
-	{
-		int index = atoi( key->value() );
-
-		if ( index <= 0 )
-			continue;
-
-		xml_node<char>* dict = key->next_sibling();
-		if ( dict == 0 )
-			continue;
-
-		xml_node<char>* name = GetKeyValue( dict, "name" );
-		if ( name == 0 )
-			continue;
-
-		captures.push_back( TextMateCapture( index, styleRegistry.ClassID( name->value() ) ) );
-	}
-
-	return captures;
-}
-
 void TextMateAnnotator::SetLanguageFile( const char* path )
 {
-	std::ifstream t( path );
-	std::string xml( ( std::istreambuf_iterator<char>( t ) ), std::istreambuf_iterator<char>() );
-
-	xml_document<char> doc;
-	doc.parse<parse_default>( const_cast<char*>( xml.c_str() ) );
-
-	xml_node<char>* plist = doc.first_node( "plist" );
-	if ( plist == 0 )
-		return;
-
-	xml_node<char>* dict = plist->first_node( "dict" );
-	if ( dict == 0 )
-		return;
-
-	xml_node<char>* patterns = GetKeyValue( dict, "patterns" );
-	if ( patterns == 0 )
-		return;
-
-	for ( xml_node<char>* dict = patterns->first_node( "dict" ); dict != 0; dict = dict->next_sibling( "dict" ) )
-	{
-		if ( GetKeyValue( dict, "begin" ) || GetKeyValue( dict, "end" ) )
-			continue;
-
-		xml_node<char>* nameNode  = GetKeyValue( dict, "name" );
-		xml_node<char>* matchNode = GetKeyValue( dict, "match" );
-
-		if ( nameNode == 0 || matchNode == 0 )
-			continue;
-
-		std::vector<TextMateCapture> captures;
-
-		xml_node<char>* capturesNode = GetKeyValue( dict, "captures" );
-
-		if ( capturesNode )
-			captures = ReadCaptures( capturesNode, m_styleRegistry );
-
-		try
-		{
-			m_patterns.push_back( TextMatePattern( m_styleRegistry.ClassID( nameNode->value() ), matchNode->value(), captures ) );
-		}
-		catch (...)
-		{
-		}
-	}
+	m_patterns = ReadTextMateFile( path, m_styleRegistry );
 }
 
 static inline bool IsAscii( wchar_t c )

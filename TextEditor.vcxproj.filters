@@ -37,7 +37,10 @@
     <Filter Include="Annotators\Relevance\Lexer">
       <UniqueIdentifier>{506c0249-6adf-41f7-b4a2-3296cb608810}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Utility\rapidxml">
+    <Filter Include="External">
+      <UniqueIdentifier>{7781d429-c502-497e-a503-348d787922e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\rapidxml">
       <UniqueIdentifier>{1471a63e-78a2-4dad-97b7-8e18a242f4e4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -307,16 +310,16 @@
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="rapidxml\rapidxml_iterators.hpp">
-      <Filter>Utility\rapidxml</Filter>
+      <Filter>External\rapidxml</Filter>
     </ClInclude>
     <ClInclude Include="rapidxml\rapidxml_print.hpp">
-      <Filter>Utility\rapidxml</Filter>
+      <Filter>External\rapidxml</Filter>
     </ClInclude>
     <ClInclude Include="rapidxml\rapidxml_utils.hpp">
-      <Filter>Utility\rapidxml</Filter>
+      <Filter>External\rapidxml</Filter>
     </ClInclude>
     <ClInclude Include="rapidxml\rapidxml.hpp">
-      <Filter>Utility\rapidxml</Filter>
+      <Filter>External\rapidxml</Filter>
     </ClInclude>
     <ClInclude Include="TextMateAnnotator.h">
       <Filter>Annotators\Textmate</Filter>

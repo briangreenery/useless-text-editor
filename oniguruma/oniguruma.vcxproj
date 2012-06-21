@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="enc\ascii.c" />
+    <ClCompile Include="enc\big5.c" />
+    <ClCompile Include="enc\cp1251.c" />
+    <ClCompile Include="enc\euc_jp.c" />
+    <ClCompile Include="enc\euc_kr.c" />
+    <ClCompile Include="enc\euc_tw.c" />
+    <ClCompile Include="enc\gb18030.c" />
+    <ClCompile Include="enc\iso8859_1.c" />
+    <ClCompile Include="enc\iso8859_10.c" />
+    <ClCompile Include="enc\iso8859_11.c" />
+    <ClCompile Include="enc\iso8859_13.c" />
+    <ClCompile Include="enc\iso8859_14.c" />
+    <ClCompile Include="enc\iso8859_15.c" />
+    <ClCompile Include="enc\iso8859_16.c" />
+    <ClCompile Include="enc\iso8859_2.c" />
+    <ClCompile Include="enc\iso8859_3.c" />
+    <ClCompile Include="enc\iso8859_4.c" />
+    <ClCompile Include="enc\iso8859_5.c" />
+    <ClCompile Include="enc\iso8859_6.c" />
+    <ClCompile Include="enc\iso8859_7.c" />
+    <ClCompile Include="enc\iso8859_8.c" />
+    <ClCompile Include="enc\iso8859_9.c" />
+    <ClCompile Include="enc\koi8.c" />
+    <ClCompile Include="enc\koi8_r.c" />
+    <ClCompile Include="enc\sjis.c" />
+    <ClCompile Include="enc\unicode.c" />
+    <ClCompile Include="enc\utf16_be.c" />
+    <ClCompile Include="enc\utf16_le.c" />
+    <ClCompile Include="enc\utf32_be.c" />
+    <ClCompile Include="enc\utf32_le.c" />
+    <ClCompile Include="enc\utf8.c" />
+    <ClCompile Include="regcomp.c" />
+    <ClCompile Include="regenc.c" />
+    <ClCompile Include="regerror.c" />
+    <ClCompile Include="regexec.c" />
+    <ClCompile Include="regext.c" />
+    <ClCompile Include="reggnu.c" />
+    <ClCompile Include="regparse.c" />
+    <ClCompile Include="regposerr.c" />
+    <ClCompile Include="regposix.c" />
+    <ClCompile Include="regsyntax.c" />
+    <ClCompile Include="regtrav.c" />
+    <ClCompile Include="regversion.c" />
+    <ClCompile Include="st.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="oniggnu.h" />
+    <ClInclude Include="onigposix.h" />
+    <ClInclude Include="oniguruma.h" />
+    <ClInclude Include="regenc.h" />
+    <ClInclude Include="regint.h" />
+    <ClInclude Include="regparse.h" />
+    <ClInclude Include="st.h" />
+    <ClInclude Include="win32\config.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{674CBFCF-36E9-4A5E-8FF0-D196170B1001}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>oniguruma</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>lib\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>lib</OutDir>
+    <TargetName>$(ProjectName)d</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;ONIG_EXTERN=extern;_CRT_SECURE_NO_WARNINGS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>win32;enc;..\oniguruma;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;ONIG_EXTERN=extern;_CRT_SECURE_NO_WARNINGS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>win32;enc;..\oniguruma;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -8,6 +8,8 @@
 #include <vector>
 #include <stdint.h>
 
+class TextStyleRegistry;
+
 class TextMateCapture
 {
 public:
@@ -28,5 +30,7 @@ public:
 	std::regex regex;
 	std::cmatch match;
 };
+
+std::vector<TextMatePattern> ReadTextMateFile( const char* path, TextStyleRegistry& styleRegistry );
 
 #endif

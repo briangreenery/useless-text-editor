@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="oniguruma">
+      <UniqueIdentifier>{56d9a957-bf31-4fc2-b84a-a195a6b778c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="oniguruma\enc">
+      <UniqueIdentifier>{cfdad03f-4d01-4b14-ae26-ba447e45611a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="oniguruma\win32">
+      <UniqueIdentifier>{18743443-01fb-4ca2-b59f-0f0a12d7bcb4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="regparse.c">
+      <Filter>oniguruma</Filter>
+    </ClCompile>
+    <ClCompile Include="regposerr.c">
+      <Filter>oniguruma</Filter>
+    </ClCompile>
+    <ClCompile Include="regposix.c">
+      <Filter>oniguruma</Filter>
+    </ClCompile>
+    <ClCompile Include="regsyntax.c">
+      <Filter>oniguruma</Filter>
+    </ClCompile>
+    <ClCompile Include="regtrav.c">
+      <Filter>oniguruma</Filter>
+    </ClCompile>
+    <ClCompile Include="regversion.c">
+      <Filter>oniguruma</Filter>
+    </ClCompile>
+    <ClCompile Include="st.c">
+      <Filter>oniguruma</Filter>
+    </ClCompile>
+    <ClCompile Include="regcomp.c">
+      <Filter>oniguruma</Filter>
+    </ClCompile>
+    <ClCompile Include="regenc.c">
+      <Filter>oniguruma</Filter>
+    </ClCompile>
+    <ClCompile Include="regerror.c">
+      <Filter>oniguruma</Filter>
+    </ClCompile>
+    <ClCompile Include="regexec.c">
+      <Filter>oniguruma</Filter>
+    </ClCompile>
+    <ClCompile Include="regext.c">
+      <Filter>oniguruma</Filter>
+    </ClCompile>
+    <ClCompile Include="reggnu.c">
+      <Filter>oniguruma</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_8.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_9.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_10.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_11.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_13.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_14.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_15.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_16.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\koi8.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\koi8_r.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\sjis.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\unicode.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\utf8.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\utf16_be.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\utf16_le.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\utf32_be.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\utf32_le.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\ascii.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\big5.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\cp1251.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\euc_jp.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\euc_kr.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\euc_tw.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\gb18030.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_1.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_2.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_3.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_4.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_5.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_6.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\iso8859_7.c">
+      <Filter>oniguruma\enc</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="oniggnu.h">
+      <Filter>oniguruma</Filter>
+    </ClInclude>
+    <ClInclude Include="onigposix.h">
+      <Filter>oniguruma</Filter>
+    </ClInclude>
+    <ClInclude Include="oniguruma.h">
+      <Filter>oniguruma</Filter>
+    </ClInclude>
+    <ClInclude Include="regenc.h">
+      <Filter>oniguruma</Filter>
+    </ClInclude>
+    <ClInclude Include="regint.h">
+      <Filter>oniguruma</Filter>
+    </ClInclude>
+    <ClInclude Include="regparse.h">
+      <Filter>oniguruma</Filter>
+    </ClInclude>
+    <ClInclude Include="st.h">
+      <Filter>oniguruma</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\config.h">
+      <Filter>oniguruma\win32</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
