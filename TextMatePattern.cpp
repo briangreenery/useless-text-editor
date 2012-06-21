@@ -33,6 +33,8 @@ TextMatePattern::TextMatePattern( uint32_t classID, OnigRegexPtr regex, const Te
 	, captures( captures )
 	, regex( regex )
 	, region( onig_region_new(), FreeOnigRegion )
+	, matchStart( -1 )
+	, matchLength( 0 )
 {
 	std::sort( this->captures.begin(), this->captures.end(), SortCaptureByIndex() );
 }

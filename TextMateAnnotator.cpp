@@ -21,58 +21,53 @@ void TextMateAnnotator::TokenizeLine( size_t offset, AsciiRef text )
 	const OnigUChar* textStart = reinterpret_cast<const uint8_t*>( text.begin() );
 	const OnigUChar* textEnd   = textStart + text.size();
 
-	const TextMatePattern* bestPattern;
-	size_t bestStart;
-	size_t bestLength;
-
-	for ( const OnigUChar* searchStart = textStart; searchStart < textEnd; searchStart += bestStart + bestLength )
+	const TextMatePattern* best;
+	for ( const OnigUChar* searchStart = textStart; searchStart < textEnd; searchStart = textStart + best->matchStart + best->matchLength )
 	{
-		bestPattern = 0;
-		bestStart   = text.size();
-		bestLength  = 0;
+		best = 0;
 
-		for ( TextMatePatterns::const_iterator it = m_patterns.begin(); it != m_patterns.end(); ++it )
+		for ( TextMatePatterns::iterator it = m_patterns.begin(); it != m_patterns.end(); ++it )
 		{
-			int matchPos = onig_search( it->regex.get(),
-			                            textStart,
-			                            textEnd,
-			                            searchStart,
-			                            textEnd,
-			                            it->region.get(),
-			                            ONIG_OPTION_NONE );
+			// If this is the first time we've searched for this regex in this line
+			// or if we're now searching past the start of the last match of this regex
+			// then search against this regex.
 
-			if ( matchPos >= 0 )
-			{
-				size_t start = matchPos;
-				if ( start > bestStart )
-					continue;
+			if ( searchStart == textStart || ( it->matchStart >= 0 && it->matchStart < searchStart - textStart ) )
+				it->matchStart = onig_search( it->regex.get(),
+				                              textStart,
+				                              textEnd,
+				                              searchStart,
+				                              textEnd,
+				                              it->region.get(),
+				                              ONIG_OPTION_NONE );
 
-				size_t length = it->region->end[0] - it->region->beg[0];
-				if ( start == bestStart && length < bestLength )
-					continue;
+			if ( it->matchStart < 0 )
+				continue;
 
-				bestPattern = &*it;
-				bestStart   = start;
-				bestLength  = length;
-			}
+			it->matchLength = it->region->end[0] - it->region->beg[0];
+
+			if ( ( best == 0 )
+			  || ( it->matchStart < best->matchStart )
+			  || ( it->matchStart == best->matchStart && it->matchLength > best->matchLength ) )
+				best = &*it;
 		}
 
-		if ( bestPattern == 0 )
+		if ( best == 0 )
 			break;
 
-		if ( bestPattern->captures.empty() )
+		if ( best->captures.empty() )
 		{
-			m_tokens.push_back( TextMateTokenRun( bestPattern->classID, offset + bestStart, bestLength ) );
+			m_tokens.push_back( TextMateTokenRun( best->classID, offset + best->matchStart, best->matchLength ) );
 		}
 		else
 		{
-			for ( TextMateCaptures::const_iterator it = bestPattern->captures.begin(); it != bestPattern->captures.end(); ++it )
+			for ( TextMateCaptures::const_iterator it = best->captures.begin(); it != best->captures.end(); ++it )
 			{
-				if ( it->index > uint32_t( bestPattern->region->num_regs ) )
+				if ( it->index > uint32_t( best->region->num_regs ) )
 					break;
 
-				size_t start  = bestPattern->region->beg[it->index];
-				size_t length = bestPattern->region->end[it->index] - start;
+				size_t start  = best->region->beg[it->index];
+				size_t length = best->region->end[it->index] - start;
 
 				if ( length == 0 )
 					continue;

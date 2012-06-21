@@ -31,9 +31,11 @@ public:
 
 	uint32_t classID;
 	TextMateCaptures captures;
-
 	OnigRegexPtr regex;
+
 	OnigRegionPtr region;
+	int matchStart;
+	int matchLength;
 };
 
 typedef std::vector<TextMatePattern> TextMatePatterns;
