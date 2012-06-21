@@ -55,26 +55,28 @@ void TextMateAnnotator::TokenizeLine( size_t offset, AsciiRef text )
 		if ( best == 0 )
 			break;
 
-		if ( best->captures.empty() )
+		size_t lastEnd = best->matchStart;
+
+		for ( TextMateCaptures::const_iterator it = best->captures.begin(); it != best->captures.end(); ++it )
 		{
-			m_tokens.push_back( TextMateTokenRun( best->classID, offset + best->matchStart, best->matchLength ) );
+			if ( it->index > uint32_t( best->region->num_regs ) )
+				break;
+
+			size_t start  = best->region->beg[it->index];
+			size_t length = best->region->end[it->index] - start;
+
+			if ( length == 0 )
+				continue;
+
+			if ( lastEnd != start )
+				m_tokens.push_back( TextMateTokenRun( best->classID, offset + lastEnd, start - lastEnd ) );
+
+			m_tokens.push_back( TextMateTokenRun( it->classID, offset + start, length ) );
+			lastEnd = start + length;
 		}
-		else
-		{
-			for ( TextMateCaptures::const_iterator it = best->captures.begin(); it != best->captures.end(); ++it )
-			{
-				if ( it->index > uint32_t( best->region->num_regs ) )
-					break;
 
-				size_t start  = best->region->beg[it->index];
-				size_t length = best->region->end[it->index] - start;
-
-				if ( length == 0 )
-					continue;
-
-				m_tokens.push_back( TextMateTokenRun( it->classID, offset + start, length ) );
-			}
-		}
+		if ( lastEnd != best->matchStart + best->matchLength )
+			m_tokens.push_back( TextMateTokenRun( best->classID, offset + lastEnd, best->matchStart + best->matchLength - lastEnd ) );
 	}
 }
 
