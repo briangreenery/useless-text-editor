@@ -75,7 +75,7 @@ static OnigRegexPtr NewRegex( const char* pattern )
 {
 	regex_t* regex;
 
-	const OnigUChar* patternStart = reinterpret_cast<const unsigned char*>( pattern );
+	const OnigUChar* patternStart = reinterpret_cast<const uint8_t*>( pattern );
 	const OnigUChar* patternEnd   = patternStart + strlen( pattern );
 
 	int status = onig_new( &regex, patternStart, patternEnd, ONIG_OPTION_DEFAULT, ONIG_ENCODING_ASCII, ONIG_SYNTAX_DEFAULT, 0 );

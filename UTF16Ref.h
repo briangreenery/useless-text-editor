@@ -5,6 +5,6 @@
 
 #include "ArrayRef.h"
 
-typedef ArrayRef<wchar_t> UTF16Ref;
+typedef ArrayRef<const wchar_t> UTF16Ref;
 
 #endif

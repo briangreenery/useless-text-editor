@@ -1,7 +1,6 @@
 // TextMateAnnotator.cpp
 
 #include "TextMateAnnotator.h"
-#include "TextDocumentReader.h"
 #include "TextDocument.h"
 #include "TextStyleRegistry.h"
 #include <string>
@@ -17,25 +16,30 @@ void TextMateAnnotator::SetLanguageFile( const char* path )
 	m_patterns = ReadTextMateFile( path, m_styleRegistry );
 }
 
-static inline bool IsAscii( wchar_t c )
+void TextMateAnnotator::TokenizeLine( size_t offset, AsciiRef text )
 {
-	return 0 < c && c < 128;
-}
+	const OnigUChar* textStart = reinterpret_cast<const uint8_t*>( text.begin() );
+	const OnigUChar* textEnd   = textStart + text.size();
 
-void TextMateAnnotator::TokenizeLine( size_t offset, size_t lineEnd, std::string line )
-{
-	while ( !line.empty() )
+	const TextMatePattern* bestPattern;
+	size_t bestStart;
+	size_t bestLength;
+
+	for ( const OnigUChar* searchStart = textStart; searchStart < textEnd; searchStart += bestStart + bestLength )
 	{
-		const TextMatePattern* bestPattern = 0;
-		size_t bestStart  = line.size();
-		size_t bestLength = 0;
+		bestPattern = 0;
+		bestStart   = text.size();
+		bestLength  = 0;
 
 		for ( TextMatePatterns::const_iterator it = m_patterns.begin(); it != m_patterns.end(); ++it )
 		{
-			const OnigUChar* start = reinterpret_cast<const unsigned char*>( line.c_str() );
-			const OnigUChar* end   = start + line.size();
-
-			int matchPos = onig_search( it->regex.get(), start, end, start, end, it->region.get(), ONIG_OPTION_NONE );
+			int matchPos = onig_search( it->regex.get(),
+			                            textStart,
+			                            textEnd,
+			                            searchStart,
+			                            textEnd,
+			                            it->region.get(),
+			                            ONIG_OPTION_NONE );
 
 			if ( matchPos >= 0 )
 			{
@@ -48,20 +52,17 @@ void TextMateAnnotator::TokenizeLine( size_t offset, size_t lineEnd, std::string
 					continue;
 
 				bestPattern = &*it;
-				bestStart = start;
-				bestLength = length;
+				bestStart   = start;
+				bestLength  = length;
 			}
 		}
 
 		if ( bestPattern == 0 )
 			break;
 
-		size_t nextStart = bestStart + bestLength;
-		bestStart += offset;
-
 		if ( bestPattern->captures.empty() )
 		{
-			m_tokens.push_back( TextMateTokenRun( bestPattern->classID, bestStart, bestLength ) );
+			m_tokens.push_back( TextMateTokenRun( bestPattern->classID, offset + bestStart, bestLength ) );
 		}
 		else
 		{
@@ -76,12 +77,9 @@ void TextMateAnnotator::TokenizeLine( size_t offset, size_t lineEnd, std::string
 				if ( length == 0 )
 					continue;
 
-				m_tokens.push_back( TextMateTokenRun( it->classID, start + offset, length ) );
+				m_tokens.push_back( TextMateTokenRun( it->classID, offset + start, length ) );
 			}
 		}
-
-		line = line.substr( nextStart );
-		offset = bestStart + bestLength;
 	}
 }
 
@@ -91,27 +89,19 @@ void TextMateAnnotator::TextChanged( TextChange )
 
 	TextDocumentReader reader( m_doc );
 
-	std::string text;
-	text.resize( m_doc.Length() );
+	AsciiRef text = reader.AsciiRange( 0, m_doc.Length() );
 
-	UTF16Ref text16 = reader.WeakRange( 0, m_doc.Length() );
-
-	for ( size_t i = 0; i < text16.size(); ++i )
-		text[i] = IsAscii( text16[i] ) ? text16[i] : -1;
-
-	size_t offset = 0;
+	const char* lineStart = text.begin();;
 
 	while ( true )
 	{
-		std::string::const_iterator lineBreak = std::find( text.begin() + offset, text.end(), 0x0A );
+		const char* newline = std::find( lineStart, text.end(), 0x0A );
+		TokenizeLine( lineStart - text.begin(), AsciiRef( lineStart, newline ) );
 
-		std::string line = std::string( text.begin() + offset, lineBreak );
-		TokenizeLine( offset, offset + line.size(), line );
-
-		if ( lineBreak == text.end() )
+		if ( newline == text.end() )
 			break;
 
-		offset += line.size() + 1;
+		lineStart = newline + 1;
 	}
 }
 

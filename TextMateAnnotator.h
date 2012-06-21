@@ -6,6 +6,7 @@
 #include "TextAnnotator.h"
 #include "TextMatePattern.h"
 #include "TextMateTokenRun.h"
+#include "TextDocumentReader.h"
 #include "UTF16Ref.h"
 #include <vector>
 
@@ -27,7 +28,7 @@ public:
 	virtual void GetHighlights( TextRanges&,    size_t start, size_t count );
 
 private:
-	void TokenizeLine( size_t offset, size_t lineEnd, std::string line );
+	void TokenizeLine( size_t offset, AsciiRef text );
 
 	const TextDocument& m_doc;
 	TextStyleRegistry& m_styleRegistry;
