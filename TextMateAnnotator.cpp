@@ -39,7 +39,7 @@ void TextMateAnnotator::TokenizeLine( size_t offset, AsciiRef text )
 				                              searchStart,
 				                              textEnd,
 				                              it->region.get(),
-				                              ONIG_OPTION_NONE );
+				                              ONIG_OPTION_SINGLELINE );
 
 			if ( it->matchStart < 0 )
 				continue;
