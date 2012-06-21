@@ -2,7 +2,7 @@
 
 #include "TextMatePattern.h"
 #include "TextStyleRegistry.h"
-#include "rapidxml\rapidxml.hpp"
+#include "rapidxml.hpp"
 #include <algorithm>
 #include <streambuf>
 #include <fstream>
@@ -23,10 +23,16 @@ struct SortCaptureByIndex
 	}
 };
 
-TextMatePattern::TextMatePattern( uint32_t classID, const std::string& match, const std::vector<TextMateCapture>& captures )
+static void FreeOnigRegion( OnigRegion* region )
+{
+	onig_region_free( region, 1 );
+}
+
+TextMatePattern::TextMatePattern( uint32_t classID, OnigRegexPtr regex, const TextMateCaptures& captures )
 	: classID( classID )
-	, regex( match, captures.empty() ? std::regex::ECMAScript|std::regex::nosubs : std::regex::ECMAScript )
 	, captures( captures )
+	, regex( regex )
+	, region( onig_region_new(), FreeOnigRegion )
 {
 	std::sort( this->captures.begin(), this->captures.end(), SortCaptureByIndex() );
 }
@@ -40,9 +46,9 @@ static xml_node<char>* GetKeyValue( xml_node<char>* node, const char* keyName )
 	return 0;
 }
 
-static std::vector<TextMateCapture> ReadCaptures( xml_node<char>* node, TextStyleRegistry& styleRegistry )
+static TextMateCaptures ReadCaptures( xml_node<char>* node, TextStyleRegistry& styleRegistry )
 {
-	std::vector<TextMateCapture> captures;
+	TextMateCaptures captures;
 
 	for ( xml_node<char>* key = node->first_node( "key" ); key != 0; key = key->next_sibling( "key" ) )
 	{
@@ -65,12 +71,27 @@ static std::vector<TextMateCapture> ReadCaptures( xml_node<char>* node, TextStyl
 	return captures;
 }
 
-std::vector<TextMatePattern> ReadTextMateFile( const char* path, TextStyleRegistry& styleRegistry )
+static OnigRegexPtr NewRegex( const char* pattern )
+{
+	regex_t* regex;
+
+	const OnigUChar* patternStart = reinterpret_cast<const unsigned char*>( pattern );
+	const OnigUChar* patternEnd   = patternStart + strlen( pattern );
+
+	int status = onig_new( &regex, patternStart, patternEnd, ONIG_OPTION_DEFAULT, ONIG_ENCODING_ASCII, ONIG_SYNTAX_DEFAULT, 0 );
+
+	if ( status != ONIG_NORMAL )
+		return OnigRegexPtr();
+
+	return OnigRegexPtr( regex, onig_free );
+}
+
+TextMatePatterns ReadTextMateFile( const char* path, TextStyleRegistry& styleRegistry )
 {
 	std::ifstream t( path );
 	std::string xml( ( std::istreambuf_iterator<char>( t ) ), std::istreambuf_iterator<char>() );
 
-	std::vector<TextMatePattern> patterns;
+	TextMatePatterns patterns;
 
 	xml_document<char> doc;
 	doc.parse<parse_default>( const_cast<char*>( xml.c_str() ) );
@@ -105,13 +126,10 @@ std::vector<TextMatePattern> ReadTextMateFile( const char* path, TextStyleRegist
 		if ( capturesNode )
 			captures = ReadCaptures( capturesNode, styleRegistry );
 
-		try
-		{
-			patterns.push_back( TextMatePattern( styleRegistry.ClassID( nameNode->value() ), matchNode->value(), captures ) );
-		}
-		catch (...)
-		{
-		}
+		OnigRegexPtr regex = NewRegex( matchNode->value() );
+
+		if ( regex )
+			patterns.push_back( TextMatePattern( styleRegistry.ClassID( nameNode->value() ), regex, captures ) );
 	}
 
 	return patterns;

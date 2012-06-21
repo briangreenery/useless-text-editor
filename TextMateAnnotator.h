@@ -32,7 +32,7 @@ private:
 	const TextDocument& m_doc;
 	TextStyleRegistry& m_styleRegistry;
 
-	std::vector<TextMatePattern> m_patterns;
+	TextMatePatterns m_patterns;
 	TextMateTokenRuns m_tokens;
 };
 

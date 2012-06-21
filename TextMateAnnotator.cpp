@@ -1,7 +1,6 @@
 // TextMateAnnotator.cpp
 
 #include "TextMateAnnotator.h"
-#include "rapidxml\rapidxml.hpp"
 #include "TextDocumentReader.h"
 #include "TextDocument.h"
 #include "TextStyleRegistry.h"
@@ -27,57 +26,57 @@ void TextMateAnnotator::TokenizeLine( size_t offset, size_t lineEnd, std::string
 {
 	while ( !line.empty() )
 	{
-		size_t best       = m_patterns.size();
+		const TextMatePattern* bestPattern = 0;
 		size_t bestStart  = line.size();
 		size_t bestLength = 0;
 
-		for ( size_t i = 0; i < m_patterns.size(); ++i )
+		for ( TextMatePatterns::const_iterator it = m_patterns.begin(); it != m_patterns.end(); ++it )
 		{
-			if ( std::regex_search( line.c_str(), line.c_str() + line.size(), m_patterns[i].match, m_patterns[i].regex ) )
+			const OnigUChar* start = reinterpret_cast<const unsigned char*>( line.c_str() );
+			const OnigUChar* end   = start + line.size();
+
+			int matchPos = onig_search( it->regex.get(), start, end, start, end, it->region.get(), ONIG_OPTION_NONE );
+
+			if ( matchPos >= 0 )
 			{
-				size_t start = m_patterns[i].match.position();
+				size_t start = matchPos;
 				if ( start > bestStart )
 					continue;
 
-				size_t length = m_patterns[i].match.length();
+				size_t length = it->region->end[0] - it->region->beg[0];
 				if ( start == bestStart && length < bestLength )
 					continue;
 
-				best = i;
+				bestPattern = &*it;
 				bestStart = start;
 				bestLength = length;
 			}
 		}
 
-		if ( best == m_patterns.size() )
+		if ( bestPattern == 0 )
 			break;
 
 		size_t nextStart = bestStart + bestLength;
 		bestStart += offset;
 
-		if ( m_patterns[best].captures.empty() )
+		if ( bestPattern->captures.empty() )
 		{
-			m_tokens.push_back( TextMateTokenRun( m_patterns[best].classID, bestStart, bestLength ) );
+			m_tokens.push_back( TextMateTokenRun( bestPattern->classID, bestStart, bestLength ) );
 		}
 		else
 		{
-			size_t lastEnd = offset;
-
-			const TextMatePattern& pattern = m_patterns[best];
-
-			for ( size_t i = 0; i < pattern.captures.size(); ++i )
+			for ( TextMateCaptures::const_iterator it = bestPattern->captures.begin(); it != bestPattern->captures.end(); ++it )
 			{
-				if ( pattern.captures[i].index > pattern.match.size() )
+				if ( it->index > uint32_t( bestPattern->region->num_regs ) )
 					break;
 
-				size_t start  = pattern.match[pattern.captures[i].index].first - line.c_str() + offset;
-				size_t length = pattern.match[pattern.captures[i].index].length();
+				size_t start  = bestPattern->region->beg[it->index];
+				size_t length = bestPattern->region->end[it->index] - start;
 
 				if ( length == 0 )
 					continue;
 
-				m_tokens.push_back( TextMateTokenRun( pattern.captures[i].classID, start, length ) );
-				lastEnd = start + length;
+				m_tokens.push_back( TextMateTokenRun( it->classID, start + offset, length ) );
 			}
 		}
 

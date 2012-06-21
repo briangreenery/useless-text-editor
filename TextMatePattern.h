@@ -4,9 +4,9 @@
 #define TextMatePattern_h
 
 #include <string>
-#include <regex>
 #include <vector>
 #include <stdint.h>
+#include <oniguruma.h>
 
 class TextStyleRegistry;
 
@@ -19,18 +19,25 @@ public:
 	uint32_t classID;
 };
 
+typedef std::vector<TextMateCapture> TextMateCaptures;
+
+typedef std::shared_ptr<regex_t> OnigRegexPtr;
+typedef std::shared_ptr<OnigRegion> OnigRegionPtr;
+
 class TextMatePattern
 {
 public:
-	TextMatePattern( uint32_t classID, const std::string& match, const std::vector<TextMateCapture>& captures );
+	TextMatePattern( uint32_t classID, OnigRegexPtr regex, const TextMateCaptures& captures );
 
 	uint32_t classID;
-	std::vector<TextMateCapture> captures;
+	TextMateCaptures captures;
 
-	std::regex regex;
-	std::cmatch match;
+	OnigRegexPtr regex;
+	OnigRegionPtr region;
 };
 
-std::vector<TextMatePattern> ReadTextMateFile( const char* path, TextStyleRegistry& styleRegistry );
+typedef std::vector<TextMatePattern> TextMatePatterns;
+
+TextMatePatterns ReadTextMateFile( const char* path, TextStyleRegistry& styleRegistry );
 
 #endif
