@@ -59,6 +59,7 @@ TextView::TextView( HWND hwnd )
 		TextTheme theme;
 		uint32_t normal = theme.AddFont( L"Consolas", false, false );
 
+		theme.SetStyle( "default",  TextStyle( normal,  RGB(   0,   0,   0 ), RGB( 255, 255, 255 ) ) );
 		theme.SetStyle( "string",   TextStyle( normal,  RGB( 0,   128, 128 ), TextStyle::useDefault ) );
 		theme.SetStyle( "constant", TextStyle( normal,  RGB( 128,   0, 128 ), TextStyle::useDefault ) );
 		theme.SetStyle( "keyword",  TextStyle( normal,  RGB( 0,     0, 255 ), TextStyle::useDefault ) );

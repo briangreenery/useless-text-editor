@@ -24,14 +24,14 @@ ArrayRef<const TextFontRun> TextStyleReader::Fonts( size_t start, size_t count )
 {
 	m_fonts.clear();
 
-	TextStyleRuns classes;
+	m_annotatorClasses.clear();
 
 	if ( m_styleRegistry.Annotator() )
-		m_styleRegistry.Annotator()->GetClasses( classes, start, count );
+		m_styleRegistry.Annotator()->GetClasses( m_annotatorClasses, start, count );
 
 	size_t lastEnd = start;
 
-	for ( TextStyleRuns::const_iterator it = classes.begin(); it != classes.end(); ++it )
+	for ( TextStyleRuns::const_iterator it = m_annotatorClasses.begin(); it != m_annotatorClasses.end(); ++it )
 	{
 		if ( lastEnd != it->start )
 			AddFont( m_defaultClassID, it->start - lastEnd );
@@ -58,14 +58,14 @@ ArrayRef<const TextStyleRun> TextStyleReader::Classes( size_t start, size_t coun
 {
 	m_classes.clear();
 
-	TextStyleRuns classes;
+	m_annotatorClasses.clear();
 
 	if ( m_styleRegistry.Annotator() )
-		m_styleRegistry.Annotator()->GetClasses( classes, start, count );
+		m_styleRegistry.Annotator()->GetClasses( m_annotatorClasses, start, count );
 
 	size_t lastEnd = start;
 
-	for ( TextStyleRuns::const_iterator it = classes.begin(); it != classes.end(); ++it )
+	for ( TextStyleRuns::const_iterator it = m_annotatorClasses.begin(); it != m_annotatorClasses.end(); ++it )
 	{
 		if ( lastEnd != it->start )
 			AddClass( m_defaultClassID, lastEnd, it->start - lastEnd );
