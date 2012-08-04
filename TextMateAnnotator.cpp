@@ -16,41 +16,55 @@ void TextMateAnnotator::SetLanguageFile( const char* path )
 	m_patterns = ReadTextMateFile( path, m_styleRegistry );
 }
 
-void TextMateAnnotator::TokenizeLine( size_t offset, AsciiRef text )
+TextMatePattern* FindBestMatch( const OnigUChar* textStart,
+                                const OnigUChar* textEnd,
+                                const OnigUChar* searchStart,
+                                TextMatePatterns& patterns )
 {
-	const OnigUChar* textStart = reinterpret_cast<const uint8_t*>( text.begin() );
-	const OnigUChar* textEnd   = textStart + text.size();
+	TextMatePattern* best = 0;
 
-	const TextMatePattern* best;
-	for ( const OnigUChar* searchStart = textStart; searchStart < textEnd; searchStart = textStart + best->matchStart + best->matchLength )
+	for ( TextMatePatterns::iterator it = patterns.begin(); it != patterns.end(); ++it )
 	{
-		best = 0;
+		// If this is the first time we've searched for this regex in this line
+		// or if we're now searching past the start of the last match of this regex
+		// then search against this regex.
 
-		for ( TextMatePatterns::iterator it = m_patterns.begin(); it != m_patterns.end(); ++it )
-		{
-			// If this is the first time we've searched for this regex in this line
-			// or if we're now searching past the start of the last match of this regex
-			// then search against this regex.
+		if ( searchStart == textStart || ( it->matchStart >= 0 && it->matchStart < searchStart - textStart ) )
+			it->matchStart = onig_search( it->regex.get(),
+				                            textStart,
+				                            textEnd,
+				                            searchStart,
+				                            textEnd,
+				                            it->region.get(),
+				                            ONIG_OPTION_SINGLELINE );
 
-			if ( searchStart == textStart || ( it->matchStart >= 0 && it->matchStart < searchStart - textStart ) )
-				it->matchStart = onig_search( it->regex.get(),
-				                              textStart,
-				                              textEnd,
-				                              searchStart,
-				                              textEnd,
-				                              it->region.get(),
-				                              ONIG_OPTION_SINGLELINE );
+		if ( it->matchStart < 0 )
+			continue;
 
-			if ( it->matchStart < 0 )
-				continue;
+		it->matchLength = it->region->end[0] - it->region->beg[0];
 
-			it->matchLength = it->region->end[0] - it->region->beg[0];
+		if ( ( best == 0 )
+			|| ( it->matchStart < best->matchStart )
+			|| ( it->matchStart == best->matchStart && it->matchLength > best->matchLength ) )
+			best = &*it;
+	}
 
-			if ( ( best == 0 )
-			  || ( it->matchStart < best->matchStart )
-			  || ( it->matchStart == best->matchStart && it->matchLength > best->matchLength ) )
-				best = &*it;
-		}
+	return best;
+}
+
+const OnigUChar* TextMateAnnotator::Tokenize( size_t offset,
+                                              const OnigUChar* textStart,
+                                              const OnigUChar* textEnd,
+                                              TextMatePatterns& patterns,
+                                              TextMatePattern* end )
+{
+	const TextMatePattern* best;
+
+	for ( const OnigUChar* searchStart = textStart;
+	      searchStart < textEnd;
+	      searchStart = textStart + best->matchStart + best->matchLength )
+	{
+		best = FindBestMatch( textStart, textEnd, searchStart, patterns );
 
 		if ( best == 0 )
 			break;
@@ -77,7 +91,12 @@ void TextMateAnnotator::TokenizeLine( size_t offset, AsciiRef text )
 
 		if ( lastEnd != best->matchStart + best->matchLength )
 			m_tokens.push_back( TextMateTokenRun( best->classID, offset + lastEnd, best->matchStart + best->matchLength - lastEnd ) );
+
+		if ( best == end )
+			return best->region->end[0];
 	}
+
+	return textEnd;
 }
 
 void TextMateAnnotator::TextChanged( TextChange )
