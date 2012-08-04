@@ -30,6 +30,7 @@ private:
 
 	TextFontRuns m_fonts;
 	TextStyleRuns m_classes;
+	TextStyleRuns m_annotatorClasses;
 	TextRanges m_squiggles;
 	TextRanges m_highlights;
 };
