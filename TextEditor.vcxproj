@@ -19,10 +19,12 @@
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -80,11 +82,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\RelevanceLexer\RelevanceLexer.cpp" />
     <ClCompile Include="DocumentCharIter.cpp" />
     <ClCompile Include="EmptyTextBlock.cpp" />
-    <ClCompile Include="RelevanceAnnotator.cpp" />
-    <ClCompile Include="RelevanceTokenRun.cpp" />
     <ClCompile Include="AccessibleTextView.cpp" />
     <ClCompile Include="TextChangeTest.cpp" />
     <ClCompile Include="TextFontRun.cpp" />
@@ -125,10 +124,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\RelevanceLexer\RelevanceLexer.h" />
-    <ClInclude Include="..\RelevanceLexer\RelevanceLexerOutput.h" />
-    <ClInclude Include="..\RelevanceLexer\RelevanceLexerToken.h" />
-    <ClInclude Include="..\RelevanceLexer\RelevanceTextRef.h" />
     <ClInclude Include="ArrayRef.h" />
     <ClInclude Include="DocumentCharIter.h" />
     <ClInclude Include="EmptyTextBlock.h" />
@@ -141,8 +136,6 @@
     <ClInclude Include="TextMateTokenRun.h" />
     <ClInclude Include="TextTheme.h" />
     <ClInclude Include="ThrowHRESULT.h" />
-    <ClInclude Include="RelevanceAnnotator.h" />
-    <ClInclude Include="RelevanceTokenRun.h" />
     <ClInclude Include="AccessibleTextView.h" />
     <ClInclude Include="TextAnnotator.h" />
     <ClInclude Include="TextChangeTest.h" />

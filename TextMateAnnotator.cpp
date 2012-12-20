@@ -8,95 +8,157 @@
 TextMateAnnotator::TextMateAnnotator( const TextDocument& doc, TextStyleRegistry& styleRegistry )
 	: m_doc( doc )
 	, m_styleRegistry( styleRegistry )
+	, m_defaultStyle( styleRegistry.ClassID( "default" ) )
 {
 }
 
 void TextMateAnnotator::SetLanguageFile( const char* path )
 {
-	m_patterns = ReadTextMateFile( path, m_styleRegistry );
+	m_language = ReadTextMateFile( path, m_styleRegistry );
 }
 
-TextMatePattern* FindBestMatch( const OnigUChar* textStart,
-                                const OnigUChar* textEnd,
-                                const OnigUChar* searchStart,
-                                TextMatePatterns& patterns )
+static TextMateBestMatch FindBestRegexMatch( const char* textStart,
+                                             const char* textEnd,
+                                             const char* searchStart,
+                                             const std::vector<TextMateRegex*>& regexes )
 {
-	TextMatePattern* best = 0;
+	TextMateBestMatch bestMatch;
 
-	for ( TextMatePatterns::iterator it = patterns.begin(); it != patterns.end(); ++it )
+	for ( int32_t i = 0, size = regexes.size(); i < size; ++i )
 	{
-		// If this is the first time we've searched for this regex in this line
-		// or if we're now searching past the start of the last match of this regex
-		// then search against this regex.
+		TextMateRegex* regex = regexes[i];
 
-		if ( searchStart == textStart || ( it->matchStart >= 0 && it->matchStart < searchStart - textStart ) )
-			it->matchStart = onig_search( it->regex.get(),
-				                            textStart,
-				                            textEnd,
-				                            searchStart,
-				                            textEnd,
-				                            it->region.get(),
-				                            ONIG_OPTION_SINGLELINE );
+		if ( searchStart == textStart || ( regex->matchStart >= 0 && regex->matchStart < searchStart - textStart ) )
+			regex->matchStart = onig_search( regex->regex.get(),
+			                                 reinterpret_cast<const OnigUChar*>( textStart ),
+			                                 reinterpret_cast<const OnigUChar*>( textEnd ),
+			                                 reinterpret_cast<const OnigUChar*>( searchStart ),
+			                                 reinterpret_cast<const OnigUChar*>( textEnd ),
+			                                 regex->region.get(),
+			                                 ONIG_OPTION_NONE );
 
-		if ( it->matchStart < 0 )
+		if ( regex->matchStart < 0 )
 			continue;
 
-		it->matchLength = it->region->end[0] - it->region->beg[0];
+		regex->matchLength = regex->region->end[0] - regex->region->beg[0];
 
-		if ( ( best == 0 )
-			|| ( it->matchStart < best->matchStart )
-			|| ( it->matchStart == best->matchStart && it->matchLength > best->matchLength ) )
-			best = &*it;
+		if ( !bestMatch.IsBetterThan( regex->matchStart, regex->matchLength ) )
+		{
+			bestMatch.index  = i;
+			bestMatch.start  = regex->matchStart;
+			bestMatch.length = regex->matchLength;
+		}
 	}
 
-	return best;
+	return bestMatch;
 }
 
-const OnigUChar* TextMateAnnotator::Tokenize( size_t offset,
-                                              const OnigUChar* textStart,
-                                              const OnigUChar* textEnd,
-                                              TextMatePatterns& patterns,
-                                              TextMatePattern* end )
+void TextMateAnnotator::AddTokens( size_t startOffset, uint32_t blockStyle, uint32_t regexStyle, const TextMateRegex* regex )
 {
-	const TextMatePattern* best;
+	size_t lastEnd = m_tokens.empty() ? 0 : m_tokens.back().start + m_tokens.back().count;
 
-	for ( const OnigUChar* searchStart = textStart;
-	      searchStart < textEnd;
-	      searchStart = textStart + best->matchStart + best->matchLength )
+	if ( lastEnd != startOffset + regex->matchStart )
+		m_tokens.push_back( TextMateTokenRun( blockStyle, lastEnd, startOffset + regex->matchStart - lastEnd ) );
+
+	lastEnd = regex->matchStart;
+
+	for ( auto it = regex->captures.begin(); it != regex->captures.end(); ++it )
 	{
-		best = FindBestMatch( textStart, textEnd, searchStart, patterns );
-
-		if ( best == 0 )
+		if ( it->index > uint32_t( regex->region->num_regs ) )
 			break;
 
-		size_t lastEnd = best->matchStart;
+		size_t start  = regex->region->beg[it->index];
+		size_t length = regex->region->end[it->index] - start;
 
-		for ( TextMateCaptures::const_iterator it = best->captures.begin(); it != best->captures.end(); ++it )
-		{
-			if ( it->index > uint32_t( best->region->num_regs ) )
-				break;
+		if ( length == 0 )
+			continue;
 
-			size_t start  = best->region->beg[it->index];
-			size_t length = best->region->end[it->index] - start;
+		if ( lastEnd != start )
+			m_tokens.push_back( TextMateTokenRun( regexStyle, startOffset + lastEnd, start - lastEnd ) );
 
-			if ( length == 0 )
-				continue;
-
-			if ( lastEnd != start )
-				m_tokens.push_back( TextMateTokenRun( best->classID, offset + lastEnd, start - lastEnd ) );
-
-			m_tokens.push_back( TextMateTokenRun( it->classID, offset + start, length ) );
-			lastEnd = start + length;
-		}
-
-		if ( lastEnd != best->matchStart + best->matchLength )
-			m_tokens.push_back( TextMateTokenRun( best->classID, offset + lastEnd, best->matchStart + best->matchLength - lastEnd ) );
-
-		if ( best == end )
-			return best->region->end[0];
+		m_tokens.push_back( TextMateTokenRun( it->style, startOffset + start, length ) );
+		lastEnd = start + length;
 	}
 
-	return textEnd;
+	if ( lastEnd != regex->matchStart + regex->matchLength )
+		m_tokens.push_back( TextMateTokenRun( regexStyle, startOffset + lastEnd, regex->matchStart + regex->matchLength - lastEnd ) );
+}
+
+void TextMateAnnotator::Tokenize( const char* docStart, const char* docEnd )
+{
+	TextMateStack stack;
+
+	const char* textStart   = docStart;
+	const char* searchStart = docStart;
+	const char* searchEnd   = std::find( searchStart, docEnd, 0x0A );
+
+	while ( searchStart < docEnd )
+	{
+		if ( stack.IsEmpty() )
+		{
+			TextMateBestMatch patternMatch = FindBestRegexMatch( textStart, searchEnd, searchStart, m_language.defaultPatterns->begins );
+
+			if ( patternMatch.index >= 0 )
+			{
+				TextMatePatterns* patterns = m_language.defaultPatterns;
+				int32_t           best     = patternMatch.index;
+
+				AddTokens( textStart - docStart, m_defaultStyle, patterns->styles[best], patterns->begins[best] );
+
+				searchStart = textStart + patternMatch.start + patternMatch.length;
+
+				if ( patterns->ends[best] )
+				{
+					stack.Push( patterns->styles[best], patterns->ends[best], patterns->patterns[best] );
+
+					textStart = searchStart;
+					searchEnd = docEnd;
+				}
+			}
+			else
+			{
+				searchStart = (std::min)( searchEnd + 1, docEnd );
+				textStart   = searchStart;
+				searchEnd   = std::find( searchStart, docEnd, 0x0A );
+			}
+		}
+		else
+		{
+			TextMateBestMatch patternMatch = FindBestRegexMatch( textStart, searchEnd, searchStart, stack.patternsList.back()->begins );
+			TextMateBestMatch endMatch     = FindBestRegexMatch( textStart, searchEnd, searchStart, stack.ends );
+
+			if ( endMatch.IsBetterThan( patternMatch.start, patternMatch.length ) )
+			{
+				AddTokens( textStart - docStart, stack.styles.back(), stack.styles[endMatch.index], stack.ends[endMatch.index] );
+
+				searchStart = textStart + endMatch.start + endMatch.length;
+
+				stack.PopTo( endMatch.index );
+
+				if ( stack.IsEmpty() )
+				{
+					textStart = searchStart;
+					searchEnd = std::find( searchStart, docEnd, 0x0A );
+				}
+			}
+			else if ( patternMatch.index >= 0 )
+			{
+				TextMatePatterns* patterns = stack.patternsList.back();
+				int32_t           best     = patternMatch.index;
+
+				AddTokens( textStart - docStart, stack.styles.back(), patterns->styles[best], patterns->begins[best] );
+
+				searchStart = textStart + patternMatch.start + patternMatch.length;
+
+				if ( patterns->ends[best] )
+					stack.Push( patterns->styles[best], patterns->ends[best], patterns->patterns[best] );
+			}
+			else
+			{
+				return;
+			}
+		}
+	}
 }
 
 void TextMateAnnotator::TextChanged( TextChange )
@@ -107,18 +169,8 @@ void TextMateAnnotator::TextChanged( TextChange )
 
 	AsciiRef text = reader.AsciiRange( 0, m_doc.Length() );
 
-	const char* lineStart = text.begin();;
-
-	while ( true )
-	{
-		const char* newline = std::find( lineStart, text.end(), 0x0A );
-		TokenizeLine( lineStart - text.begin(), AsciiRef( lineStart, newline ) );
-
-		if ( newline == text.end() )
-			break;
-
-		lineStart = newline + 1;
-	}
+	if ( m_language.defaultPatterns )
+		Tokenize( text.begin(), text.end() );
 }
 
 void TextMateAnnotator::SelectionChanged( size_t start, size_t end )

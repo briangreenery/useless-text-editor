@@ -5,7 +5,6 @@
 #include <Windowsx.h>
 #include <uxtheme.h>
 
-#include "RelevanceAnnotator.h"
 #include "TextMateAnnotator.h"
 
 TextView::TextView( HWND hwnd )
@@ -49,20 +48,7 @@ TextView::TextView( HWND hwnd )
 		theme.SetStyle( "constant",             TextStyle( normal,  RGB( 174, 129, 255 ), TextStyle::useDefault ) );
 		theme.SetStyle( "variable",             TextStyle( italics, RGB( 253, 151,  32 ), TextStyle::useDefault ) );
 		theme.SetStyle( "comment",              TextStyle( normal,  RGB( 117, 113,  94 ), TextStyle::useDefault ) );
-
-		m_styleRegistry.SetTheme( theme );
-	}
-	else
-	{
-		m_styleRegistry.SetAnnotator( new RelevanceAnnotator( m_doc, m_styleRegistry ) );
-
-		TextTheme theme;
-		uint32_t normal = theme.AddFont( L"Consolas", false, false );
-
-		theme.SetStyle( "default",  TextStyle( normal,  RGB(   0,   0,   0 ), RGB( 255, 255, 255 ) ) );
-		theme.SetStyle( "string",   TextStyle( normal,  RGB( 0,   128, 128 ), TextStyle::useDefault ) );
-		theme.SetStyle( "constant", TextStyle( normal,  RGB( 128,   0, 128 ), TextStyle::useDefault ) );
-		theme.SetStyle( "keyword",  TextStyle( normal,  RGB( 0,     0, 255 ), TextStyle::useDefault ) );
+		theme.SetStyle( "string",               TextStyle( normal,  RGB( 230, 219, 116 ), TextStyle::useDefault ) );
 
 		m_styleRegistry.SetTheme( theme );
 	}

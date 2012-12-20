@@ -31,12 +31,6 @@
     <Filter Include="Annotators\Textmate">
       <UniqueIdentifier>{7e76a81f-193d-4f3a-9b8c-7b753b4a805c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Annotators\Relevance">
-      <UniqueIdentifier>{01e98e77-53bd-4c5a-8737-e385986223a2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Annotators\Relevance\Lexer">
-      <UniqueIdentifier>{506c0249-6adf-41f7-b4a2-3296cb608810}</UniqueIdentifier>
-    </Filter>
     <Filter Include="External">
       <UniqueIdentifier>{7781d429-c502-497e-a503-348d787922e4}</UniqueIdentifier>
     </Filter>
@@ -139,9 +133,6 @@
     <ClCompile Include="TextStyleReader.cpp">
       <Filter>TextStyle</Filter>
     </ClCompile>
-    <ClCompile Include="RelevanceAnnotator.cpp">
-      <Filter>Annotators\Relevance</Filter>
-    </ClCompile>
     <ClCompile Include="TextSquiggle.cpp">
       <Filter>TextView</Filter>
     </ClCompile>
@@ -150,12 +141,6 @@
     </ClCompile>
     <ClCompile Include="TextDocumentUndo.cpp">
       <Filter>TextDocument</Filter>
-    </ClCompile>
-    <ClCompile Include="..\RelevanceLexer\RelevanceLexer.cpp">
-      <Filter>Annotators\Relevance\Lexer</Filter>
-    </ClCompile>
-    <ClCompile Include="RelevanceTokenRun.cpp">
-      <Filter>Annotators\Relevance</Filter>
     </ClCompile>
     <ClCompile Include="AccessibleTextView.cpp">
       <Filter>TextView</Filter>
@@ -270,9 +255,6 @@
     <ClInclude Include="TextStyleReader.h">
       <Filter>TextStyle</Filter>
     </ClInclude>
-    <ClInclude Include="RelevanceAnnotator.h">
-      <Filter>Annotators\Relevance</Filter>
-    </ClInclude>
     <ClInclude Include="TextSquiggle.h">
       <Filter>TextView</Filter>
     </ClInclude>
@@ -281,21 +263,6 @@
     </ClInclude>
     <ClInclude Include="TextDocumentUndo.h">
       <Filter>TextDocument</Filter>
-    </ClInclude>
-    <ClInclude Include="..\RelevanceLexer\RelevanceLexer.h">
-      <Filter>Annotators\Relevance\Lexer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\RelevanceLexer\RelevanceLexerOutput.h">
-      <Filter>Annotators\Relevance\Lexer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\RelevanceLexer\RelevanceLexerToken.h">
-      <Filter>Annotators\Relevance\Lexer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\RelevanceLexer\RelevanceTextRef.h">
-      <Filter>Annotators\Relevance\Lexer</Filter>
-    </ClInclude>
-    <ClInclude Include="RelevanceTokenRun.h">
-      <Filter>Annotators\Relevance</Filter>
     </ClInclude>
     <ClInclude Include="AccessibleTextView.h">
       <Filter>TextView</Filter>

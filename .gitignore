@@ -10,3 +10,4 @@ TextEditor.idc
 ipch/*
 *.cl.cfg
 *.cl.cmd
+*.suo
