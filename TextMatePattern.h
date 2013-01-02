@@ -19,6 +19,8 @@ public:
 	uint32_t style;
 };
 
+typedef std::vector<TextMateCapture> TextMateCaptures;
+
 typedef std::shared_ptr<regex_t> OnigRegexPtr;
 typedef std::shared_ptr<OnigRegion> OnigRegionPtr;
 
@@ -37,14 +39,11 @@ public:
 class TextMateRegex
 {
 public:
-	TextMateRegex( OnigRegexPtr regex, const std::vector<TextMateCapture>& captures );
+	TextMateRegex( OnigRegexPtr regex );
 
 	OnigRegexPtr regex;
-	std::vector<TextMateCapture> captures;
-
 	OnigRegionPtr region;
 	int32_t matchStart;
-	int32_t matchLength;
 };
 
 typedef std::shared_ptr<TextMateRegex> TextMateRegexPtr;
@@ -52,8 +51,8 @@ typedef std::shared_ptr<TextMateRegex> TextMateRegexPtr;
 class TextMatePatterns
 {
 public:
-	std::vector<TextMateRegex*> begins;
-	std::vector<TextMateRegex*> ends;
+	std::vector<TextMateRegex*> regexes;
+	std::vector<TextMateCaptures> captures;
 	std::vector<TextMatePatterns*> patterns;
 	std::vector<uint32_t> styles;
 };
@@ -65,7 +64,7 @@ class TextMateLanguage
 public:
 	TextMateLanguage();
 
-	TextMateRegex* NewRegex( const char* pattern, const std::vector<TextMateCapture>& );
+	TextMateRegex* NewRegex( const char* pattern );
 	TextMatePatterns* NewPatterns();
 
 	std::vector<TextMateRegexPtr> regexes;
@@ -73,24 +72,6 @@ public:
 	TextMatePatterns* defaultPatterns;
 };
 
-class TextMateStack
-{
-public:
-	bool IsEmpty() const;
-	void Push( uint32_t style, TextMateRegex* end, TextMatePatterns* patterns );
-	void PopTo( int32_t index );
-
-	std::vector<TextMatePatterns*> patternsList;
-	std::vector<TextMateRegex*> ends;
-	std::vector<uint32_t> styles;
-};
-
 TextMateLanguage ReadTextMateFile( const char* path, TextStyleRegistry& styleRegistry );
-
-// Match begin, apply patterns
-// If there is an end, maybe re-generate the end regex using the matched patterns (not yet)
-// Lookup the patterns
-
-// maybe just use vectors of integers for everything, might be simplest.
 
 #endif

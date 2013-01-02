@@ -28,7 +28,8 @@ public:
 	virtual void GetHighlights( TextRanges&,    size_t start, size_t count );
 
 private:
-	void AddTokens( size_t startOffset, uint32_t blockStyle, uint32_t regexStyle, const TextMateRegex* regex );
+	void AddTokensUpTo( size_t offset, uint32_t style );
+	void AddTokens( const TextMateRegex* regex, const TextMateCaptures&, uint32_t style, size_t offset );
 	void Tokenize( const char* docStart, const char* docEnd );
 
 	const TextDocument& m_doc;

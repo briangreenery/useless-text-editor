@@ -17,7 +17,7 @@ TextMateCapture::TextMateCapture( uint32_t index, uint32_t style )
 
 TextMateBestMatch::TextMateBestMatch()
 	: index( -1 )
-	, start( MAXINT32 )
+	, start( (std::numeric_limits<int32_t>::max)() )
 	, length( -1 )
 {
 }
@@ -27,34 +27,12 @@ bool TextMateBestMatch::IsBetterThan( int32_t otherStart, int32_t otherLength ) 
 	return index >= 0 && ( start < otherStart || ( start == otherStart && length >= otherLength ) );
 }
 
-bool TextMateStack::IsEmpty() const
-{
-	return patternsList.empty();
-}
-
-void TextMateStack::Push( uint32_t style, TextMateRegex* end, TextMatePatterns* patterns )
-{
-	styles.push_back( style );
-	ends.push_back( end );
-	patternsList.push_back( patterns );
-}
-
-void TextMateStack::PopTo( int32_t index )
-{
-	while ( styles.size() > size_t( index ) )
-	{
-		styles.pop_back();
-		ends.pop_back();
-		patternsList.pop_back();
-	}
-}
-
 TextMateLanguage::TextMateLanguage()
 	: defaultPatterns( 0 )
 {
 }
 
-TextMateRegex* TextMateLanguage::NewRegex( const char* pattern, const std::vector<TextMateCapture>& captures )
+TextMateRegex* TextMateLanguage::NewRegex( const char* pattern )
 {
 	regex_t* regex;
 
@@ -66,7 +44,7 @@ TextMateRegex* TextMateLanguage::NewRegex( const char* pattern, const std::vecto
 	if ( status != ONIG_NORMAL )
 		return 0;
 
-	TextMateRegexPtr textMateRegex( new TextMateRegex( OnigRegexPtr( regex, onig_free ), captures ) );
+	TextMateRegexPtr textMateRegex( new TextMateRegex( OnigRegexPtr( regex, onig_free ) ) );
 	regexes.push_back( textMateRegex );
 	return textMateRegex.get();
 }
@@ -83,14 +61,11 @@ static void FreeOnigRegion( OnigRegion* region )
 	onig_region_free( region, 1 );
 }
 
-TextMateRegex::TextMateRegex( OnigRegexPtr regex, const std::vector<TextMateCapture>& captures )
+TextMateRegex::TextMateRegex( OnigRegexPtr regex )
 	: regex( regex )
-	, captures( captures )
 	, region( onig_region_new(), FreeOnigRegion )
 	, matchStart( -1 )
-	, matchLength( 0 )
 {
-	std::sort( this->captures.begin(), this->captures.end(), []( const TextMateCapture& a, const TextMateCapture& b ) { return a.index < b.index; } );
 }
 
 static xml_node<char>* GetKeyValue( xml_node<char>* node, const char* keyName )
@@ -124,6 +99,7 @@ static std::vector<TextMateCapture> ReadCaptures( xml_node<char>* node, TextStyl
 		captures.push_back( TextMateCapture( index, styleRegistry.ClassID( name->value() ) ) );
 	}
 
+	std::sort( captures.begin(), captures.end(), []( const TextMateCapture& a, const TextMateCapture& b ) { return a.index < b.index; } );
 	return captures;
 }
 
@@ -152,32 +128,37 @@ static void ReadTextMatePatterns( TextMateLanguage& language, TextMatePatterns* 
 			std::vector<TextMateCapture> beginCaptures = beginCapturesNode ? ReadCaptures( beginCapturesNode, styleRegistry ) : captures;
 			std::vector<TextMateCapture> endCaptures   = endCapturesNode ? ReadCaptures( endCapturesNode, styleRegistry ) : captures;
 
-			TextMateRegex* begin = language.NewRegex( beginNode->value(), beginCaptures );
+			TextMateRegex* begin = language.NewRegex( beginNode->value() );
 			if ( begin == 0 )
 				continue;
 
-			TextMateRegex* end = language.NewRegex( endNode->value(), endCaptures );
+			TextMateRegex* end = language.NewRegex( endNode->value() );
 			if ( end == 0 )
 				continue;
 
 			TextMatePatterns* subPatterns = language.NewPatterns();
 
+			subPatterns->regexes.push_back( end );
+			subPatterns->captures.push_back( endCaptures );
+			subPatterns->patterns.push_back( 0 );
+			subPatterns->styles.push_back( styleRegistry.ClassID( nameNode->value() ) );
+
 			if ( subPatternsNode )
 				ReadTextMatePatterns( language, subPatterns, subPatternsNode, styleRegistry );
 
-			patterns->begins.push_back( begin );
-			patterns->ends.push_back( end );
+			patterns->regexes.push_back( begin );
+			patterns->captures.push_back( beginCaptures );
 			patterns->patterns.push_back( subPatterns );
 			patterns->styles.push_back( styleRegistry.ClassID( nameNode->value() ) );
 		}
 		else if ( matchNode )
 		{
-			TextMateRegex* match = language.NewRegex( matchNode->value(), captures );
+			TextMateRegex* match = language.NewRegex( matchNode->value() );
 			if ( match == 0 )
 				continue;
 
-			patterns->begins.push_back( match );
-			patterns->ends.push_back( 0 );
+			patterns->regexes.push_back( match );
+			patterns->captures.push_back( captures );
 			patterns->patterns.push_back( 0 );
 			patterns->styles.push_back( styleRegistry.ClassID( nameNode->value() ) );
 		}
