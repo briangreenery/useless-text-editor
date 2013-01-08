@@ -82,7 +82,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DocumentCharIter.cpp" />
+    <ClCompile Include="CharIter.cpp" />
     <ClCompile Include="EmptyTextBlock.cpp" />
     <ClCompile Include="AccessibleTextView.cpp" />
     <ClCompile Include="GapArray.cpp" />
@@ -95,18 +95,19 @@
     <ClCompile Include="SimpleTextRunLoop.cpp" />
     <ClCompile Include="SimpleTextBlock.cpp" />
     <ClCompile Include="TextDocumentReader.cpp" />
-    <ClCompile Include="TextBuffer.cpp" />
+    <ClCompile Include="CharBuffer.cpp" />
     <ClCompile Include="TextBlock.cpp" />
     <ClCompile Include="TextFont.cpp" />
+    <ClCompile Include="LineBuffer.cpp" />
     <ClCompile Include="TextMateAnnotator.cpp" />
     <ClCompile Include="TextMatePattern.cpp" />
     <ClCompile Include="TextMateTokenRun.cpp" />
-    <ClCompile Include="TextRange.cpp" />
+    <ClCompile Include="CharRange.cpp" />
     <ClCompile Include="TextSquiggle.cpp" />
     <ClCompile Include="TextStyleReader.cpp" />
     <ClCompile Include="TextStyleRegistry.cpp" />
     <ClCompile Include="TextStyleRun.cpp" />
-    <ClCompile Include="TextDocumentUndo.cpp" />
+    <ClCompile Include="UndoBuffer.cpp" />
     <ClCompile Include="TextTheme.cpp" />
     <ClCompile Include="VisualPainter.cpp" />
     <ClCompile Include="TextStyle.cpp" />
@@ -116,8 +117,8 @@
     <ClCompile Include="TextView.cpp" />
     <ClCompile Include="TextViewMetrics.cpp" />
     <ClCompile Include="TextEdit.cpp" />
-    <ClCompile Include="TextChange.cpp" />
-    <ClCompile Include="TextDocument.cpp" />
+    <ClCompile Include="CharChange.cpp" />
+    <ClCompile Include="Document.cpp" />
     <ClCompile Include="UniscribeLayoutData.cpp" />
     <ClCompile Include="UniscribeLayout.cpp" />
     <ClCompile Include="UniscribeTextRun.cpp" />
@@ -126,13 +127,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayRef.h" />
-    <ClInclude Include="DocumentCharIter.h" />
+    <ClInclude Include="CharIter.h" />
     <ClInclude Include="EmptyTextBlock.h" />
     <ClInclude Include="GapArray.h" />
     <ClInclude Include="rapidxml\rapidxml.hpp" />
     <ClInclude Include="rapidxml\rapidxml_iterators.hpp" />
     <ClInclude Include="rapidxml\rapidxml_print.hpp" />
     <ClInclude Include="rapidxml\rapidxml_utils.hpp" />
+    <ClInclude Include="LineBuffer.h" />
     <ClInclude Include="TextMateAnnotator.h" />
     <ClInclude Include="TextMatePattern.h" />
     <ClInclude Include="TextMateTokenRun.h" />
@@ -150,25 +152,25 @@
     <ClInclude Include="SimpleTextBlock.h" />
     <ClInclude Include="TextBlock.h" />
     <ClInclude Include="TextFont.h" />
-    <ClInclude Include="TextRange.h" />
+    <ClInclude Include="CharRange.h" />
     <ClInclude Include="TextSquiggle.h" />
     <ClInclude Include="TextStyleReader.h" />
     <ClInclude Include="TextStyleRegistry.h" />
     <ClInclude Include="TextStyleRun.h" />
-    <ClInclude Include="TextDocumentUndo.h" />
+    <ClInclude Include="UndoBuffer.h" />
     <ClInclude Include="VisualPainter.h" />
     <ClInclude Include="TextStyle.h" />
     <ClInclude Include="UTF16Ref.h" />
     <ClInclude Include="TextDocumentReader.h" />
-    <ClInclude Include="TextBuffer.h" />
+    <ClInclude Include="CharBuffer.h" />
     <ClInclude Include="UniscribeTextBlock.h" />
     <ClInclude Include="VisualDocument.h" />
     <ClInclude Include="TextSelection.h" />
     <ClInclude Include="TextView.h" />
     <ClInclude Include="TextViewMetrics.h" />
     <ClInclude Include="TextEdit.h" />
-    <ClInclude Include="TextChange.h" />
-    <ClInclude Include="TextDocument.h" />
+    <ClInclude Include="CharChange.h" />
+    <ClInclude Include="Document.h" />
     <ClInclude Include="UniscribeLayoutData.h" />
     <ClInclude Include="UniscribeLayout.h" />
     <ClInclude Include="UniscribeTextRun.h" />

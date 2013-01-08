@@ -4,6 +4,7 @@
 #define GapArray_h
 
 #include <stdint.h>
+#include <cassert>
 
 class GapArrayBase
 {
@@ -40,8 +41,7 @@ public:
 
 	const T& operator[]( size_t pos ) const;
 
-	bool   IsEmpty() const { return m_size == 0; }
-	size_t Size() const    { return m_size / sizeof( T ); }
+	size_t Length() const;
 };
 
 template < class T >
@@ -53,7 +53,7 @@ void GapArray<T>::Insert( size_t pos, const T& element )
 template < class T >
 void GapArray<T>::Insert( size_t pos, const T* elements, size_t count )
 {
-	InsertBytes( pos * sizeof( T ), elements, count * sizeof( T ) );
+	InsertBytes( pos * sizeof( T ), reinterpret_cast<const uint8_t*>( elements ), count * sizeof( T ) );
 }
 
 template < class T >
@@ -65,13 +65,13 @@ void GapArray<T>::Erase( size_t pos, size_t count )
 template < class T >
 size_t GapArray<T>::Read( size_t pos, T* elements, size_t count ) const
 {
-	return ReadBytes( pos * sizeof( T ), elements, count * sizeof( T ) ) / sizeof( T );
+	return ReadBytes( pos * sizeof( T ), reinterpret_cast<uint8_t*>( elements ), count * sizeof( T ) ) / sizeof( T );
 }
 
 template < class T >
 const T& GapArray<T>::operator[]( size_t pos ) const
 {
-	assert( pos < Size() );
+	assert( pos < Length() );
 
 	size_t bytePos = pos * sizeof( T );
 	
@@ -79,6 +79,12 @@ const T& GapArray<T>::operator[]( size_t pos ) const
 		bytePos += m_gapPosition;
 
 	return *reinterpret_cast<const T*>( m_buffer + bytePos );
+}
+
+template < class T >
+size_t GapArray<T>::Length() const
+{
+	return m_size / sizeof( T );
 }
 
 #endif

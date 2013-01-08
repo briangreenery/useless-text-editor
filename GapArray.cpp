@@ -24,9 +24,9 @@ void GapArrayBase::MoveGapTo( size_t pos )
 		assert( m_capacity >= pos + GapLength() );
 
 		if ( pos > m_gapPosition )
-			memcpy( m_buffer + m_gapPosition, m_buffer + m_gapPosition + GapLength(), pos - m_gapPosition );
+			memcpy_s( m_buffer + m_gapPosition, m_capacity - m_gapPosition, m_buffer + m_gapPosition + GapLength(), pos - m_gapPosition );
 		else
-			memmove( m_buffer + pos + GapLength(), m_buffer + pos, m_gapPosition - pos );
+			memmove_s( m_buffer + pos + GapLength(), pos + m_size, m_buffer + pos, m_gapPosition - pos );
 
 		m_gapPosition = pos;
 	}
@@ -38,7 +38,7 @@ void GapArrayBase::Resize( size_t newCapacity )
 
 	uint8_t* newBuffer = 0;
 	
-	if ( newCapacity > 0 )
+	if ( newCapacity != 0 )
 	{
 		newBuffer = new uint8_t[newCapacity];
 		ReadBytes( 0, newBuffer, m_size );

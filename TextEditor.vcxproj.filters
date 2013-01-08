@@ -7,9 +7,6 @@
     <Filter Include="TextEdit">
       <UniqueIdentifier>{aee8ffd2-ac89-4bf5-8820-20e5b4ce6f6c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TextDocument">
-      <UniqueIdentifier>{3e23faf4-05a2-44fd-9346-1ad100ab3ac1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="TextStyle">
       <UniqueIdentifier>{9dfcb392-4b14-493f-a2e1-050ade9e56be}</UniqueIdentifier>
     </Filter>
@@ -21,9 +18,6 @@
     </Filter>
     <Filter Include="Tests">
       <UniqueIdentifier>{2dd1b87f-2fbf-4c3d-9da7-f1ee81a0c4f5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Utility">
-      <UniqueIdentifier>{0d0accc7-2dc3-4276-9a70-40d856baa633}</UniqueIdentifier>
     </Filter>
     <Filter Include="Annotators">
       <UniqueIdentifier>{4cb6e6d6-fa87-454c-b469-c90089c3073c}</UniqueIdentifier>
@@ -37,6 +31,12 @@
     <Filter Include="External\rapidxml">
       <UniqueIdentifier>{1471a63e-78a2-4dad-97b7-8e18a242f4e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Basics">
+      <UniqueIdentifier>{3f665982-b863-468d-afd5-8556b63bddc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Document">
+      <UniqueIdentifier>{3e23faf4-05a2-44fd-9346-1ad100ab3ac1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TextSelection.cpp">
@@ -44,12 +44,6 @@
     </ClCompile>
     <ClCompile Include="TextEdit.cpp">
       <Filter>TextEdit</Filter>
-    </ClCompile>
-    <ClCompile Include="TextChange.cpp">
-      <Filter>TextDocument</Filter>
-    </ClCompile>
-    <ClCompile Include="TextDocument.cpp">
-      <Filter>TextDocument</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TextStyle.cpp">
@@ -60,9 +54,6 @@
     </ClCompile>
     <ClCompile Include="VisualDocument.cpp">
       <Filter>TextView</Filter>
-    </ClCompile>
-    <ClCompile Include="DocumentCharIter.cpp">
-      <Filter>TextDocument</Filter>
     </ClCompile>
     <ClCompile Include="TextFont.cpp">
       <Filter>TextStyle</Filter>
@@ -112,9 +103,6 @@
     <ClCompile Include="TextLayoutArgs.cpp">
       <Filter>TextView</Filter>
     </ClCompile>
-    <ClCompile Include="TextBuffer.cpp">
-      <Filter>TextDocument</Filter>
-    </ClCompile>
     <ClCompile Include="TextChangeTest.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -128,19 +116,13 @@
       <Filter>TextStyle</Filter>
     </ClCompile>
     <ClCompile Include="TextDocumentReader.cpp">
-      <Filter>TextDocument</Filter>
+      <Filter>Document</Filter>
     </ClCompile>
     <ClCompile Include="TextStyleReader.cpp">
       <Filter>TextStyle</Filter>
     </ClCompile>
     <ClCompile Include="TextSquiggle.cpp">
       <Filter>TextView</Filter>
-    </ClCompile>
-    <ClCompile Include="TextRange.cpp">
-      <Filter>TextDocument</Filter>
-    </ClCompile>
-    <ClCompile Include="TextDocumentUndo.cpp">
-      <Filter>TextDocument</Filter>
     </ClCompile>
     <ClCompile Include="AccessibleTextView.cpp">
       <Filter>TextView</Filter>
@@ -157,8 +139,29 @@
     <ClCompile Include="TextTheme.cpp">
       <Filter>TextStyle</Filter>
     </ClCompile>
+    <ClCompile Include="CharBuffer.cpp">
+      <Filter>Document</Filter>
+    </ClCompile>
+    <ClCompile Include="LineBuffer.cpp">
+      <Filter>Document</Filter>
+    </ClCompile>
     <ClCompile Include="GapArray.cpp">
-      <Filter>TextDocument</Filter>
+      <Filter>Basics</Filter>
+    </ClCompile>
+    <ClCompile Include="CharIter.cpp">
+      <Filter>Document</Filter>
+    </ClCompile>
+    <ClCompile Include="CharRange.cpp">
+      <Filter>Document</Filter>
+    </ClCompile>
+    <ClCompile Include="Document.cpp">
+      <Filter>Document</Filter>
+    </ClCompile>
+    <ClCompile Include="CharChange.cpp">
+      <Filter>Document</Filter>
+    </ClCompile>
+    <ClCompile Include="UndoBuffer.cpp">
+      <Filter>Document</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -168,12 +171,6 @@
     <ClInclude Include="TextEdit.h">
       <Filter>TextEdit</Filter>
     </ClInclude>
-    <ClInclude Include="TextChange.h">
-      <Filter>TextDocument</Filter>
-    </ClInclude>
-    <ClInclude Include="TextDocument.h">
-      <Filter>TextDocument</Filter>
-    </ClInclude>
     <ClInclude Include="TextStyle.h">
       <Filter>TextStyle</Filter>
     </ClInclude>
@@ -182,9 +179,6 @@
     </ClInclude>
     <ClInclude Include="VisualDocument.h">
       <Filter>TextView</Filter>
-    </ClInclude>
-    <ClInclude Include="DocumentCharIter.h">
-      <Filter>TextDocument</Filter>
     </ClInclude>
     <ClInclude Include="TextFont.h">
       <Filter>TextStyle</Filter>
@@ -234,9 +228,6 @@
     <ClInclude Include="TextLayoutArgs.h">
       <Filter>TextView</Filter>
     </ClInclude>
-    <ClInclude Include="TextBuffer.h">
-      <Filter>TextDocument</Filter>
-    </ClInclude>
     <ClInclude Include="TextChangeTest.h">
       <Filter>Tests</Filter>
     </ClInclude>
@@ -253,7 +244,7 @@
       <Filter>TextStyle</Filter>
     </ClInclude>
     <ClInclude Include="TextDocumentReader.h">
-      <Filter>TextDocument</Filter>
+      <Filter>Document</Filter>
     </ClInclude>
     <ClInclude Include="TextStyleReader.h">
       <Filter>TextStyle</Filter>
@@ -261,23 +252,8 @@
     <ClInclude Include="TextSquiggle.h">
       <Filter>TextView</Filter>
     </ClInclude>
-    <ClInclude Include="TextRange.h">
-      <Filter>TextDocument</Filter>
-    </ClInclude>
-    <ClInclude Include="TextDocumentUndo.h">
-      <Filter>TextDocument</Filter>
-    </ClInclude>
     <ClInclude Include="AccessibleTextView.h">
       <Filter>TextView</Filter>
-    </ClInclude>
-    <ClInclude Include="ArrayRef.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="UTF16Ref.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="ThrowHRESULT.h">
-      <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="rapidxml\rapidxml_iterators.hpp">
       <Filter>External\rapidxml</Filter>
@@ -303,8 +279,38 @@
     <ClInclude Include="TextTheme.h">
       <Filter>TextStyle</Filter>
     </ClInclude>
+    <ClInclude Include="CharBuffer.h">
+      <Filter>Document</Filter>
+    </ClInclude>
+    <ClInclude Include="LineBuffer.h">
+      <Filter>Document</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayRef.h">
+      <Filter>Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="UTF16Ref.h">
+      <Filter>Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="ThrowHRESULT.h">
+      <Filter>Basics</Filter>
+    </ClInclude>
     <ClInclude Include="GapArray.h">
-      <Filter>TextDocument</Filter>
+      <Filter>Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="CharIter.h">
+      <Filter>Document</Filter>
+    </ClInclude>
+    <ClInclude Include="CharRange.h">
+      <Filter>Document</Filter>
+    </ClInclude>
+    <ClInclude Include="Document.h">
+      <Filter>Document</Filter>
+    </ClInclude>
+    <ClInclude Include="CharChange.h">
+      <Filter>Document</Filter>
+    </ClInclude>
+    <ClInclude Include="UndoBuffer.h">
+      <Filter>Document</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

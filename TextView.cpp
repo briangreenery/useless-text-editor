@@ -433,9 +433,9 @@ void TextView::SetText( UTF16Ref text )
 	m_doc.EndUndoGroup();
 	m_lastEditOperation = lastWasNothing;
 
-	TextChange change;
-	change.AddChange( m_doc.Delete( 0, m_doc.Length() ) );
-	change.AddChange( m_doc.Insert( 0, text ) );
+	CharChange change;
+	change += m_doc.Delete( 0, m_doc.Length() );
+	change += m_doc.Insert( 0, text );
 
 	TextSelection selection;
 	UpdateLayout( change, selection );
