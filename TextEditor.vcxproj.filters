@@ -157,6 +157,9 @@
     <ClCompile Include="TextTheme.cpp">
       <Filter>TextStyle</Filter>
     </ClCompile>
+    <ClCompile Include="GapArray.cpp">
+      <Filter>TextDocument</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TextSelection.h">
@@ -299,6 +302,9 @@
     </ClInclude>
     <ClInclude Include="TextTheme.h">
       <Filter>TextStyle</Filter>
+    </ClInclude>
+    <ClInclude Include="GapArray.h">
+      <Filter>TextDocument</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

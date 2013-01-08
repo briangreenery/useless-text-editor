@@ -13,8 +13,8 @@ TextDocument::TextDocument()
 	, m_wordIter( icu::BreakIterator::createWordInstance     ( icu::Locale::getUS(), m_wordErrorStatus ) )
 	, m_lineIter( icu::BreakIterator::createLineInstance( icu::Locale::getDefault(), m_lineErrorStatus ) )
 	, m_needIterReset( true )
-	, m_lineCount( 1 )
 {
+	m_lineLengths.Insert( 0, 0 );
 }
 
 TextDocument::~TextDocument()
@@ -25,13 +25,35 @@ TextDocument::~TextDocument()
 	delete m_lineIter;
 }
 
-size_t TextDocument::SizeWithCRLF( size_t start, size_t count ) const
+size_t TextDocument::LineBreakCount( size_t start, size_t count ) const
 {
-	return count + m_buffer.count( start, count, 0x0A );
+	LineContaining_Result line = LineContaining( start );
+
+	size_t lineBreakCount = 0;
+
+	for ( ; line.index < m_lineLengths.Size(); ++line.index )
+	{
+		if ( start + count < line.textStart + m_lineLengths[line.index] )
+			break;
+
+		lineBreakCount++;
+	}
+
+	return count + lineBreakCount;
 }
 
-void TextDocument::ReadWithCRLF( size_t start, size_t count, ArrayRef<wchar_t> out ) const
+void TextDocument::ReadWithCRLF( size_t start, size_t count, wchar_t* outBuffer, size_t outBufferSize ) const
 {
+	LineContaining_Result line = LineContaining( start );
+
+	size_t numCopied = 0;
+	for ( ; line.index < m_lineBuffer.Size(); ++line.index )
+	{
+
+		numCopied += ReadLine( i, out.begin(), out.size() - numCopied );
+		out.begin
+	}
+
 	size_t numCopied = m_buffer.copy( out.begin(), count, start );
 
 	wchar_t* read  = out.begin() + numCopied - 1;
@@ -47,6 +69,43 @@ void TextDocument::ReadWithCRLF( size_t start, size_t count, ArrayRef<wchar_t> o
 		if ( unit == 0x0A )
 			*write-- = 0x0D;
 	}
+}
+
+size_t TextDocument::LineLength( size_t index ) const
+{
+	assert( index < m_lineBuffer.Size() );
+	return m_lineLengths[index];
+}
+
+size_t TextDocument::ReadLine( size_t index, wchar_t* outBuffer, size_t outBufferSize ) const
+{
+	assert( index < m_lineBuffer.Size() );
+	assert( outBufferSize >= m_lineBuffer[index] );
+
+	size_t textOffset = 0;
+	for ( size_t i = 0; i < index; ++i )
+		textOffset += m_lineLengths[i];
+
+	return ReadText( textOffset, m_lineLengths[index], outBuffer );
+}
+
+TextDocument::LineContaining_Result TextDocument::LineContaining( size_t pos ) const
+{
+	LineContaining_Result line = {};
+
+	for ( size_t lineCount = m_lineBuffer.Size(); line.index < lineCount; ++line.index )
+	{
+		size_t lineLength = m_lineBuffer[line.index];
+
+		if ( pos < line.textStart + lineLength )
+			return line;
+
+		line.textStart += lineLength;
+	}
+
+	line.index--;
+	line.textStart -= m_lineBuffer[line.index];
+	return line;
 }
 
 size_t TextDocument::LineCount() const
@@ -83,8 +142,6 @@ TextChange TextDocument::Insert( size_t pos, UTF16Ref text )
 {
 	if ( text.empty() )
 		return TextChange();
-
-	// TODO: validate unicode (?)
 
 	// Normalize line endings to U+000A (Line Feed)
 
@@ -199,7 +256,7 @@ static bool IsWhitespace( wchar_t unit )
 size_t TextDocument::NextNonWhitespace( size_t pos ) const
 {
 	for ( ; pos < Length(); ++pos )
-		if ( !IsWhitespace( m_buffer[pos] ) )
+		if ( !IsWhitespace( m_textBuffer[pos] ) )
 			break;
 
 	return pos;
@@ -208,7 +265,7 @@ size_t TextDocument::NextNonWhitespace( size_t pos ) const
 size_t TextDocument::PrevNonWhitespace( size_t pos ) const
 {
 	for ( ; pos != 0; --pos )
-		if ( !IsWhitespace( m_buffer[pos - 1] ) )
+		if ( !IsWhitespace( m_textBuffer[pos - 1] ) )
 			break;
 
 	return pos;
@@ -218,8 +275,8 @@ std::pair<size_t, size_t> TextDocument::WordAt( size_t pos ) const
 {
 	std::pair<size_t, size_t> word( pos, pos );
 
-	bool leftSpace  = ( pos > 0 )        && IsWhitespace( m_buffer[pos - 1] );
-	bool rightSpace = ( pos < Length() ) && IsWhitespace( m_buffer[pos] );
+	bool leftSpace  = ( pos > 0 )        && IsWhitespace( m_textBuffer[pos - 1] );
+	bool rightSpace = ( pos < Length() ) && IsWhitespace( m_textBuffer[pos] );
 
 	if ( leftSpace && rightSpace )
 	{

@@ -4,7 +4,7 @@
 #define TextDocument_h
 
 #include "TextChange.h"
-#include "TextBuffer.h"
+#include "GapArray.h"
 #include "UTF16Ref.h"
 #include "TextDocumentUndo.h"
 #include "ArrayRef.h"
@@ -18,11 +18,12 @@ public:
 	TextDocument();
 	~TextDocument();
 
+	bool   IsEmpty() const;
 	size_t Length() const;
-	bool Empty() const;
+	size_t ReadText( size_t start, size_t count, wchar_t* outBuffer ) const;
 
-	wchar_t operator[]( size_t pos ) const;
-	size_t Read( size_t start, size_t count, wchar_t* dest ) const;
+	size_t LineLength( size_t index ) const;
+	size_t ReadLine( size_t index, wchar_t* outBuffer, size_t outBufferSize ) const;
 
 	TextChange Insert( size_t pos, UTF16Ref );
 	TextChange Delete( size_t pos, size_t count );
@@ -39,10 +40,10 @@ public:
 	size_t NextNonWhitespace( size_t pos ) const;
 	size_t PrevNonWhitespace( size_t pos ) const;
 
-	std::pair<size_t, size_t> WordAt( size_t pos ) const;
+	std::pair<size_t,size_t> WordAt( size_t pos ) const;
 
-	size_t SizeWithCRLF( size_t start, size_t count ) const;
-	void ReadWithCRLF( size_t start, size_t count, ArrayRef<wchar_t> out ) const;
+	size_t LineBreakCount( size_t start, size_t count ) const;
+	void ReadWithCRLF( size_t start, size_t count, wchar_t* outBuffer, size_t outBufferSize ) const;
 
 	std::pair<TextChange,TextSelection> Undo();
 	TextChange                          Redo();
@@ -60,9 +61,17 @@ private:
 	size_t NextBreak( icu::BreakIterator*, size_t ) const;
 	size_t PrevBreak( icu::BreakIterator*, size_t ) const;
 
-	TextBuffer m_buffer;
+	struct LineContaining_Result
+	{
+		size_t index;
+		size_t textStart;
+	};
+	LineContaining_Result LineContaining( size_t pos ) const;
+
+	GapArray<wchar_t> m_textBuffer;
+	GapArray<size_t> m_lineLengths;
+
 	TextDocumentUndo m_undo;
-	size_t m_lineCount;
 
 	mutable bool m_needIterReset;
 	UErrorCode m_charErrorStatus;
@@ -75,22 +84,22 @@ private:
 
 inline size_t TextDocument::Length() const
 {
-	return m_buffer.size();
+	return m_textBuffer.Size();
 }
 
 inline bool TextDocument::Empty() const
 {
-	return m_buffer.empty();
+	return m_textBuffer.IsEmpty();
 }
 
 inline wchar_t TextDocument::operator[]( size_t pos ) const
 {
-	return m_buffer[pos];
+	return m_textBuffer[pos];
 }
 
 inline size_t TextDocument::Read( size_t start, size_t count, wchar_t* dest ) const
 {
-	return m_buffer.copy( dest, count, start );
+	return m_textBuffer.Read( start, dest, count );
 }
 
 #endif

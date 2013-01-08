@@ -85,6 +85,7 @@
     <ClCompile Include="DocumentCharIter.cpp" />
     <ClCompile Include="EmptyTextBlock.cpp" />
     <ClCompile Include="AccessibleTextView.cpp" />
+    <ClCompile Include="GapArray.cpp" />
     <ClCompile Include="TextChangeTest.cpp" />
     <ClCompile Include="TextFontRun.cpp" />
     <ClCompile Include="TextLayoutArgs.cpp" />
@@ -127,6 +128,7 @@
     <ClInclude Include="ArrayRef.h" />
     <ClInclude Include="DocumentCharIter.h" />
     <ClInclude Include="EmptyTextBlock.h" />
+    <ClInclude Include="GapArray.h" />
     <ClInclude Include="rapidxml\rapidxml.hpp" />
     <ClInclude Include="rapidxml\rapidxml_iterators.hpp" />
     <ClInclude Include="rapidxml\rapidxml_print.hpp" />
