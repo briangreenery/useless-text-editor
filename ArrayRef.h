@@ -3,7 +3,8 @@
 #ifndef ArrayRef_h
 #define ArrayRef_h
 
-#include <cstddef>
+#include <stdint.h>
+#include <cassert>
 
 template < class T >
 class ArrayRef
@@ -49,7 +50,7 @@ public:
 	size_t size() const             { return m_end - m_begin; }
 	bool empty() const              { return m_begin == m_end; }
 
-	T& operator[]( size_t i ) const { return m_begin[i]; }
+	T& operator[]( size_t i ) const { assert( i < size() ); return m_begin[i]; }
 
 private:
 	T* m_begin;

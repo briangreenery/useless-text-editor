@@ -2,7 +2,7 @@
 
 #include "Document.h"
 
-static const wchar_t* NextLineBreak( const wchar_t* it, const wchar_t* end )
+static const wchar_t* FindLineBreak( const wchar_t* it, const wchar_t* end )
 {
 	for ( ; it != end; ++it )
 		if ( *it == 0x0A || *it == 0x0D )
@@ -27,26 +27,26 @@ static const wchar_t* SkipLineBreak( const wchar_t* lineBreak, const wchar_t* en
 	return lineBreak;
 }
 
-CharChange Document::Insert( size_t pos, const wchar_t* text, size_t count )
+CharChange Document::Insert( size_t pos, ArrayRef<const wchar_t> text )
 {
 	CharChange change;
 
-	if ( count == 0 )
+	if ( text.empty() )
 		return change;
 
 	// This normalizes the line endings to 0x0A while inserting
 
-	for ( const wchar_t* it = text; it != text + count; )
+	for ( const wchar_t* it = text.begin(); it != text.end(); )
 	{
-		const wchar_t* lineBreak = NextLineBreak( it, text + count );
+		const wchar_t* lineBreak = FindLineBreak( it, text.end() );
 
 		if ( lineBreak != it )
-			change += m_charBuffer.Insert( pos, it, lineBreak - it );
+			change += m_charBuffer.Insert( pos + change.delta, ArrayRef<const wchar_t>( it, lineBreak - it ) );
 
-		if ( lineBreak != text + count )
-			change += m_charBuffer.Insert( pos + count, 0x0A );
+		if ( lineBreak != text.end() )
+			change += m_charBuffer.Insert( pos + change.delta, 0x0A );
 
-		it = SkipLineBreak( lineBreak, text + count );
+		it = SkipLineBreak( lineBreak, text.end() );
 	}
 
 	m_undoBuffer.Update( m_charBuffer, change );

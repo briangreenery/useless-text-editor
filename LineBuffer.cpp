@@ -2,14 +2,14 @@
 
 #include "LineBuffer.h"
 #include "CharBuffer.h"
-#include "TextChange.h"
+#include "CharChange.h"
 
 LineBuffer::LineBuffer()
 {
 	m_lineLengths.Insert( 0, 0 );
 }
 
-void LineBuffer::Update( CharBuffer& charBuffer, TextChange change )
+void LineBuffer::Update( CharBuffer& charBuffer, CharChange change )
 {
 	size_t start = LineContaining( change.start );
 	size_t end   = start;

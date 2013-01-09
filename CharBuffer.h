@@ -7,6 +7,7 @@
 #include <unicode/brkiter.h>
 
 class CharRange;
+class CharChange;
 
 class CharBuffer
 {
@@ -14,23 +15,23 @@ public:
 	CharBuffer();
 	~CharBuffer();
 
-	size_t Read( size_t start, size_t count, wchar_t* buffer, size_t bufferSize ) const;
+	CharChange Insert( size_t pos, wchar_t );
+	CharChange Insert( size_t pos, ArrayRef<const wchar_t> );
+	CharChange Delete( size_t pos, size_t count );
 
-	void Insert( size_t pos, wchar_t character )                 { m_buffer.Insert( pos, character ); }
-	void Insert( size_t pos, const wchar_t* text, size_t count ) { m_buffer.Insert( pos, text, count ); }
-	void Delete( size_t pos, size_t count )                      { m_buffer.Erase( pos, count ); }
+	ArrayRef<wchar_t> Read( size_t start, size_t count, ArrayRef<wchar_t> buffer ) const;
 
-	size_t Length() const                                        { return m_buffer.Length(); }
-	wchar_t operator[]( size_t pos ) const                       { return m_buffer[pos]; }
+	size_t Length() const                    { return m_buffer.Length(); }
+	wchar_t operator[]( size_t pos ) const   { return m_buffer[pos]; }
 
-	size_t NextCharStop( size_t pos ) const                      { return NextBreak( m_charIter, pos ); }
-	size_t PrevCharStop( size_t pos ) const                      { return PrevBreak( m_charIter, pos ); }
+	size_t NextCharStop( size_t pos ) const  { return NextBreak( m_charIter, pos ); }
+	size_t PrevCharStop( size_t pos ) const  { return PrevBreak( m_charIter, pos ); }
 
-	size_t NextWordStop( size_t pos ) const                      { return NextBreak( m_wordIter, pos ); }
-	size_t PrevWordStop( size_t pos ) const                      { return PrevBreak( m_wordIter, pos ); }
+	size_t NextWordStop( size_t pos ) const  { return NextBreak( m_wordIter, pos ); }
+	size_t PrevWordStop( size_t pos ) const  { return PrevBreak( m_wordIter, pos ); }
 
-	size_t NextSoftBreak( size_t pos ) const                     { return NextBreak( m_lineIter, pos ); }
-	size_t PrevSoftBreak( size_t pos ) const                     { return PrevBreak( m_lineIter, pos ); }
+	size_t NextSoftBreak( size_t pos ) const { return NextBreak( m_lineIter, pos ); }
+	size_t PrevSoftBreak( size_t pos ) const { return PrevBreak( m_lineIter, pos ); }
 
 	size_t NextLineBreak( size_t pos ) const;
 

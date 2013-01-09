@@ -41,6 +41,7 @@ void CharChange::operator+=( CharChange change )
 	{
 		if ( change.start > start )
 			change.start -= std::min<int32_t>( change.start - start, delta );
+
 		if ( change.end > start )
 			change.end -= std::min<int32_t>( change.end - start, delta );
 

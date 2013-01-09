@@ -3,8 +3,7 @@
 #ifndef GapArray_h
 #define GapArray_h
 
-#include <stdint.h>
-#include <cassert>
+#include "ArrayRef.h"
 
 class GapArrayBase
 {
@@ -12,10 +11,10 @@ public:
 	GapArrayBase();
 	~GapArrayBase();
 
-	void InsertBytes( size_t pos, const uint8_t* buffer, size_t count );
-	void EraseBytes( size_t pos, size_t count );
+	void InsertBytes( size_t pos, ArrayRef<const uint8_t> bytes );
+	void EraseBytes ( size_t pos, size_t count );
 
-	size_t ReadBytes( size_t pos, uint8_t* buffer, size_t count ) const;
+	size_t ReadBytes( size_t pos, size_t count, ArrayRef<uint8_t> buffer ) const;
 
 protected:
 	size_t GapLength() const { return m_capacity - m_size; }
@@ -34,10 +33,10 @@ class GapArray : private GapArrayBase
 {
 public:
 	void Insert( size_t pos, const T& element );
-	void Insert( size_t pos, const T* elements, size_t count );
-	void Erase( size_t pos, size_t count );
+	void Insert( size_t pos, ArrayRef<const T> elements );
+	void Erase ( size_t pos, size_t count );
 
-	size_t Read( size_t pos, T* elements, size_t count ) const;
+	ArrayRef<T> Read( size_t pos, size_t count, ArrayRef<T> buffer ) const;
 
 	const T& operator[]( size_t pos ) const;
 
@@ -47,13 +46,16 @@ public:
 template < class T >
 void GapArray<T>::Insert( size_t pos, const T& element )
 {
-	Insert( pos, &element, 1 );
+	Insert( pos, ArrayRef<const T>( &element, 1 ) );
 }
 
 template < class T >
-void GapArray<T>::Insert( size_t pos, const T* elements, size_t count )
+void GapArray<T>::Insert( size_t pos, ArrayRef<const T> elements )
 {
-	InsertBytes( pos * sizeof( T ), reinterpret_cast<const uint8_t*>( elements ), count * sizeof( T ) );
+	ArrayRef<const uint8_t> bytes( reinterpret_cast<const uint8_t*>( elements.begin() ),
+	                               reinterpret_cast<const uint8_t*>( elements.end() ) );
+
+	InsertBytes( pos * sizeof( T ), bytes );
 }
 
 template < class T >
@@ -63,9 +65,14 @@ void GapArray<T>::Erase( size_t pos, size_t count )
 }
 
 template < class T >
-size_t GapArray<T>::Read( size_t pos, T* elements, size_t count ) const
+ArrayRef<T> GapArray<T>::Read( size_t pos, size_t count, ArrayRef<T> buffer ) const
 {
-	return ReadBytes( pos * sizeof( T ), reinterpret_cast<uint8_t*>( elements ), count * sizeof( T ) ) / sizeof( T );
+	ArrayRef<uint8_t> bytes( reinterpret_cast<uint8_t*>( buffer.begin() ),
+	                         reinterpret_cast<uint8_t*>( buffer.end() ) );
+
+	size_t bytesRead = ReadBytes( pos * sizeof( T ), count * sizeof( T ), bytes );
+
+	return ArrayRef<T>( buffer.begin(), bytesRead / sizeof( T ) );
 }
 
 template < class T >

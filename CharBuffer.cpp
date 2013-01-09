@@ -3,6 +3,7 @@
 #include "CharBuffer.h"
 #include "CharIter.h"
 #include "CharRange.h"
+#include "CharChange.h"
 
 CharBuffer::CharBuffer()
 	: m_charIterStatus( U_ZERO_ERROR )
@@ -21,6 +22,29 @@ CharBuffer::~CharBuffer()
 	delete m_charIter;
 	delete m_wordIter;
 	delete m_lineIter;
+}
+
+CharChange CharBuffer::Insert( size_t pos, wchar_t character )
+{
+	m_buffer.Insert( pos, character );
+	return CharChange( pos, 1, CharChange::insertion );
+}
+
+CharChange CharBuffer::Insert( size_t pos, ArrayRef<const wchar_t> text )
+{
+	m_buffer.Insert( pos, text );
+	return CharChange( pos, text.size(), CharChange::insertion );
+}
+
+CharChange CharBuffer::Delete( size_t pos, size_t count )
+{
+	m_buffer.Erase( pos, count );
+	return CharChange( pos, count, CharChange::deletion );
+}
+
+ArrayRef<wchar_t> CharBuffer::Read( size_t start, size_t count, ArrayRef<wchar_t> buffer ) const
+{
+	return m_buffer.Read( start, count, buffer );
 }
 
 void CharBuffer::ResetIterators() const

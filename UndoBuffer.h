@@ -3,28 +3,36 @@
 #ifndef UndoBuffer_h
 #define UndoBuffer_h
 
-#include "TextChange.h"
-#include "TextSelection.h"
+#include "CharChange.h"
+#include "CharRange.h"
 #include <vector>
 
-class TextDocument;
+class CharBuffer;
 
-struct UndoAction
+class UndoChange
 {
+public:
+	CharChange change;
+	CharRange  selection;
+};
+
+class UndoAction
+{
+public:
 	enum Type { insertion, deletion };
 
-	UndoAction( Type type, size_t pos, size_t length, size_t savedTextPos );
+	UndoAction( Type type, size_t pos, size_t count, size_t savedTextPos );
 
-	Type type;
+	Type   type;
 	size_t pos;
-	size_t length;
+	size_t count;
 	size_t savedTextPos;
 };
 
 class UndoGroup
 {
 public:
-	UndoGroup( CharRange );
+	UndoGroup( CharRange selection );
 
 	void RecordInsertion( CharBuffer&, size_t pos, size_t length, size_t savedTextPos );
 	void RecordDeletion ( CharBuffer&, size_t pos, size_t length, size_t savedTextPos );
@@ -32,6 +40,7 @@ public:
 	UndoChange Undo( CharBuffer&, UTF16Ref savedText ) const;
 	CharChange Redo( CharBuffer&, UTF16Ref savedText ) const;
 
+private:
 	std::vector<UndoAction> m_actions;
 	CharRange m_selection;
 };
@@ -41,7 +50,7 @@ class UndoBuffer
 public:
 	UndoBuffer();
 
-	void Update( CharBuffer&, CharChange );
+	void AddAction( UndoAction );
 
 	bool CanUndo() const;
 	bool CanRedo() const;

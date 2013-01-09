@@ -288,9 +288,6 @@
     <ClInclude Include="ArrayRef.h">
       <Filter>Basics</Filter>
     </ClInclude>
-    <ClInclude Include="UTF16Ref.h">
-      <Filter>Basics</Filter>
-    </ClInclude>
     <ClInclude Include="ThrowHRESULT.h">
       <Filter>Basics</Filter>
     </ClInclude>

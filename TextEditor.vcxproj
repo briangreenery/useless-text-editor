@@ -160,7 +160,6 @@
     <ClInclude Include="UndoBuffer.h" />
     <ClInclude Include="VisualPainter.h" />
     <ClInclude Include="TextStyle.h" />
-    <ClInclude Include="UTF16Ref.h" />
     <ClInclude Include="TextDocumentReader.h" />
     <ClInclude Include="CharBuffer.h" />
     <ClInclude Include="UniscribeTextBlock.h" />

@@ -41,7 +41,7 @@ void GapArrayBase::Resize( size_t newCapacity )
 	if ( newCapacity != 0 )
 	{
 		newBuffer = new uint8_t[newCapacity];
-		ReadBytes( 0, newBuffer, m_size );
+		ReadBytes( 0, m_size, ArrayRef<uint8_t>( newBuffer, newCapacity ) );
 	}
 
 	if ( m_buffer )
@@ -51,16 +51,16 @@ void GapArrayBase::Resize( size_t newCapacity )
 	m_capacity = newCapacity;
 }
 
-void GapArrayBase::InsertBytes( size_t pos, const uint8_t* buffer, size_t count )
+void GapArrayBase::InsertBytes( size_t pos, ArrayRef<const uint8_t> bytes )
 {
-	if ( GapLength() < count )
-		Resize( m_capacity + std::max( m_capacity, count - GapLength() ) );
+	if ( GapLength() < bytes.size() )
+		Resize( m_capacity + std::max( m_capacity, bytes.size() - GapLength() ) );
 
 	MoveGapTo( pos );
-	memcpy( m_buffer + m_gapPosition, buffer, count );
+	memcpy( m_buffer + m_gapPosition, bytes.begin(), bytes.size() );
 
-	m_gapPosition += count;
-	m_size        += count;
+	m_gapPosition += bytes.size();
+	m_size        += bytes.size();
 }
 
 void GapArrayBase::EraseBytes( size_t pos, size_t count )
@@ -73,25 +73,23 @@ void GapArrayBase::EraseBytes( size_t pos, size_t count )
 		Resize( 2 * m_size );
 }
 
-size_t GapArrayBase::ReadBytes( size_t pos, uint8_t* buffer, size_t count ) const
+size_t GapArrayBase::ReadBytes( size_t pos, size_t count, ArrayRef<uint8_t> output ) const
 {
-	if ( pos >= m_size )
-		return 0;
-
 	size_t numCopied = 0;
+	size_t numToCopy = std::min( count, output.size() );
 
 	if ( pos < m_gapPosition )
 	{
-		size_t numToCopy = std::min( count, m_gapPosition - pos );
-		memcpy( buffer, m_buffer + pos, numToCopy );
-		numCopied += numToCopy;
+		size_t chunkSize = std::min( numToCopy, m_gapPosition - pos );
+		memcpy( output.begin(), m_buffer + pos, chunkSize );
+		numCopied += chunkSize;
 	}
 
-	if ( numCopied < count )
+	if ( numCopied < numToCopy )
 	{
-		size_t numToCopy = std::min( m_size - ( pos + numCopied ), count - numCopied );
-		memcpy( buffer + numCopied, m_buffer + pos + numCopied + GapLength(), numToCopy );
-		numCopied += numToCopy;
+		size_t chunkSize = std::min( m_size - ( pos + numCopied ), count - numCopied );
+		memcpy( output.begin() + numCopied, m_buffer + pos + numCopied + GapLength(), chunkSize );
+		numCopied += chunkSize;
 	}
 
 	return numCopied;

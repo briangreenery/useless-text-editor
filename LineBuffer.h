@@ -6,14 +6,14 @@
 #include "GapArray.h"
 
 class CharBuffer;
-class TextChange;
+class CharChange;
 
 class LineBuffer
 {
 public:
 	LineBuffer();
 
-	void Update( CharBuffer& text, TextChange change );
+	void Update( CharBuffer& text, CharChange change );
 
 	size_t LineCount() const;
 
