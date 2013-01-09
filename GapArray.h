@@ -5,6 +5,8 @@
 
 #include "ArrayRef.h"
 
+// GapArray is an array where nearby inserts and deletes are very fast (it's on wikipedia).
+
 class GapArrayBase
 {
 public:
@@ -13,19 +15,18 @@ public:
 
 	void InsertBytes( size_t pos, ArrayRef<const uint8_t> bytes );
 	void EraseBytes ( size_t pos, size_t count );
-
-	size_t ReadBytes( size_t pos, size_t count, ArrayRef<uint8_t> buffer ) const;
+	ArrayRef<const uint8_t> ReadBytes( size_t pos, size_t count ) const;
 
 protected:
 	size_t GapLength() const { return m_capacity - m_size; }
 
-	void MoveGapTo( size_t pos );
+	void MoveGapTo( size_t pos ) const;
 	void Resize( size_t newCapacity );
 
 	uint8_t* m_buffer;
 	size_t m_size;
 	size_t m_capacity;
-	size_t m_gapPosition;
+	mutable size_t m_gapPosition;
 };
 
 template < class T >
@@ -35,8 +36,7 @@ public:
 	void Insert( size_t pos, const T& element );
 	void Insert( size_t pos, ArrayRef<const T> elements );
 	void Erase ( size_t pos, size_t count );
-
-	ArrayRef<T> Read( size_t pos, size_t count, ArrayRef<T> buffer ) const;
+	ArrayRef<const T> Read( size_t pos, size_t count ) const;
 
 	const T& operator[]( size_t pos ) const;
 
@@ -65,14 +65,14 @@ void GapArray<T>::Erase( size_t pos, size_t count )
 }
 
 template < class T >
-ArrayRef<T> GapArray<T>::Read( size_t pos, size_t count, ArrayRef<T> buffer ) const
+ArrayRef<const T> GapArray<T>::Read( size_t pos, size_t count ) const
 {
-	ArrayRef<uint8_t> bytes( reinterpret_cast<uint8_t*>( buffer.begin() ),
-	                         reinterpret_cast<uint8_t*>( buffer.end() ) );
+	ArrayRef<const uint8_t> bytes = ReadBytes( pos * sizeof( T ), count * sizeof( T ) );
 
-	size_t bytesRead = ReadBytes( pos * sizeof( T ), count * sizeof( T ), bytes );
+	ArrayRef<const T> elements( reinterpret_cast<const T*>( bytes.begin() ),
+	                            reinterpret_cast<const T*>( bytes.end() ) );
 
-	return ArrayRef<T>( buffer.begin(), bytesRead / sizeof( T ) );
+	return elements;
 }
 
 template < class T >

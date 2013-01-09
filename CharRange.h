@@ -3,6 +3,8 @@
 #ifndef CharRange_h
 #define CharRange_h
 
+// CharRange is a range of characters.
+
 class CharRange
 {
 public:

@@ -19,14 +19,10 @@ CharChange::CharChange( size_t pos, size_t count, Type type )
 	{
 		delta = static_cast<int32_t>( count );
 	}
-	else if ( type == deletion )
-	{
-		end = start + count;
-		delta = -static_cast<int32_t>( count );
-	}
 	else
 	{
 		end = start + count;
+		delta = -static_cast<int32_t>( count );
 	}
 }
 

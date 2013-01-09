@@ -484,31 +484,27 @@ void TextView::SelectWord()
 	MoveSelection( selection, true );
 }
 
-void TextView::Clear( TextSelection rangeToClear )
+void TextView::Clear( CharRange rangeToClear )
 {
-	if ( rangeToClear.IsEmpty() )
+	if ( rangeToClear. )
 		return;
-
-	m_doc.SetBeforeSelection( m_selection );
 
 	if ( m_lastEditOperation != lastWasClear )
 	{
-		m_doc.EndUndoGroup();
+		m_doc.NewUndoGroup();
 		m_lastEditOperation = lastWasClear;
 	}
 
-	TextChange change = m_doc.Delete( rangeToClear.Min(), rangeToClear.Size() );
+	CharChange change = m_doc.Delete( rangeToClear.Min(), rangeToClear.Size(), m_selection );
 
-	TextSelection selection;
-	selection.start = rangeToClear.Min();
-	selection.end   = selection.start;
+	CharRange newSelection( rangeToClear.Min(), selection.start );
 
-	UpdateLayout( change, selection );
+	UpdateLayout( change, newSelection );
 }
 
 void TextView::Cut()
 {
-	m_doc.EndUndoGroup();
+	m_doc.NewUndoGroup();
 
 	Copy();
 	Clear( m_selection );

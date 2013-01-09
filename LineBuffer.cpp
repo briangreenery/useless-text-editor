@@ -4,12 +4,13 @@
 #include "CharBuffer.h"
 #include "CharChange.h"
 
-LineBuffer::LineBuffer()
+LineBuffer::LineBuffer( const CharBuffer& charBuffer )
+	: m_charBuffer( charBuffer )
 {
 	m_lineLengths.Insert( 0, 0 );
 }
 
-void LineBuffer::Update( CharBuffer& charBuffer, CharChange change )
+void LineBuffer::Update( CharChange change )
 {
 	size_t start = LineContaining( change.start );
 	size_t end   = start;
@@ -25,11 +26,6 @@ void LineBuffer::Update( CharBuffer& charBuffer, CharChange change )
 	while ( textStart + textLength < change.end );
 
 	m_lineLengths.Erase( start, end - start );
-
-	while ( textLength > 0 )
-	{
-		size_t nextLineBreak = charBuffer.NextLineBreak( textLength );
-	}
 }
 
 size_t LineBuffer::LineCount() const

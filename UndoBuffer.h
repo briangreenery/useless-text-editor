@@ -48,7 +48,7 @@ private:
 class UndoBuffer
 {
 public:
-	UndoBuffer();
+	UndoBuffer( CharBuffer& );
 
 	void AddAction( UndoAction );
 
@@ -62,13 +62,11 @@ public:
 	void EndGroup();
 
 private:
-	size_t SaveText( CharBuffer&, size_t pos, size_t length );
-
-	void RemoveUnreachableGroups();
+	CharBuffer& m_charBuffer;
 
 	bool m_endCurrentGroup;
 
-	TextSelection m_beforeSelection;
+	CharRange m_beforeSelection;
 
 	size_t m_index;
 	std::vector<UndoGroup> m_groups;

@@ -83,6 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CharIter.cpp" />
+    <ClCompile Include="CharSelection.cpp" />
     <ClCompile Include="EmptyTextBlock.cpp" />
     <ClCompile Include="AccessibleTextView.cpp" />
     <ClCompile Include="GapArray.cpp" />
@@ -128,6 +129,7 @@
   <ItemGroup>
     <ClInclude Include="ArrayRef.h" />
     <ClInclude Include="CharIter.h" />
+    <ClInclude Include="CharSelection.h" />
     <ClInclude Include="EmptyTextBlock.h" />
     <ClInclude Include="GapArray.h" />
     <ClInclude Include="rapidxml\rapidxml.hpp" />

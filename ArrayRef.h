@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <cassert>
 
+// ArrayRef is a reference to a section of an array
+
 template < class T >
 class ArrayRef
 {

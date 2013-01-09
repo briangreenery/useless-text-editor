@@ -163,6 +163,9 @@
     <ClCompile Include="UndoBuffer.cpp">
       <Filter>Document</Filter>
     </ClCompile>
+    <ClCompile Include="CharSelection.cpp">
+      <Filter>Document</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TextSelection.h">
@@ -307,6 +310,9 @@
       <Filter>Document</Filter>
     </ClInclude>
     <ClInclude Include="UndoBuffer.h">
+      <Filter>Document</Filter>
+    </ClInclude>
+    <ClInclude Include="CharSelection.h">
       <Filter>Document</Filter>
     </ClInclude>
   </ItemGroup>

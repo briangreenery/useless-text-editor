@@ -42,9 +42,9 @@ CharChange CharBuffer::Delete( size_t pos, size_t count )
 	return CharChange( pos, count, CharChange::deletion );
 }
 
-ArrayRef<wchar_t> CharBuffer::Read( size_t start, size_t count, ArrayRef<wchar_t> buffer ) const
+ArrayRef<const wchar_t> CharBuffer::Read( size_t start, size_t count ) const
 {
-	return m_buffer.Read( start, count, buffer );
+	return m_buffer.Read( start, count );
 }
 
 void CharBuffer::ResetIterators() const

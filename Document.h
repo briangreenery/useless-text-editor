@@ -6,15 +6,18 @@
 #include "CharBuffer.h"
 #include "LineBuffer.h"
 #include "UndoBuffer.h"
-#include "CharChange.h"
+
+// Document stores all non-display, non-style stuff.
 
 class Document
 {
 public:
-	CharChange Insert( size_t pos, ArrayRef<const wchar_t> text );
-	CharChange Delete( size_t pos, size_t count );
+	Document();
 
-	void NewUndoGroup( CharRange selection );
+	CharChange Insert( size_t pos, ArrayRef<const wchar_t> text, CharSelection );
+	CharChange Delete( size_t pos, size_t count, CharSelection );
+
+	void NewUndoGroup();
 
 	bool CanUndo() const { return m_undoBuffer.CanUndo(); }
 	bool CanRedo() const { return m_undoBuffer.CanRedo(); }

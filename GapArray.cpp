@@ -17,16 +17,24 @@ GapArrayBase::~GapArrayBase()
 		delete[] m_buffer;
 }
 
-void GapArrayBase::MoveGapTo( size_t pos )
+void GapArrayBase::MoveGapTo( size_t pos ) const
 {
 	if ( m_gapPosition != pos )
 	{
 		assert( m_capacity >= pos + GapLength() );
 
 		if ( pos > m_gapPosition )
-			memcpy_s( m_buffer + m_gapPosition, m_capacity - m_gapPosition, m_buffer + m_gapPosition + GapLength(), pos - m_gapPosition );
+		{
+			memcpy( m_buffer + m_gapPosition,
+			        m_buffer + m_gapPosition + GapLength(),
+			        pos - m_gapPosition );
+		}
 		else
-			memmove_s( m_buffer + pos + GapLength(), pos + m_size, m_buffer + pos, m_gapPosition - pos );
+		{
+			memmove( m_buffer + pos + GapLength(),
+			         m_buffer + pos,
+			         m_gapPosition - pos );
+		}
 
 		m_gapPosition = pos;
 	}
@@ -41,7 +49,12 @@ void GapArrayBase::Resize( size_t newCapacity )
 	if ( newCapacity != 0 )
 	{
 		newBuffer = new uint8_t[newCapacity];
-		ReadBytes( 0, m_size, ArrayRef<uint8_t>( newBuffer, newCapacity ) );
+
+		memcpy( newBuffer, m_buffer, m_gapPosition );
+
+		memcpy( newBuffer + m_gapPosition + ( newCapacity - m_size ),
+		        m_buffer  + m_gapPosition + ( m_capacity  - m_size ),
+		        m_size - m_gapPosition );
 	}
 
 	if ( m_buffer )
@@ -73,24 +86,13 @@ void GapArrayBase::EraseBytes( size_t pos, size_t count )
 		Resize( 2 * m_size );
 }
 
-size_t GapArrayBase::ReadBytes( size_t pos, size_t count, ArrayRef<uint8_t> output ) const
+ArrayRef<const uint8_t> GapArrayBase::ReadBytes( size_t pos, size_t count ) const
 {
-	size_t numCopied = 0;
-	size_t numToCopy = std::min( count, output.size() );
+	pos   = std::min( pos,   m_size );
+	count = std::min( count, m_size - pos );
 
-	if ( pos < m_gapPosition )
-	{
-		size_t chunkSize = std::min( numToCopy, m_gapPosition - pos );
-		memcpy( output.begin(), m_buffer + pos, chunkSize );
-		numCopied += chunkSize;
-	}
+	if ( pos <= m_gapPosition && m_gapPosition < pos + count )
+		MoveGapTo( pos + count );
 
-	if ( numCopied < numToCopy )
-	{
-		size_t chunkSize = std::min( m_size - ( pos + numCopied ), count - numCopied );
-		memcpy( output.begin() + numCopied, m_buffer + pos + numCopied + GapLength(), chunkSize );
-		numCopied += chunkSize;
-	}
-
-	return numCopied;
+	return ArrayRef<const uint8_t>( m_buffer + pos, count );
 }

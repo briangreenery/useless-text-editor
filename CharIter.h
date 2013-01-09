@@ -6,6 +6,9 @@
 #include "GapArray.h"
 #include <unicode/chariter.h>
 
+// CharIter is used by ICU to read parts of the text.
+// ICU is used to find character, word, and soft-linebreak boundaries.
+
 class CharIter : public icu::CharacterIterator
 {
 public:

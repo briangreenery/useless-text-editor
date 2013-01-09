@@ -8,12 +8,14 @@
 class CharBuffer;
 class CharChange;
 
+// LineBuffer stores where the line breaks are.
+
 class LineBuffer
 {
 public:
-	LineBuffer();
+	LineBuffer( const CharBuffer& );
 
-	void Update( CharBuffer& text, CharChange change );
+	void Update( CharChange change );
 
 	size_t LineCount() const;
 
@@ -24,6 +26,7 @@ public:
 
 private:
 	GapArray<size_t> m_lineLengths;
+	const CharBuffer& m_charBuffer;
 };
 
 #endif

@@ -2,6 +2,12 @@
 
 #include "Document.h"
 
+Document::Document()
+	: m_lineBuffer( m_charBuffer )
+	, m_undoBufer( m_charBuffer )
+{
+}
+
 static const wchar_t* FindLineBreak( const wchar_t* it, const wchar_t* end )
 {
 	for ( ; it != end; ++it )
@@ -27,7 +33,7 @@ static const wchar_t* SkipLineBreak( const wchar_t* lineBreak, const wchar_t* en
 	return lineBreak;
 }
 
-CharChange Document::Insert( size_t pos, ArrayRef<const wchar_t> text )
+CharChange Document::Insert( size_t pos, ArrayRef<const wchar_t> text, CharRange selection )
 {
 	CharChange change;
 
@@ -49,18 +55,21 @@ CharChange Document::Insert( size_t pos, ArrayRef<const wchar_t> text )
 		it = SkipLineBreak( lineBreak, text.end() );
 	}
 
-	m_undoBuffer.Update( m_charBuffer, change );
+	m_undoBuffer.SaveInsert( m_charBuffer, change );
+
 	m_lineBuffer.Update( m_charBuffer, change );
 
 	return change;
 }
 
-CharChange Document::Delete( size_t pos, size_t count )
+CharChange Document::Delete( size_t pos, size_t count, CharRange selection )
 {
 	CharChange change;
 
 	if ( count == 0 )
 		return change;
+
+	m_undoBufer.SaveDelete( m_charBuffer, pos, count );
 
 	change += m_charBuffer.Delete( pos, count );
 

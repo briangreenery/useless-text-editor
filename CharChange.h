@@ -11,7 +11,7 @@
 class CharChange
 {
 public:
-	enum Type { noChange, insertion, deletion, modification };
+	enum Type { insertion, deletion };
 
 	CharChange();
 	CharChange( size_t pos, size_t count, Type );
