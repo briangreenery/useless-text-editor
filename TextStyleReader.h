@@ -5,7 +5,7 @@
 
 #include "TextStyleRun.h"
 #include "TextFontRun.h"
-#include "TextRange.h"
+#include "CharRange.h"
 #include "ArrayRef.h"
 
 class TextStyleRegistry;
@@ -18,8 +18,8 @@ public:
 
 	ArrayRef<const TextFontRun>  Fonts     ( size_t start, size_t count );
 	ArrayRef<const TextStyleRun> Classes   ( size_t start, size_t count );
-	ArrayRef<const TextRange>    Squiggles ( size_t start, size_t count );
-	ArrayRef<const TextRange>    Highlights( size_t start, size_t count );
+	ArrayRef<const CharRange>    Squiggles ( size_t start, size_t count );
+	ArrayRef<const CharRange>    Highlights( size_t start, size_t count );
 
 private:
 	void AddFont( uint32_t classID, size_t count );
@@ -31,8 +31,8 @@ private:
 	TextFontRuns m_fonts;
 	TextStyleRuns m_classes;
 	TextStyleRuns m_annotatorClasses;
-	TextRanges m_squiggles;
-	TextRanges m_highlights;
+	CharRanges m_squiggles;
+	CharRanges m_highlights;
 };
 
 #endif

@@ -7,14 +7,13 @@
 #include <Windows.h>
 #include <GdiPlus.h>
 
-VisualPainter::VisualPainter( HDC hdc, const TextDocument& doc, TextStyleRegistry& styleRegistry, const TextSquiggle& squiggle, TextSelection selection )
+VisualPainter::VisualPainter( HDC hdc, const Document& doc, TextStyleRegistry& styleRegistry, const TextSquiggle& squiggle, TextSelection selection )
 	: hdc( hdc )
 	, styleRegistry( styleRegistry )
 	, doc( doc )
 	, selection( selection )
 	, oldSelection( selection )
 	, textStart( 0 )
-	, docReader( doc )
 	, styleReader( styleRegistry )
 	, squiggle( squiggle )
 {

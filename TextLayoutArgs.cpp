@@ -2,7 +2,7 @@
 
 #include "TextLayoutArgs.h"
 
-TextLayoutArgs::TextLayoutArgs( const TextDocument& doc,
+TextLayoutArgs::TextLayoutArgs( const Document& doc,
                                 TextStyleRegistry& styleRegistry,
                                 HDC hdc,
                                 int maxWidth )

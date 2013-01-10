@@ -80,7 +80,7 @@ ArrayRef<const TextStyleRun> TextStyleReader::Classes( size_t start, size_t coun
 	return ArrayRef<const TextStyleRun>( &m_classes.front(), &m_classes.back() + 1 );
 }
 
-ArrayRef<const TextRange> TextStyleReader::Squiggles( size_t start, size_t count )
+ArrayRef<const CharRange> TextStyleReader::Squiggles( size_t start, size_t count )
 {
 	m_squiggles.clear();
 
@@ -88,12 +88,12 @@ ArrayRef<const TextRange> TextStyleReader::Squiggles( size_t start, size_t count
 		m_styleRegistry.Annotator()->GetSquiggles( m_squiggles, start, count );
 
 	if ( m_squiggles.empty() )
-		return ArrayRef<const TextRange>();
+		return ArrayRef<const CharRange>();
 
-	return ArrayRef<const TextRange>( &m_squiggles.front(), &m_squiggles.back() + 1 );
+	return ArrayRef<const CharRange>( &m_squiggles.front(), &m_squiggles.back() + 1 );
 }
 
-ArrayRef<const TextRange> TextStyleReader::Highlights( size_t start, size_t count )
+ArrayRef<const CharRange> TextStyleReader::Highlights( size_t start, size_t count )
 {
 	m_highlights.clear();
 
@@ -101,7 +101,7 @@ ArrayRef<const TextRange> TextStyleReader::Highlights( size_t start, size_t coun
 		m_styleRegistry.Annotator()->GetHighlights( m_highlights, start, count );
 
 	if ( m_highlights.empty() )
-		return ArrayRef<const TextRange>();
+		return ArrayRef<const CharRange>();
 
-	return ArrayRef<const TextRange>( &m_highlights.front(), &m_highlights.back() + 1 );
+	return ArrayRef<const CharRange>( &m_highlights.front(), &m_highlights.back() + 1 );
 }

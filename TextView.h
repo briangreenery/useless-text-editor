@@ -3,7 +3,7 @@
 #ifndef TextView_h
 #define TextView_h
 
-#include "TextDocument.h"
+#include "Document.h"
 #include "TextSelection.h"
 #include "TextViewMetrics.h"
 #include "TextStyleRegistry.h"
@@ -53,7 +53,7 @@ public:
 
 	void Backspace( bool wholeWord );
 	void Delete   ( bool wholeWord );
-	void Insert   ( UTF16Ref );
+	void Insert   ( ArrayRef<const wchar_t> );
 
 	void SelectAll();
 	void SelectWord();
@@ -67,12 +67,12 @@ public:
 	void Redo();
 
 	std::wstring GetText();
-	void SetText( UTF16Ref );
+	void SetText( ArrayRef<const wchar_t> );
 
 	HWND WindowHandle() const;
 
 private:
-	void UpdateLayout( TextChange, TextSelection );
+	void UpdateLayout( CharChange, TextSelection );
 	void UpdateLayout();
 
 	size_t LineNumberDigits();
@@ -86,9 +86,10 @@ private:
 
 	HWND m_hwnd;
 
-	TextDocument      m_doc;
+	Document          m_doc;
+	CharSelection     m_selection;
+	POINT             m_caretPoint;
 	TextStyleRegistry m_styleRegistry;
-	TextSelection     m_selection;
 	TextViewMetrics   m_metrics;
 	VisualDocument    m_blocks;
 

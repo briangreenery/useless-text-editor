@@ -1,186 +1,106 @@
 // TextChangeTest.cpp
 
 #include "TextChangeTest.h"
-#include "TextChange.h"
+#include "CharChange.h"
 #include <cassert>
 
 static void SimpleTests()
 {
 	{
-		TextChange change;
+		CharChange change;
 		assert( change.start == 0 );
 		assert( change.end == 0 );
 		assert( change.delta == 0 );
-		change.AddChange( TextChange() );
+		change += CharChange();
 		assert( change.start == 0 );
 		assert( change.end == 0 );
 		assert( change.delta == 0 );
 	}
 
 	{
-		TextChange change;
-		change.AddChange( TextChange( 1, 5, TextChange::insertion ) );
+		CharChange change;
+		change += CharChange( 1, 5, CharChange::insertion );
 		assert( change.start == 1 );
 		assert( change.end == 1 );
 		assert( change.delta == 5 );
 	}
 
 	{
-		TextChange change;
-		change.AddChange( TextChange( 1, 5, TextChange::deletion ) );
+		CharChange change;
+		change += CharChange( 1, 5, CharChange::deletion );
 		assert( change.start == 1 );
 		assert( change.end == 6 );
 		assert( change.delta == -5 );
-	}
-
-	{
-		TextChange change;
-		change.AddChange( TextChange( 1, 5, TextChange::modification ) );
-		assert( change.start == 1 );
-		assert( change.end == 6 );
-		assert( change.delta == 0 );
 	}
 }
 
 static void ComplicatedTests()
 {
 	{
-		TextChange change;
-		change.AddChange( TextChange( 1, 3, TextChange::insertion ) );
-		change.AddChange( TextChange( 1, 3, TextChange::insertion ) );
+		CharChange change;
+		change += CharChange( 1, 3, CharChange::insertion );
+		change += CharChange( 1, 3, CharChange::insertion );
 		assert( change.start == 1 );
 		assert( change.end == 1 );
 		assert( change.delta == 6 );
 	}
 	
 	{
-		TextChange change;
-		change.AddChange( TextChange( 1, 3, TextChange::deletion ) );
-		change.AddChange( TextChange( 1, 3, TextChange::deletion ) );
+		CharChange change;
+		change += CharChange( 1, 3, CharChange::deletion );
+		change += CharChange( 1, 3, CharChange::deletion );
 		assert( change.start == 1 );
 		assert( change.end == 7 );
 		assert( change.delta == -6 );
 	}
 
 	{
-		TextChange change;
-		change.AddChange( TextChange( 1, 3, TextChange::modification ) );
-		change.AddChange( TextChange( 1, 3, TextChange::modification  ) );
-		assert( change.start == 1 );
-		assert( change.end == 4 );
-		assert( change.delta == 0 );
-	}
-
-	{
-		TextChange change;
-		change.AddChange( TextChange( 1, 3, TextChange::modification ) );
-		change.AddChange( TextChange( 0, 10, TextChange::modification ) );
-		assert( change.start == 0 );
-		assert( change.end == 10 );
-		assert( change.delta == 0 );
-	}
-
-	{
-		TextChange change;
-		change.AddChange( TextChange( 1, 3, TextChange::insertion ) );
-		change.AddChange( TextChange( 1, 3, TextChange::deletion ) );
+		CharChange change;
+		change += CharChange( 1, 3, CharChange::insertion );
+		change += CharChange( 1, 3, CharChange::deletion );
 		assert( change.start == 1 );
 		assert( change.end == 1 );
 		assert( change.delta == 0 );
 	}
 
 	{
-		TextChange change;
-		change.AddChange( TextChange( 1, 3, TextChange::insertion ) );
-		change.AddChange( TextChange( 9, 3, TextChange::insertion ) );
+		CharChange change;
+		change += CharChange( 1, 3, CharChange::insertion );
+		change += CharChange( 9, 3, CharChange::insertion );
 		assert( change.start == 1 );
 		assert( change.end == 6 );
 		assert( change.delta == 6 );
 	}
 
 	{
-		TextChange change;
-		change.AddChange( TextChange( 9, 3, TextChange::insertion ) );
-		change.AddChange( TextChange( 1, 3, TextChange::insertion ) );
+		CharChange change;
+		change += CharChange( 9, 3, CharChange::insertion );
+		change += CharChange( 1, 3, CharChange::insertion );
 		assert( change.start == 1 );
 		assert( change.end == 9 );
 		assert( change.delta == 6 );
 	}
 
 	{
-		TextChange change;
-		change.AddChange( TextChange( 1, 9, TextChange::insertion ) );
-		change.AddChange( TextChange( 2, 1, TextChange::insertion ) );
+		CharChange change;
+		change += CharChange( 1, 9, CharChange::insertion );
+		change += CharChange( 2, 1, CharChange::insertion );
 		assert( change.start == 1 );
 		assert( change.end == 1 );
 		assert( change.delta == 10 );
 	}
 
 	{
-		TextChange change;
-		change.AddChange( TextChange( 1, 9, TextChange::deletion ) );
-		change.AddChange( TextChange( 2, 1, TextChange::deletion ) );
+		CharChange change;
+		change += CharChange( 1, 9, CharChange::deletion );
+		change += CharChange( 2, 1, CharChange::deletion );
 		assert( change.start == 1 );
 		assert( change.end == 12 );
 		assert( change.delta == -10 );
 	}
-
-	{
-		TextChange change;
-		change.AddChange( TextChange( 0, 1,   TextChange::insertion ) );
-		change.AddChange( TextChange( 0, 100, TextChange::modification ) );
-		assert( change.start == 0 );
-		assert( change.end   == 99 );
-		assert( change.delta == 1 );
-	}
-
-	{
-		TextChange change;
-		change.AddChange( TextChange( 99,  1, TextChange::insertion ) );
-		change.AddChange( TextChange( 0, 100, TextChange::modification ) );
-		assert( change.start == 0 );
-		assert( change.end   == 99 );
-		assert( change.delta == 1 );
-	}
-
-	{
-		TextChange change;
-		change.AddChange( TextChange( 10, 10, TextChange::insertion ) );
-		change.AddChange( TextChange( 0,  20, TextChange::modification ) );
-		assert( change.start == 0 );
-		assert( change.end   == 10 );
-		assert( change.delta == 10 );
-	}
-
-	{
-		TextChange change;
-		change.AddChange( TextChange( 0, 1,  TextChange::deletion ) );
-		change.AddChange( TextChange( 0, 99, TextChange::modification ) );
-		assert( change.start == 0 );
-		assert( change.end == 100 );
-		assert( change.delta == -1 );
-	}
-
-	{
-		TextChange change;
-		change.AddChange( TextChange( 99, 1,  TextChange::deletion ) );
-		change.AddChange( TextChange( 0, 99, TextChange::modification ) );
-		assert( change.start == 0 );
-		assert( change.end == 100 );
-		assert( change.delta == -1 );
-	}
-
-	{
-		TextChange change;
-		change.AddChange( TextChange( 10, 10, TextChange::deletion ) );
-		change.AddChange( TextChange( 0,  20, TextChange::modification ) );
-		assert( change.start == 0 );
-		assert( change.end   == 30 );
-		assert( change.delta == -10 );
-	}
 }
 
-void TextChangeTest()
+void CharChangeTest()
 {
 	SimpleTests();
 	ComplicatedTests();

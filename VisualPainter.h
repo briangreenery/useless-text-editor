@@ -4,7 +4,6 @@
 #define VisualPainter_h
 
 #include "TextSelection.h"
-#include "TextDocumentReader.h"
 #include "TextStyleReader.h"
 #include <stdint.h>
 #include <Windows.h>
@@ -12,12 +11,12 @@
 
 class TextSquiggle;
 class TextStyleRegistry;
-class TextDocument;
+class Document;
 
 class VisualPainter
 {
 public:
-	VisualPainter( HDC, const TextDocument&, TextStyleRegistry&, const TextSquiggle&, TextSelection );
+	VisualPainter( HDC, const Document&, TextStyleRegistry&, const TextSquiggle&, TextSelection );
 	~VisualPainter();
 
 	void SetOrigin( size_t textStart, LONG yStart );
@@ -29,10 +28,9 @@ public:
 
 	HDC                 hdc;
 	TextSelection       selection;
-	const TextDocument& doc;
+	const Document&     doc;
 	TextStyleRegistry&  styleRegistry;
 	size_t              textStart;
-	TextDocumentReader  docReader;
 	TextStyleReader     styleReader;
 
 private:

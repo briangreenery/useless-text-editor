@@ -11,6 +11,8 @@ public:
 	CharSelection();
 	CharSelection( size_t start, size_t end );
 
+	bool Intersects( size_t start, size_t end ) const;
+
 	size_t Min() const;
 	size_t Max() const;
 	size_t Length() const;

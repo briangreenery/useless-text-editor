@@ -1,11 +1,11 @@
 // TextMateAnnotator.cpp
 
 #include "TextMateAnnotator.h"
-#include "TextDocument.h"
+#include "Document.h"
 #include "TextStyleRegistry.h"
 #include <string>
 
-TextMateAnnotator::TextMateAnnotator( const TextDocument& doc, TextStyleRegistry& styleRegistry )
+TextMateAnnotator::TextMateAnnotator( const Document& doc, TextStyleRegistry& styleRegistry )
 	: m_doc( doc )
 	, m_styleRegistry( styleRegistry )
 	, m_defaultStyle( styleRegistry.ClassID( "default" ) )
@@ -154,11 +154,9 @@ void TextMateAnnotator::Tokenize( const char* docStart, const char* docEnd )
 	AddTokensUpTo( docEnd - docStart, style );
 }
 
-void TextMateAnnotator::TextChanged( TextChange )
+void TextMateAnnotator::TextChanged( CharChange )
 {
 	m_tokens.clear();
-
-	TextDocumentReader reader( m_doc );
 
 	AsciiRef text = reader.AsciiRange( 0, m_doc.Length() );
 

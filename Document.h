@@ -14,8 +14,10 @@ class Document
 public:
 	Document();
 
-	CharChange Insert( size_t pos, ArrayRef<const wchar_t> text, CharSelection );
-	CharChange Delete( size_t pos, size_t count, CharSelection );
+	CharChange Insert( size_t pos, ArrayRef<const wchar_t> text );
+	CharChange Delete( size_t pos, size_t count );
+
+	ArrayRef<const wchar_t> Read( size_t pos, size_t count ) const;
 
 	void NewUndoGroup();
 
@@ -28,7 +30,7 @@ public:
 private:
 	CharBuffer m_charBuffer;
 	LineBuffer m_lineBuffer;
-	UndoBuffer m_undoBufer;
+	UndoBuffer m_undoBuffer;
 };
 
 #endif

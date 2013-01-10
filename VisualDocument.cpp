@@ -1,9 +1,8 @@
 // VisualDocument.cpp
 
 #include "VisualDocument.h"
-#include "TextDocumentReader.h"
 #include "TextStyleReader.h"
-#include "TextDocument.h"
+#include "Document.h"
 #include "TextStyleRegistry.h"
 #include "TextSelection.h"
 #include "VisualPainter.h"
@@ -14,7 +13,7 @@
 #include <cassert>
 #include <stdio.h>
 
-VisualDocument::VisualDocument( const TextDocument& doc, TextStyleRegistry& styleRegistry )
+VisualDocument::VisualDocument( const Document& doc, TextStyleRegistry& styleRegistry )
 	: m_doc( doc )
 	, m_styleRegistry( styleRegistry )
 	, m_lineCount( 1 )
@@ -78,7 +77,7 @@ void VisualDocument::Draw( BlockContaining_Result block, VisualPainter& painter,
 	}
 }
 
-void VisualDocument::Update( HDC hdc, int maxWidth, TextChange change )
+void VisualDocument::Update( HDC hdc, int maxWidth, CharChange change )
 {
 	BlockContaining_Result block = BlockContaining( change.start );
 
@@ -97,7 +96,7 @@ void VisualDocument::Update( HDC hdc, int maxWidth, TextChange change )
 	LayoutText( block.it, start, count + change.delta, hdc, maxWidth );
 }
 
-bool VisualDocument::IsSimpleText( UTF16Ref text ) const
+bool VisualDocument::IsSimpleText( ArrayRef<const wchar_t> text ) const
 {
 	for ( const wchar_t* it = text.begin(); it != text.end(); ++it )
 		if ( *it >= 128 )
@@ -113,7 +112,6 @@ void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start,
 
 	TextLayoutArgs layoutArgs( m_doc, m_styleRegistry, hdc, maxWidth );
 
-	TextDocumentReader docReader( m_doc );
 	TextStyleReader styleReader( m_styleRegistry );
 
 	for ( size_t end = start + count; start < end; )
@@ -131,7 +129,7 @@ void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start,
 		}
 		else
 		{
-			layoutArgs.text = docReader.StrictRange( start, lineEnd - start );
+			layoutArgs.text = m_doc.Read( start, lineEnd - start );
 			layoutArgs.fonts = styleReader.Fonts( start, lineEnd - start );
 			layoutArgs.endsWithNewline = lineEnd != end;
 			layoutArgs.textStart = start;

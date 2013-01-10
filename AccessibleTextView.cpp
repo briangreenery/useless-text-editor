@@ -288,6 +288,6 @@ HRESULT STDMETHODCALLTYPE AccessibleTextView::put_accValue( VARIANT varChild, BS
 	if ( varChild.vt != VT_I4 || varChild.lVal != CHILDID_SELF )
 		return E_INVALIDARG;
 
-	m_textView.SetText( UTF16Ref( szValue, SysStringLen( szValue ) ) );
+	m_textView.SetText( ArrayRef<const wchar_t>( szValue, SysStringLen( szValue ) ) );
 	return S_OK;
 }

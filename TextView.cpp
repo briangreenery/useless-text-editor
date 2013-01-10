@@ -56,9 +56,9 @@ TextView::TextView( HWND hwnd )
 
 int TextView::OnCreate( LPCREATESTRUCT )
 {
-	m_selection.endPoint.x = 0;
-	m_selection.endPoint.y = 0;
-	m_selection.start = m_selection.end = m_blocks.CharFromPoint( &m_selection.endPoint );
+	m_caretPoint.x = 0;
+	m_caretPoint.y = 0;
+	m_selection.start = m_selection.end = m_blocks.CharFromPoint( &m_caretPoint );
 
 	return 0;
 }
@@ -128,7 +128,7 @@ void TextView::OnChar( UINT keyCode, UINT repCnt, UINT flags )
 	while ( repCnt-- > 0 )
 	{
 		wchar_t unit = ( keyCode == VK_RETURN ) ? 0x0A : keyCode;
-		Insert( UTF16Ref( &unit, 1 ) );
+		Insert( ArrayRef<const wchar_t>( &unit, 1 ) );
 	}
 }
 
@@ -427,7 +427,7 @@ std::wstring TextView::GetText()
 	return text;
 }
 
-void TextView::SetText( UTF16Ref text )
+void TextView::SetText( ArrayRef<const wchar_t> text )
 {
 	m_doc.SetBeforeSelection( m_selection );
 	m_doc.EndUndoGroup();
@@ -441,19 +441,19 @@ void TextView::SetText( UTF16Ref text )
 	UpdateLayout( change, selection );
 }
 
-void TextView::Insert( UTF16Ref text )
+void TextView::Insert( ArrayRef<const wchar_t> text )
 {
-	m_doc.SetBeforeSelection( m_selection );
+	//m_doc.SetBeforeSelection( m_selection );
 
-	if ( m_lastEditOperation != lastWasInsert )
-	{
-		m_doc.EndUndoGroup();
-		m_lastEditOperation = lastWasInsert;
-	}
+	//if ( m_lastEditOperation != lastWasInsert )
+	//{
+	//	m_doc.EndUndoGroup();
+	//	m_lastEditOperation = lastWasInsert;
+	//}
 
-	TextChange change;
-	change.AddChange( m_doc.Delete( m_selection.Min(), m_selection.Size() ) );
-	change.AddChange( m_doc.Insert( m_selection.Min(), text ) );
+	CharChange change;
+	change += m_doc.Delete( m_selection.Min(), m_selection.Length() );
+	change += m_doc.Insert( m_selection.Min(), text );
 
 	TextSelection selection;
 	selection.start = m_selection.Max() + change.delta;
@@ -559,7 +559,7 @@ void TextView::Paste()
 		wchar_t* clipboardString = static_cast<wchar_t*>( GlobalLock( hClipboardData ) );
 
 		if ( clipboardString != 0 )
-			Insert( UTF16Ref( clipboardString, wcslen( clipboardString ) ) );
+			Insert( ArrayRef<const wchar_t>( clipboardString, wcslen( clipboardString ) ) );
 
 		GlobalUnlock( hClipboardData );
 	}

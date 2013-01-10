@@ -4,7 +4,7 @@
 
 Document::Document()
 	: m_lineBuffer( m_charBuffer )
-	, m_undoBufer( m_charBuffer )
+	, m_undoBuffer( m_charBuffer )
 {
 }
 
@@ -33,7 +33,7 @@ static const wchar_t* SkipLineBreak( const wchar_t* lineBreak, const wchar_t* en
 	return lineBreak;
 }
 
-CharChange Document::Insert( size_t pos, ArrayRef<const wchar_t> text, CharRange selection )
+CharChange Document::Insert( size_t pos, ArrayRef<const wchar_t> text )
 {
 	CharChange change;
 
@@ -55,44 +55,33 @@ CharChange Document::Insert( size_t pos, ArrayRef<const wchar_t> text, CharRange
 		it = SkipLineBreak( lineBreak, text.end() );
 	}
 
-	m_undoBuffer.SaveInsert( m_charBuffer, change );
-
-	m_lineBuffer.Update( m_charBuffer, change );
-
 	return change;
 }
 
-CharChange Document::Delete( size_t pos, size_t count, CharRange selection )
+CharChange Document::Delete( size_t pos, size_t count )
 {
 	CharChange change;
 
 	if ( count == 0 )
 		return change;
 
-	m_undoBufer.SaveDelete( m_charBuffer, pos, count );
-
 	change += m_charBuffer.Delete( pos, count );
-
-	m_undoBuffer.Update( m_charBuffer, change );
-	m_lineBuffer.Update( m_charBuffer, change );
-
 	return change;
+}
+
+ArrayRef<const wchar_t> Document::Read( size_t pos, size_t count ) const
+{
+	return m_charBuffer.Read( pos, count );
 }
 
 UndoChange Document::Undo()
 {
-	UndoChange change = m_undoBuffer.Undo();
-
-	m_lineBuffer.Update( m_charBuffer, change.charChange );
-
+	UndoChange change;
 	return change;
 }
 
 CharChange Document::Redo()
 {
-	CharChange change = m_undoBuffer.Redo();
-
-	m_lineBuffer.Update( m_charBuffer, change );
-
+	CharChange change;
 	return change;
 }

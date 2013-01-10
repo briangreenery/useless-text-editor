@@ -3,21 +3,21 @@
 #ifndef VisualDocument_h
 #define VisualDocument_h
 
+#include "ArrayRef.h"
 #include "TextBlock.h"
-#include "TextChange.h"
-#include "UTF16Ref.h"
+#include "CharChange.h"
 #include "TextSquiggle.h"
 #include <Windows.h>
 #include <list>
 
-class TextDocument;
+class Document;
 class TextSelection;
 class TextStyleRegistry;
 
 class VisualDocument
 {
 public:
-	VisualDocument( const TextDocument&, TextStyleRegistry& );
+	VisualDocument( const Document&, TextStyleRegistry& );
 
 	void DrawText( HDC hdc, RECT rect, TextSelection ) const;
 	void DrawLineNumbers( HDC hdc, RECT rect ) const;
@@ -31,10 +31,10 @@ public:
 	POINT PointFromChar( size_t, bool advancing ) const;
 	size_t CharFromPoint( POINT* ) const;
 
-	void Update( HDC, int width, TextChange );
+	void Update( HDC, int width, CharChange );
 
 private:
-	bool IsSimpleText( UTF16Ref ) const;
+	bool IsSimpleText( ArrayRef<const wchar_t> ) const;
 	void LayoutText( TextBlockList::const_iterator, size_t start, size_t count, HDC hdc, int maxWidth );
 
 	struct BlockContaining_Result
@@ -53,7 +53,7 @@ private:
 	typedef void (TextBlock::*DrawFunction)( VisualPainter&, RECT ) const;
 	void Draw( BlockContaining_Result, VisualPainter&, RECT, DrawFunction ) const;
 
-	const TextDocument& m_doc;
+	const Document& m_doc;
 	TextStyleRegistry&  m_styleRegistry;
 	TextSquiggle        m_squiggle;
 	size_t              m_lineCount;

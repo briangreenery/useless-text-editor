@@ -15,6 +15,11 @@ CharSelection::CharSelection( size_t start, size_t end )
 {
 }
 
+bool CharSelection::Intersects( size_t otherStart, size_t otheEnd ) const
+{
+	return Min() < otheEnd && otherStart < Max();
+}
+
 size_t CharSelection::Min() const
 {
 	return std::min( start, end );
