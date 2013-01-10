@@ -11,7 +11,7 @@
 #include <list>
 
 class Document;
-class TextSelection;
+class CharSelection;
 class TextStyleRegistry;
 
 class VisualDocument
@@ -19,12 +19,12 @@ class VisualDocument
 public:
 	VisualDocument( const Document&, TextStyleRegistry& );
 
-	void DrawText( HDC hdc, RECT rect, TextSelection ) const;
+	void DrawText( HDC hdc, RECT rect, CharSelection ) const;
 	void DrawLineNumbers( HDC hdc, RECT rect ) const;
 
 	size_t LineCount() const;
-	size_t LineStart( int y ) const;
-	size_t LineEnd  ( int y ) const;
+	size_t LineStart( size_t pos ) const;
+	size_t LineEnd  ( size_t pos ) const;
 
 	int Height() const;
 

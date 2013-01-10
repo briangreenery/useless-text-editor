@@ -5,10 +5,10 @@
 #include "UniscribeTextRunLoop.h"
 #include "UniscribeTextBlock.h"
 #include "TextLayoutArgs.h"
-#include "TextDocument.h"
 #include "TextStyleRegistry.h"
 #include "UTF16Ref.h"
 #include "ThrowHRESULT.h"
+#include "CharBuffer.h"
 #include <algorithm>
 
 static std::vector<SCRIPT_ITEM> Itemize( UTF16Ref text )
@@ -250,13 +250,13 @@ static size_t WrapLine( UniscribeLayoutData& layoutData,
 {
 	size_t estimate = args.textStart + EstimateLineWrap( layoutData, args, lineWidth );
 
-	size_t lineEnd = args.doc.PrevSoftBreak( estimate + 1 );
+	size_t lineEnd = args.charBuffer.PrevSoftBreak( estimate + 1 );
 
 	if ( lineEnd <= args.textStart + lineStart )
-		lineEnd = args.doc.PrevWordStop( estimate + 1 );
+		lineEnd = args.charBuffer.PrevWordStop( estimate + 1 );
 
 	if ( lineEnd <= args.textStart + lineStart )
-		lineEnd = args.doc.PrevCharStop( estimate + 1 );
+		lineEnd = args.charBuffer.PrevCharStop( estimate + 1 );
 
 	if ( lineEnd <= args.textStart + lineStart )
 		lineEnd = (std::max)( estimate, args.textStart + lineStart + 1 );

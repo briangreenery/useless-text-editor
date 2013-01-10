@@ -4,7 +4,7 @@
 #define TextView_h
 
 #include "Document.h"
-#include "TextSelection.h"
+#include "CharSelection.h"
 #include "TextViewMetrics.h"
 #include "TextStyleRegistry.h"
 #include "VisualDocument.h"
@@ -58,7 +58,7 @@ public:
 	void SelectAll();
 	void SelectWord();
 
-	void Clear( TextSelection );
+	void Clear( CharSelection );
 	void Cut();
 	void Copy();
 	void Paste();
@@ -72,7 +72,7 @@ public:
 	HWND WindowHandle() const;
 
 private:
-	void UpdateLayout( CharChange, TextSelection );
+	void UpdateLayout( CharChange, CharSelection );
 	void UpdateLayout();
 
 	size_t LineNumberDigits();
@@ -80,7 +80,7 @@ private:
 
 	void HideCaret();
 	void ShowCaret();
-	void MoveSelection( TextSelection, bool scrollToCaret );
+	void MoveSelection( CharSelection, bool scrollToCaret );
 	void ScrollToCaret();
 	void UpdateCaretPos();
 
@@ -88,7 +88,6 @@ private:
 
 	Document          m_doc;
 	CharSelection     m_selection;
-	POINT             m_caretPoint;
 	TextStyleRegistry m_styleRegistry;
 	TextViewMetrics   m_metrics;
 	VisualDocument    m_blocks;

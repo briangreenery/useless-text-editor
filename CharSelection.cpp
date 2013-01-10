@@ -34,3 +34,8 @@ size_t CharSelection::Length() const
 {
 	return Max() - Min();
 }
+
+bool CharSelection::IsEmpty() const
+{
+	return start == end;
+}

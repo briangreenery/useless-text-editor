@@ -5,6 +5,7 @@
 #include "TextStyleRegistry.h"
 #include "TextDocumentReader.h"
 #include "TextStyleReader.h"
+#include "CharBuffer.h"
 #include <algorithm>
 
 SimpleTextBlock::SimpleTextBlock( SimpleLayoutDataPtr data, const TextStyleRegistry& styleRegistry )
@@ -86,8 +87,8 @@ void SimpleTextBlock::DrawLineSquiggles( size_t line, VisualPainter& painter, RE
 	size_t textStart = TextStart( line );
 	size_t textEnd   = TextEnd  ( line );
 
-	ArrayRef<const TextRange> squiggles = painter.styleReader.Squiggles( painter.textStart + textStart, textEnd - textStart );
-	for ( const TextRange* it = squiggles.begin(); it != squiggles.end(); ++it )
+	ArrayRef<const CharRange> squiggles = painter.styleReader.Squiggles( painter.textStart + textStart, textEnd - textStart );
+	for ( const CharRange* it = squiggles.begin(); it != squiggles.end(); ++it )
 	{
 		int xStart = CPtoX( line, it->start - painter.textStart,                 false );
 		int xEnd   = CPtoX( line, it->start - painter.textStart + it->count - 1, true );
@@ -104,8 +105,8 @@ void SimpleTextBlock::DrawLineHighlights( size_t line, VisualPainter& painter, R
 	size_t textStart = TextStart( line );
 	size_t textEnd   = TextEnd( line );
 
-	ArrayRef<const TextRange> highlights = painter.styleReader.Highlights( painter.textStart + textStart, textEnd - textStart );
-	for ( const TextRange* it = highlights.begin(); it != highlights.end(); ++it )
+	ArrayRef<const CharRange> highlights = painter.styleReader.Highlights( painter.textStart + textStart, textEnd - textStart );
+	for ( const CharRange* it = highlights.begin(); it != highlights.end(); ++it )
 	{
 		int xStart = CPtoX( line, it->start - painter.textStart,                 false );
 		int xEnd   = CPtoX( line, it->start - painter.textStart + it->count - 1, true );
@@ -128,7 +129,7 @@ void SimpleTextBlock::DrawLineText( size_t line, VisualPainter& painter, RECT re
 	int xRunStart = 0;
 	for ( const SimpleTextRun* run = runs.begin(); run != runs.end() && xRunStart < rect.right; ++run )
 	{
-		UTF16Ref text = painter.docReader.StrictRange( painter.textStart + run->textStart, run->textCount );
+		ArrayRef<const wchar_t> text = painter.charBuffer.Read( painter.textStart + run->textStart, run->textCount );
 
 		SelectObject( painter.hdc, m_styleRegistry.Font( run->fontid ).hfont );
 

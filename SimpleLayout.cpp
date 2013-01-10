@@ -5,8 +5,8 @@
 #include "SimpleTextRunLoop.h"
 #include "SimpleTextBlock.h"
 #include "TextLayoutArgs.h"
-#include "TextDocument.h"
 #include "TextStyleRegistry.h"
+#include "CharBuffer.h"
 #include <cassert>
 #include <algorithm>
 
@@ -62,13 +62,13 @@ static size_t WrapLine( SimpleLayoutData& layoutData,
 	// 'lastRun' can have a textCount of 0
 	size_t estimate = args.textStart + lastRun.textStart + lastRun.textCount;
 
-	size_t lineEnd = args.doc.PrevSoftBreak( estimate + 1 );
+	size_t lineEnd = args.charBuffer.PrevSoftBreak( estimate + 1 );
 
 	if ( lineEnd <= args.textStart + lineStart )
-		lineEnd = args.doc.PrevWordStop( estimate + 1 );
+		lineEnd = args.charBuffer.PrevWordStop( estimate + 1 );
 
 	if ( lineEnd <= args.textStart + lineStart )
-		lineEnd = args.doc.PrevCharStop( estimate + 1 );
+		lineEnd = args.charBuffer.PrevCharStop( estimate + 1 );
 
 	if ( lineEnd <= args.textStart + lineStart )
 		lineEnd = estimate;

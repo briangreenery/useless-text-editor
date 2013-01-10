@@ -4,6 +4,7 @@
 #include "Document.h"
 #include "TextStyleRegistry.h"
 #include <string>
+#include <algorithm>
 
 TextMateAnnotator::TextMateAnnotator( const Document& doc, TextStyleRegistry& styleRegistry )
 	: m_doc( doc )
@@ -158,10 +159,16 @@ void TextMateAnnotator::TextChanged( CharChange )
 {
 	m_tokens.clear();
 
-	AsciiRef text = reader.AsciiRange( 0, m_doc.Length() );
+	ArrayRef<const wchar_t> text = m_doc.Chars().Read( 0, m_doc.Chars().Length() );
 
-	if ( m_language.defaultPatterns )
-		Tokenize( text.begin(), text.end() );
+	std::vector<char> ascii;
+	ascii.resize( text.size() );
+
+	for ( size_t i = 0; i < text.size(); ++i )
+		ascii[i] = (char)(std::max<wchar_t>)( text[i], 127 );
+
+	if ( !ascii.empty() && m_language.defaultPatterns )
+		Tokenize( &ascii.front(), &ascii.front() + ascii.size() );
 }
 
 void TextMateAnnotator::SelectionChanged( size_t start, size_t end )
@@ -173,14 +180,14 @@ typedef std::pair<TextMateTokenRuns::const_iterator, TextMateTokenRuns::const_it
 struct TokenRunCompare
 {
 	bool operator()( const TextMateTokenRun& a, const TextMateTokenRun&  b ) const { return a.start + a.count <= b.start; }
-	bool operator()( const TextMateTokenRun& a, const TextRange&         b ) const { return a.start + a.count <= b.start; }
-	bool operator()( const TextRange&        a, const TextMateTokenRun&  b ) const { return a.start + a.count <= b.start; }
+	bool operator()( const TextMateTokenRun& a, const CharRange&         b ) const { return a.start + a.count <= b.start; }
+	bool operator()( const CharRange&        a, const TextMateTokenRun&  b ) const { return a.start + a.count <= b.start; }
 };
 
 void TextMateAnnotator::GetClasses( TextStyleRuns& styles, size_t start, size_t count )
 {
-	TextRange textRange( start, count );
-	TokenRange range = std::equal_range( m_tokens.begin(), m_tokens.end(), textRange, TokenRunCompare() );
+	CharRange CharRange( start, count );
+	TokenRange range = std::equal_range( m_tokens.begin(), m_tokens.end(), CharRange, TokenRunCompare() );
 
 	for ( TextMateTokenRuns::const_iterator it = range.first; it != range.second; ++it )
 	{
@@ -191,10 +198,10 @@ void TextMateAnnotator::GetClasses( TextStyleRuns& styles, size_t start, size_t 
 	}
 }
 
-void TextMateAnnotator::GetSquiggles( TextRanges&, size_t start, size_t count )
+void TextMateAnnotator::GetSquiggles( CharRanges&, size_t start, size_t count )
 {
 }
 
-void TextMateAnnotator::GetHighlights( TextRanges&, size_t start, size_t count )
+void TextMateAnnotator::GetHighlights( CharRanges&, size_t start, size_t count )
 {
 }

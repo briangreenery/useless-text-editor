@@ -117,7 +117,7 @@ void UniscribeTextBlock::DrawLineSquiggles( size_t line, const std::vector<int>&
 	size_t lineEnd   = TextEnd( line );
 
 	ArrayRef<const UniscribeTextRun> runs = LineRuns( line );
-	ArrayRef<const TextRange> squiggles = painter.styleReader.Squiggles( painter.textStart + lineStart, lineEnd - lineStart );
+	ArrayRef<const CharRange> squiggles = painter.styleReader.Squiggles( painter.textStart + lineStart, lineEnd - lineStart );
 
 	if ( squiggles.empty() )
 		return;
@@ -127,8 +127,8 @@ void UniscribeTextBlock::DrawLineSquiggles( size_t line, const std::vector<int>&
 	{
 		const UniscribeTextRun& run = runs[visualToLogical[i]];
 
-		ArrayRef<const TextRange> runSquiggles = RunSquiggles( painter.textStart, run, squiggles );
-		for ( const TextRange* squiggle = runSquiggles.begin(); squiggle != runSquiggles.end(); ++squiggle )
+		ArrayRef<const CharRange> runSquiggles = RunSquiggles( painter.textStart, run, squiggles );
+		for ( const CharRange* squiggle = runSquiggles.begin(); squiggle != runSquiggles.end(); ++squiggle )
 		{
 			size_t squiggleStart = squiggle->start - painter.textStart;
 			size_t squiggleEnd   = squiggle->start - painter.textStart + squiggle->count;
@@ -148,7 +148,7 @@ void UniscribeTextBlock::DrawLineHighlights( size_t line, const std::vector<int>
 	size_t lineEnd   = TextEnd( line );
 
 	ArrayRef<const UniscribeTextRun> runs = LineRuns( line );
-	ArrayRef<const TextRange> highlights = painter.styleReader.Highlights( painter.textStart + lineStart, lineEnd - lineStart );
+	ArrayRef<const CharRange> highlights = painter.styleReader.Highlights( painter.textStart + lineStart, lineEnd - lineStart );
 
 	if ( highlights.empty() )
 		return;
@@ -158,8 +158,8 @@ void UniscribeTextBlock::DrawLineHighlights( size_t line, const std::vector<int>
 	{
 		const UniscribeTextRun& run = runs[visualToLogical[i]];
 
-		ArrayRef<const TextRange> runHighlights = RunSquiggles( painter.textStart, run, highlights );
-		for ( const TextRange* highlight = runHighlights.begin(); highlight != runHighlights.end(); ++highlight )
+		ArrayRef<const CharRange> runHighlights = RunSquiggles( painter.textStart, run, highlights );
+		for ( const CharRange* highlight = runHighlights.begin(); highlight != runHighlights.end(); ++highlight )
 		{
 			size_t highlightStart = highlight->start - painter.textStart;
 			size_t highlightEnd   = highlight->start - painter.textStart + highlight->count;
@@ -239,19 +239,19 @@ ArrayRef<const TextStyleRun> UniscribeTextBlock::RunStyles( size_t blockStart, c
 	return ArrayRef<const TextStyleRun>( range.first, range.second );
 }
 
-ArrayRef<const TextRange> UniscribeTextBlock::RunSquiggles( size_t blockStart, const UniscribeTextRun& run, ArrayRef<const TextRange> squiggles ) const
+ArrayRef<const CharRange> UniscribeTextBlock::RunSquiggles( size_t blockStart, const UniscribeTextRun& run, ArrayRef<const CharRange> squiggles ) const
 {
-	struct TextRangeEqual
+	struct CharRangeEqual
 	{
-		TextRangeEqual( size_t blockStart ) : m_blockStart( blockStart ) {}
-		bool operator()( const TextRange&        a, const TextRange&        b ) const { return a.start + a.count <= b.start; }
-		bool operator()( const TextRange&        a, const UniscribeTextRun& b ) const { return a.start + a.count <= m_blockStart + b.textStart; }
-		bool operator()( const UniscribeTextRun& a, const TextRange&        b ) const { return m_blockStart + a.textStart + a.textCount <= b.start; }
+		CharRangeEqual( size_t blockStart ) : m_blockStart( blockStart ) {}
+		bool operator()( const CharRange&        a, const CharRange&        b ) const { return a.start + a.count <= b.start; }
+		bool operator()( const CharRange&        a, const UniscribeTextRun& b ) const { return a.start + a.count <= m_blockStart + b.textStart; }
+		bool operator()( const UniscribeTextRun& a, const CharRange&        b ) const { return m_blockStart + a.textStart + a.textCount <= b.start; }
 		size_t m_blockStart;
 	};
 
-	std::pair<const TextRange*, const TextRange*> range = std::equal_range( squiggles.begin(), squiggles.end(), run, TextRangeEqual( blockStart ) );
-	return ArrayRef<const TextRange>( range.first, range.second );
+	std::pair<const CharRange*, const CharRange*> range = std::equal_range( squiggles.begin(), squiggles.end(), run, CharRangeEqual( blockStart ) );
+	return ArrayRef<const CharRange>( range.first, range.second );
 }
 
 void UniscribeTextBlock::DrawLineRect( VisualPainter& painter, RECT rect, int xStart, int xEnd, COLORREF color ) const

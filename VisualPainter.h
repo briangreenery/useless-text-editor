@@ -3,7 +3,7 @@
 #ifndef VisualPainter_h
 #define VisualPainter_h
 
-#include "TextSelection.h"
+#include "CharSelection.h"
 #include "TextStyleReader.h"
 #include <stdint.h>
 #include <Windows.h>
@@ -11,12 +11,12 @@
 
 class TextSquiggle;
 class TextStyleRegistry;
-class Document;
+class CharBuffer;
 
 class VisualPainter
 {
 public:
-	VisualPainter( HDC, const Document&, TextStyleRegistry&, const TextSquiggle&, TextSelection );
+	VisualPainter( HDC, const CharBuffer&, TextStyleRegistry&, const TextSquiggle&, CharSelection );
 	~VisualPainter();
 
 	void SetOrigin( size_t textStart, LONG yStart );
@@ -27,8 +27,8 @@ public:
 	void DrawHighlight( int xStart, int xEnd, RECT rect );
 
 	HDC                 hdc;
-	TextSelection       selection;
-	const Document&     doc;
+	CharSelection       selection;
+	const CharBuffer&   charBuffer;
 	TextStyleRegistry&  styleRegistry;
 	size_t              textStart;
 	TextStyleReader     styleReader;
@@ -36,7 +36,7 @@ public:
 private:
 	const TextSquiggle& squiggle;
 
-	TextSelection oldSelection;
+	CharSelection oldSelection;
 	POINT         oldOrigin;
 	HGDIOBJ       oldFont;
 	COLORREF      oldTextColor;

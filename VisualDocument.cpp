@@ -21,9 +21,9 @@ VisualDocument::VisualDocument( const Document& doc, TextStyleRegistry& styleReg
 	m_blocks.push_back( TextBlockPtr( new EmptyTextBlock( false, m_styleRegistry ) ) );
 }
 
-void VisualDocument::DrawText( HDC hdc, RECT rect, TextSelection selection ) const
+void VisualDocument::DrawText( HDC hdc, RECT rect, CharSelection selection ) const
 {
-	VisualPainter painter( hdc, m_doc, m_styleRegistry, m_squiggle, selection );
+	VisualPainter painter( hdc, m_doc.Chars(), m_styleRegistry, m_squiggle, selection );
 
 	BlockContaining_Result block = BlockContaining( rect.top );
 	OffsetRect( &rect, 0, -block.yStart );
@@ -34,7 +34,7 @@ void VisualDocument::DrawText( HDC hdc, RECT rect, TextSelection selection ) con
 
 void VisualDocument::DrawLineNumbers( HDC hdc, RECT rect ) const
 {
-	VisualPainter painter( hdc, m_doc, m_styleRegistry, m_squiggle, TextSelection() );
+	VisualPainter painter( hdc, m_doc.Chars(), m_styleRegistry, m_squiggle, CharSelection() );
 
 	BlockContaining_Result block = BlockContaining( rect.top );
 
@@ -110,7 +110,7 @@ void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start,
 	if ( maxWidth != 0 )
 		maxWidth = (std::max)( maxWidth, m_styleRegistry.AvgCharWidth() * 10 );
 
-	TextLayoutArgs layoutArgs( m_doc, m_styleRegistry, hdc, maxWidth );
+	TextLayoutArgs layoutArgs( m_doc.Chars(), m_styleRegistry, hdc, maxWidth );
 
 	TextStyleReader styleReader( m_styleRegistry );
 
@@ -119,7 +119,7 @@ void VisualDocument::LayoutText( TextBlockList::const_iterator it, size_t start,
 		size_t lineEnd;
 
 		for ( lineEnd = start; lineEnd < end; ++lineEnd )
-			if ( m_doc[lineEnd] == wchar_t( 0x0A ) )
+			if ( m_doc.Chars()[lineEnd] == wchar_t( 0x0A ) )
 				break;
 
 		if ( lineEnd == start )
@@ -157,9 +157,9 @@ size_t VisualDocument::LineCount() const
 	return m_lineCount;
 }
 
-size_t VisualDocument::LineStart( int y ) const
+size_t VisualDocument::LineStart( size_t pos ) const
 {
-	BlockContaining_Result block = BlockContaining( y );
+	BlockContaining_Result block = BlockContaining( pos );
 	assert( block.it != m_blocks.end() );
 
 	return block.textStart + block->LineStart( y - block.yStart );

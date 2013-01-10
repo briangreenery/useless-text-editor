@@ -56,10 +56,8 @@ TextView::TextView( HWND hwnd )
 
 int TextView::OnCreate( LPCREATESTRUCT )
 {
-	m_caretPoint.x = 0;
-	m_caretPoint.y = 0;
-	m_selection.start = m_selection.end = m_blocks.CharFromPoint( &m_caretPoint );
-
+	POINT point = {};
+	m_selection.start = m_selection.end = m_blocks.CharFromPoint( &point );
 	return 0;
 }
 
@@ -176,9 +174,9 @@ void TextView::OnLButtonDown( POINT point )
 	if ( !m_metrics.IsInTextOrMargin( point, m_hwnd ) )
 		return;
 
-	TextSelection selection = m_selection;
-	selection.endPoint = m_metrics.ClientToText( point );
-	selection.end = m_blocks.CharFromPoint( &selection.endPoint );
+	point = m_metrics.ClientToText( point );
+
+	CharSelection selection( m_selection.start, m_blocks.CharFromPoint( &point ) );
 
 	bool isShiftPressed = GetKeyState( VK_SHIFT ) < 0;
 	if ( !isShiftPressed )
@@ -221,10 +219,9 @@ void TextView::OnMouseMove( POINT point )
 	point.y = (std::min)( m_metrics.clientRect.bottom, point.y );
 	point.y = (std::max)( m_metrics.clientRect.top,    point.y );
 
-	TextSelection selection = m_selection;
-	selection.endPoint = m_metrics.ClientToText( point );
-	selection.end = m_blocks.CharFromPoint( &selection.endPoint );
+	point = m_metrics.ClientToText( point );
 
+	CharSelection selection( m_selection.start, m_blocks.CharFromPoint( &point ) );
 	MoveSelection( selection, false );
 }
 
@@ -281,7 +278,7 @@ void TextView::OnKillFocus( HWND )
 
 void TextView::AdvanceCaret( bool wholeWord, bool moveSelection )
 {
-	TextSelection selection = m_selection;
+	CharSelection selection = m_selection;
 
 	if ( !wholeWord && !moveSelection && !selection.IsEmpty() )
 	{
@@ -290,20 +287,19 @@ void TextView::AdvanceCaret( bool wholeWord, bool moveSelection )
 	else
 	{
 		selection.end = wholeWord
-		                   ? m_doc.NextNonWhitespace( m_doc.NextWordStop( selection.end ) )
-		                   : m_doc.NextCharStop( selection.end );
+		                   ? m_doc.Chars().NextNonWhitespace( m_doc.Chars().NextWordStop( selection.end ) )
+		                   : m_doc.Chars().NextCharStop( selection.end );
 
 		if ( !moveSelection )
 			selection.start = selection.end;
 	}
 
-	selection.endPoint = m_blocks.PointFromChar( selection.end, true );
-	MoveSelection( selection, true );
+	MoveSelection( selection, true, directionAdvancing );
 }
 
 void TextView::RetireCaret( bool wholeWord, bool moveSelection )
 {
-	TextSelection selection = m_selection;
+	CharSelection selection = m_selection;
 
 	if ( !wholeWord && !moveSelection && !selection.IsEmpty() )
 	{
@@ -312,50 +308,47 @@ void TextView::RetireCaret( bool wholeWord, bool moveSelection )
 	else
 	{
 		selection.end = wholeWord
-		                   ? m_doc.PrevWordStop( m_doc.PrevNonWhitespace( selection.end ) )
-		                   : m_doc.PrevCharStop( selection.end );
+		                   ? m_doc.Chars().PrevWordStop( m_doc.Chars().PrevNonWhitespace( selection.end ) )
+		                   : m_doc.Chars().PrevCharStop( selection.end );
 
 		if ( !moveSelection )
 			selection.start = selection.end;
 	}
 
-	selection.endPoint = m_blocks.PointFromChar( selection.end, false );
-	MoveSelection( selection, true );
+	MoveSelection( selection, true, directionRetiring );
 }
 
 void TextView::Home( bool gotoDocStart, bool moveSelection )
 {
-	TextSelection selection = m_selection;
+	CharSelection selection = m_selection;
 
 	selection.end = gotoDocStart
 	                   ? 0
-	                   : m_blocks.LineStart( selection.endPoint.y );
+	                   : m_blocks.LineStart( m_caretPoint.y );
 
 	if ( !moveSelection )
 		selection.start = selection.end;
 
-	selection.endPoint = m_blocks.PointFromChar( selection.end, false );
-	MoveSelection( selection, true );
+	MoveSelection( selection, true, directionRetiring );
 }
 
 void TextView::End( bool gotoDocEnd, bool moveSelection )
 {
-	TextSelection selection = m_selection;
+	CharSelection selection = m_selection;
 
 	selection.end = gotoDocEnd
 	                   ? m_doc.Length()
-	                   : m_blocks.LineEnd( selection.endPoint.y );
+	                   : m_blocks.LineEnd( m_caretPoint.y );
 
 	if ( !moveSelection )
 		selection.start = selection.end;
 
-	selection.endPoint = m_blocks.PointFromChar( selection.end, true );
-	MoveSelection( selection, true );
+	MoveSelection( selection, true, directionAdvancing );
 }
 
 void TextView::LineUp( bool moveSelection, bool up )
 {
-	TextSelection selection = m_selection;
+	CharSelection selection = m_selection;
 
 	if ( m_lineUpCount == 0 )
 		m_lineUpStart = selection.endPoint;
@@ -382,7 +375,7 @@ void TextView::LineUp( bool moveSelection, bool up )
 
 void TextView::Backspace( bool wholeWord )
 {
-	TextSelection selection = m_selection;
+	CharSelection selection = m_selection;
 
 	if ( selection.IsEmpty() )
 	{
@@ -399,7 +392,7 @@ void TextView::Backspace( bool wholeWord )
 
 void TextView::Delete( bool wholeWord )
 {
-	TextSelection selection = m_selection;
+	CharSelection selection = m_selection;
 
 	if ( selection.IsEmpty() )
 	{
@@ -437,7 +430,7 @@ void TextView::SetText( ArrayRef<const wchar_t> text )
 	change += m_doc.Delete( 0, m_doc.Length() );
 	change += m_doc.Insert( 0, text );
 
-	TextSelection selection;
+	CharSelection selection;
 	UpdateLayout( change, selection );
 }
 
@@ -455,7 +448,7 @@ void TextView::Insert( ArrayRef<const wchar_t> text )
 	change += m_doc.Delete( m_selection.Min(), m_selection.Length() );
 	change += m_doc.Insert( m_selection.Min(), text );
 
-	TextSelection selection;
+	CharSelection selection;
 	selection.start = m_selection.Max() + change.delta;
 	selection.end   = selection.start;
 
@@ -464,7 +457,7 @@ void TextView::Insert( ArrayRef<const wchar_t> text )
 
 void TextView::SelectAll()
 {
-	TextSelection selection;
+	CharSelection selection;
 	selection.start    = 0;
 	selection.end      = m_doc.Length();
 	selection.endPoint = m_blocks.PointFromChar( selection.end, true );
@@ -476,7 +469,7 @@ void TextView::SelectWord()
 {
 	std::pair<size_t, size_t> word = m_doc.WordAt( m_selection.end );
 
-	TextSelection selection;
+	CharSelection selection;
 	selection.start    = word.first;
 	selection.end      = word.second;
 	selection.endPoint = m_blocks.PointFromChar( selection.end, true );
@@ -572,7 +565,7 @@ void TextView::Undo()
 	if ( !m_doc.CanUndo() )
 		return;
 
-	std::pair<TextChange,TextSelection> change = m_doc.Undo();
+	std::pair<TextChange,CharSelection> change = m_doc.Undo();
 	UpdateLayout( change.first, change.second );
 }
 
@@ -583,7 +576,7 @@ void TextView::Redo()
 
 	TextChange change = m_doc.Redo();
 
-	TextSelection selection;
+	CharSelection selection;
 	selection.start = change.end + change.delta;
 	selection.end   = selection.start;
 
@@ -612,7 +605,7 @@ bool TextView::AdjustGutterWidth()
 	return oldGutterWidth != m_metrics.gutterWidth;
 }
 
-void TextView::UpdateLayout( TextChange change, TextSelection selection )
+void TextView::UpdateLayout( TextChange change, CharSelection selection )
 {
 	if ( m_styleRegistry.Annotator() )
 	{
@@ -646,7 +639,7 @@ void TextView::UpdateLayout()
 	UpdateLayout( change, m_selection );
 }
 
-void TextView::MoveSelection( TextSelection selection, bool scroll )
+void TextView::MoveSelection( CharSelection selection, bool scroll )
 {
 	if ( selection == m_selection )
 		return;

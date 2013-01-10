@@ -17,6 +17,8 @@ public:
 	size_t Max() const;
 	size_t Length() const;
 
+	bool IsEmpty() const;
+
 	size_t start;
 	size_t end;
 };

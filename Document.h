@@ -27,6 +27,9 @@ public:
 	UndoChange Undo();
 	CharChange Redo();
 
+	const CharBuffer& Chars() const { return m_charBuffer; }
+	const LineBuffer& Lines() const { return m_lineBuffer; }
+
 private:
 	CharBuffer m_charBuffer;
 	LineBuffer m_lineBuffer;

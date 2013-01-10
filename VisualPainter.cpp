@@ -7,10 +7,10 @@
 #include <Windows.h>
 #include <GdiPlus.h>
 
-VisualPainter::VisualPainter( HDC hdc, const Document& doc, TextStyleRegistry& styleRegistry, const TextSquiggle& squiggle, TextSelection selection )
+VisualPainter::VisualPainter( HDC hdc, const CharBuffer& charBuffer, TextStyleRegistry& styleRegistry, const TextSquiggle& squiggle, CharSelection selection )
 	: hdc( hdc )
 	, styleRegistry( styleRegistry )
-	, doc( doc )
+	, charBuffer( charBuffer )
 	, selection( selection )
 	, oldSelection( selection )
 	, textStart( 0 )

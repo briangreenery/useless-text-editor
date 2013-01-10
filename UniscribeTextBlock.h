@@ -6,7 +6,7 @@
 #include "TextBlock.h"
 #include "UniscribeLayoutData.h"
 #include "TextStyleRun.h"
-#include "TextRange.h"
+#include "CharRange.h"
 #include "ArrayRef.h"
 #include <Windows.h>
 #include <usp10.h>
@@ -50,7 +50,7 @@ private:
 	ArrayRef<const UniscribeTextRun> LineRuns( size_t line ) const;
 
 	ArrayRef<const TextStyleRun> RunStyles   ( size_t blockStart, const UniscribeTextRun&, ArrayRef<const TextStyleRun> ) const;
-	ArrayRef<const TextRange>    RunSquiggles( size_t blockStart, const UniscribeTextRun&, ArrayRef<const TextRange>    ) const;
+	ArrayRef<const CharRange>    RunSquiggles( size_t blockStart, const UniscribeTextRun&, ArrayRef<const CharRange>    ) const;
 
 	size_t TextStart( size_t line ) const;
 	size_t TextEnd  ( size_t line ) const;
