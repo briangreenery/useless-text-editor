@@ -23,8 +23,8 @@ public:
 	void DrawLineNumbers( HDC hdc, RECT rect ) const;
 
 	size_t LineCount() const;
-	size_t LineStart( size_t pos ) const;
-	size_t LineEnd  ( size_t pos ) const;
+	size_t LineStart( int y ) const;
+	size_t LineEnd  ( int y ) const;
 
 	int Height() const;
 

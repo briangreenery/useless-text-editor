@@ -157,9 +157,9 @@ size_t VisualDocument::LineCount() const
 	return m_lineCount;
 }
 
-size_t VisualDocument::LineStart( size_t pos ) const
+size_t VisualDocument::LineStart( int y ) const
 {
-	BlockContaining_Result block = BlockContaining( pos );
+	BlockContaining_Result block = BlockContaining( y );
 	assert( block.it != m_blocks.end() );
 
 	return block.textStart + block->LineStart( y - block.yStart );

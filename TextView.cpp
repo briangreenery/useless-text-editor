@@ -174,9 +174,8 @@ void TextView::OnLButtonDown( POINT point )
 	if ( !m_metrics.IsInTextOrMargin( point, m_hwnd ) )
 		return;
 
-	point = m_metrics.ClientToText( point );
-
-	CharSelection selection( m_selection.start, m_blocks.CharFromPoint( &point ) );
+	m_caretPoint = m_metrics.ClientToText( point );
+	CharSelection selection( m_selection.start, m_blocks.CharFromPoint( &m_caretPoint ) );
 
 	bool isShiftPressed = GetKeyState( VK_SHIFT ) < 0;
 	if ( !isShiftPressed )
@@ -219,9 +218,8 @@ void TextView::OnMouseMove( POINT point )
 	point.y = (std::min)( m_metrics.clientRect.bottom, point.y );
 	point.y = (std::max)( m_metrics.clientRect.top,    point.y );
 
-	point = m_metrics.ClientToText( point );
-
-	CharSelection selection( m_selection.start, m_blocks.CharFromPoint( &point ) );
+	m_caretPoint = m_metrics.ClientToText( point );
+	CharSelection selection( m_selection.start, m_blocks.CharFromPoint( &m_caretPoint ) );
 	MoveSelection( selection, false );
 }
 
