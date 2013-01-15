@@ -279,9 +279,6 @@
     <ClInclude Include="ArrayRef.h">
       <Filter>Basics</Filter>
     </ClInclude>
-    <ClInclude Include="ThrowHRESULT.h">
-      <Filter>Basics</Filter>
-    </ClInclude>
     <ClInclude Include="GapArray.h">
       <Filter>Basics</Filter>
     </ClInclude>

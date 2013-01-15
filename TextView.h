@@ -97,13 +97,15 @@ private:
 	DWORD    m_lastMouseScrollTick;
 	DWORD    m_mouseScrollInterval;
 
-	bool m_isCaretVisible;
+	POINT m_caretPoint;
+	bool  m_isCaretVisible;
+
 	int  m_mouseWheelRemainder;
 
 	POINT m_lineUpStart;
 	int   m_lineUpCount;
 
-	enum { lastWasNothing, lastWasInsert, lastWasClear } m_lastEditOperation;
+	enum class EditOp { nothing, insert, clear } m_lastEditOp;
 	DWORD m_lastUndoTick;
 };
 

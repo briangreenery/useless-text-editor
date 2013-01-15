@@ -66,6 +66,8 @@ void GapArrayBase::Resize( size_t newCapacity )
 
 void GapArrayBase::InsertBytes( size_t pos, ArrayRef<const uint8_t> bytes )
 {
+	assert( pos <= m_size );
+
 	if ( GapLength() < bytes.size() )
 		Resize( m_capacity + std::max( m_capacity, bytes.size() - GapLength() ) );
 

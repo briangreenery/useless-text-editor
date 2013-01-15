@@ -139,7 +139,6 @@
     <ClInclude Include="TextMatePattern.h" />
     <ClInclude Include="TextMateTokenRun.h" />
     <ClInclude Include="TextTheme.h" />
-    <ClInclude Include="ThrowHRESULT.h" />
     <ClInclude Include="AccessibleTextView.h" />
     <ClInclude Include="TextAnnotator.h" />
     <ClInclude Include="TextChangeTest.h" />

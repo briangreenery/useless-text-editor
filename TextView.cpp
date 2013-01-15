@@ -123,7 +123,7 @@ void TextView::OnChar( UINT keyCode, UINT repCnt, UINT flags )
 	if ( isCtrlPressed || keyCode == VK_BACK )
 		return;
 
-	while ( repCnt-- > 0 )
+	for ( ; repCnt > 0; --repCnt )
 	{
 		wchar_t unit = ( keyCode == VK_RETURN ) ? 0x0A : keyCode;
 		Insert( ArrayRef<const wchar_t>( &unit, 1 ) );
@@ -138,7 +138,7 @@ void TextView::OnKeyDown( UINT keyCode, UINT repCnt, UINT flags )
 	if ( keyCode != VK_UP && keyCode != VK_DOWN )
 		m_lineUpCount = 0;
 
-	while ( repCnt-- > 0 )
+	for ( ; repCnt > 0; --repCnt )
 	{
 		switch ( keyCode )
 		{
@@ -292,7 +292,7 @@ void TextView::AdvanceCaret( bool wholeWord, bool moveSelection )
 			selection.start = selection.end;
 	}
 
-	MoveSelection( selection, true, directionAdvancing );
+	MoveSelection( selection, true );
 }
 
 void TextView::RetireCaret( bool wholeWord, bool moveSelection )
