@@ -5,16 +5,22 @@
 
 #include <vector>
 
-// CharRange is a range of characters.
+// CharRange is a range of text.
 
-class CharRange
+struct CharRange
 {
-public:
-	CharRange();
-	CharRange( size_t start, size_t count );
+  CharRange()
+    , start( 0 )
+    , count( 0 )
+  {}
 
-	size_t start;
-	size_t count;
+  CharRange( size_t start, size_t count )
+    : start( start )
+    , count( count )
+  {}
+
+  size_t start;
+  size_t count;
 };
 
 typedef std::vector<CharRange> CharRanges;

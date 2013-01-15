@@ -5,7 +5,7 @@
 
 CharIter::CharIter( const GapArray<wchar_t>& buffer )
 	: CharacterIterator( buffer.Length(), 0, buffer.Length(), 0 )
-	, m_buffer( buffer )
+	, buffer_( buffer )
 {
 }
 
@@ -18,7 +18,7 @@ UClassID CharIter::getDynamicClassID() const
 UBool CharIter::operator==( const icu::ForwardCharacterIterator& other ) const
 {
 	const CharIter* iter = dynamic_cast<const CharIter*>( &other );
-	return iter && pos == iter->pos && &m_buffer == &iter->m_buffer;
+	return iter && pos == iter->pos && &buffer_ == &iter->buffer_;
 }
 
 int32_t CharIter::hashCode() const
@@ -28,7 +28,7 @@ int32_t CharIter::hashCode() const
 
 icu::CharacterIterator* CharIter::clone() const
 {
-	CharIter* cloned = new CharIter( m_buffer );
+	CharIter* cloned = new CharIter( buffer_ );
 	cloned->pos = pos;
 	return cloned;
 }
@@ -50,7 +50,7 @@ UChar CharIter::last()
 	if ( pos == 0 )
 		return DONE;
 
-	return m_buffer[--pos];
+	return buffer_[--pos];
 }
 
 UChar32 CharIter::last32()
@@ -61,7 +61,7 @@ UChar32 CharIter::last32()
 		return DONE;
 	
 	UChar32 result;
-	U16_PREV( m_buffer, 0, pos, result );
+	U16_PREV( buffer_, 0, pos, result );
 	return result;
 }
 
@@ -82,7 +82,7 @@ UChar CharIter::current() const
 	if ( pos < 0 || pos >= textLength )
 		return DONE;
 
-	return m_buffer[pos];
+	return buffer_[pos];
 }
 
 UChar32 CharIter::current32() const
@@ -91,7 +91,7 @@ UChar32 CharIter::current32() const
 		return DONE;
 
 	UChar32 result;
-	U16_GET( m_buffer, 0, pos, textLength, result );
+	U16_GET( buffer_, 0, pos, textLength, result );
 	return result;
 }
 
@@ -100,7 +100,7 @@ UChar CharIter::next()
 	if ( pos < -1 || pos >= textLength - 1 )
 		return DONE;
 
-	return m_buffer[++pos];
+	return buffer_[++pos];
 }
 
 UChar32 CharIter::next32()
@@ -108,7 +108,7 @@ UChar32 CharIter::next32()
 	if ( pos < 0 || pos >= textLength )
 		return DONE;
 
-	U16_FWD_1( m_buffer, pos, textLength );
+	U16_FWD_1( buffer_, pos, textLength );
 	return CharIter::current32();
 }
 
@@ -117,7 +117,7 @@ UChar CharIter::nextPostInc()
 	if ( pos < 0 || pos >= textLength )
 		return DONE;
 
-	return m_buffer[pos++];
+	return buffer_[pos++];
 }
 
 UChar32 CharIter::next32PostInc()
@@ -126,7 +126,7 @@ UChar32 CharIter::next32PostInc()
 		return DONE;
 
 	UChar32 result;
-	U16_NEXT( m_buffer, pos, textLength, result );
+	U16_NEXT( buffer_, pos, textLength, result );
 	return result;
 }
 
@@ -140,7 +140,7 @@ UChar CharIter::previous()
 	if ( pos <= 0 || pos > textLength )
 		return DONE;
 
-	return m_buffer[--pos];
+	return buffer_[--pos];
 }
 
 UChar32 CharIter::previous32()
@@ -149,7 +149,7 @@ UChar32 CharIter::previous32()
 		return DONE;
 
 	UChar32 result;
-	U16_PREV( m_buffer, 0, pos, result );
+	U16_PREV( buffer_, 0, pos, result );
 	return result;
 }
 
@@ -182,7 +182,7 @@ int32_t CharIter::move32( int32_t delta, EOrigin origin )
 	{
 		if ( pos >= 0 )
 		{
-			U16_FWD_N( m_buffer, pos, textLength, delta );
+			U16_FWD_N( buffer_, pos, textLength, delta );
 		}
 	}
 	else
@@ -190,7 +190,7 @@ int32_t CharIter::move32( int32_t delta, EOrigin origin )
 		if ( pos <= textLength )
 		{
 			delta = -delta;
-			U16_BACK_N( m_buffer, 0, pos, delta );
+			U16_BACK_N( buffer_, 0, pos, delta );
 		}
 	}
 

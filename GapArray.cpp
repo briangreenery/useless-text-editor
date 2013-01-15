@@ -5,96 +5,109 @@
 #include <algorithm>
 
 GapArrayBase::GapArrayBase()
-	: m_size( 0 )
-	, m_gapPosition( 0 )
-	, m_buffer( 0 )
+  : m_buffer( 0 )
+  , m_size( 0 )
+  , m_capacity( 0 )
+  , m_gapPos( 0 )
 {
 }
 
 GapArrayBase::~GapArrayBase()
 {
-	if ( m_buffer )
-		delete[] m_buffer;
+  if ( m_buffer )
+    delete[] m_buffer;
 }
 
 void GapArrayBase::MoveGapTo( size_t pos ) const
 {
-	if ( m_gapPosition != pos )
-	{
-		assert( m_capacity >= pos + GapLength() );
+  if ( m_gapPos == pos )
+    return;
 
-		if ( pos > m_gapPosition )
-		{
-			memcpy( m_buffer + m_gapPosition,
-			        m_buffer + m_gapPosition + GapLength(),
-			        pos - m_gapPosition );
-		}
-		else
-		{
-			memmove( m_buffer + pos + GapLength(),
-			         m_buffer + pos,
-			         m_gapPosition - pos );
-		}
+  assert( m_capacity >= pos + GapLength() );
 
-		m_gapPosition = pos;
-	}
+  if ( pos > m_gapPos )
+  {
+    memcpy( m_buffer + m_gapPos,
+            m_buffer + m_gapPos + GapLength(),
+            pos - m_gapPos );
+  }
+  else
+  {
+    memmove( m_buffer + pos + GapLength(),
+             m_buffer + pos,
+             m_gapPos - pos );
+  }
+
+  m_gapPos = pos;
 }
 
-void GapArrayBase::Resize( size_t newCapacity )
+bool GapArrayBase::TryResize( size_t newCapacity )
 {
-	assert( newCapacity >= m_size );
+  assert( newCapacity >= m_size );
 
-	uint8_t* newBuffer = 0;
-	
-	if ( newCapacity != 0 )
-	{
-		newBuffer = new uint8_t[newCapacity];
+  uint8_t* newBuffer = 0;
+  
+  if ( newCapacity != 0 )
+  {
+    newBuffer = new(std::nothrow) uint8_t[newCapacity];
 
-		memcpy( newBuffer, m_buffer, m_gapPosition );
+    if ( newBuffer == 0 )
+      return false;
 
-		memcpy( newBuffer + m_gapPosition + ( newCapacity - m_size ),
-		        m_buffer  + m_gapPosition + ( m_capacity  - m_size ),
-		        m_size - m_gapPosition );
-	}
+    memcpy( newBuffer, m_buffer, m_gapPos );
 
-	if ( m_buffer )
-		delete[] m_buffer;
+    memcpy( newBuffer + m_gapPos + ( new_capacity - m_size ),
+            m_buffer  + m_gapPos + ( m_capacity  - m_size ),
+            m_size - m_gapPos );
+  }
 
-	m_buffer   = newBuffer;
-	m_capacity = newCapacity;
+  if ( m_buffer )
+    delete[] m_buffer;
+
+  m_buffer   = newBuffer;
+  m_capacity = newCapacity;
+  return true;
 }
 
-void GapArrayBase::InsertBytes( size_t pos, ArrayRef<const uint8_t> bytes )
+bool GapArrayBase::TryInsert( size_t pos, ArrayRef<uint8_t> bytes )
 {
-	assert( pos <= m_size );
+  assert( pos <= m_size );
+  if ( pos > m_size )
+    return false;
 
-	if ( GapLength() < bytes.size() )
-		Resize( m_capacity + std::max( m_capacity, bytes.size() - GapLength() ) );
+  if ( GapLength() < bytes.Length() )
+  {
+    size_t requiredCapacity = m_size + bytes.Length();
 
-	MoveGapTo( pos );
-	memcpy( m_buffer + m_gapPosition, bytes.begin(), bytes.size() );
+    if ( !TryResize( std::max( 2 * m_capacity, requiredCapacity ) ) )
+      return false;
+  }
 
-	m_gapPosition += bytes.size();
-	m_size        += bytes.size();
+  MoveGapTo( pos );
+  memcpy( m_buffer + m_gapPos, bytes.start, bytes.end );
+
+  m_gapPos += bytes.Length();
+  m_size   += bytes.Length();
 }
 
-void GapArrayBase::EraseBytes( size_t pos, size_t count )
+void GapArrayBase::Delete( size_t pos, size_t count )
 {
-	assert( pos + count <= m_size );
-	MoveGapTo( pos );
-	m_size -= count;
+  assert( pos + count <= m_size );
+  
+  MoveGapTo( pos );
+  m_size -= count;
 
-	if ( m_size < m_capacity / 4 )
-		Resize( 2 * m_size );
+  if ( m_size < m_capacity / 4 )
+    TryResize( 2 * m_size );
 }
 
-ArrayRef<const uint8_t> GapArrayBase::ReadBytes( size_t pos, size_t count ) const
+ArrayRef<uint8_t> GapArrayBase::Read( size_t pos, size_t count ) const
 {
-	pos   = std::min( pos,   m_size );
-	count = std::min( count, m_size - pos );
+  pos   = std::min( pos,   m_size );
+  count = std::min( count, m_size - pos );
 
-	if ( pos <= m_gapPosition && m_gapPosition < pos + count )
-		MoveGapTo( pos + count );
+  if ( pos <= m_gapPos && m_gapPos < pos + count )
+    MoveGapTo( pos + count );
 
-	return ArrayRef<const uint8_t>( m_buffer + pos, count );
+  return ArrayRef<uint8_t>( m_buffer + pos, m_buffer + pos + count );
 }

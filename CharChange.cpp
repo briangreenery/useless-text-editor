@@ -4,46 +4,55 @@
 #include <algorithm>
 
 CharChange::CharChange()
-	: start( 0 )
-	, end( 0 )
-	, delta( 0 )
+  : m_start( 0 )
+  , m_end( 0 )
+  , m_delta( 0 )
 {
 }
 
-CharChange::CharChange( size_t pos, size_t count, Type type )
-	: start( pos )
-	, end( pos )
-	, delta( 0 )
+CharChange::CharChange( size_t start, size_t count, Type type )
 {
-	if ( type == insertion )
-	{
-		delta = static_cast<int32_t>( count );
-	}
-	else
-	{
-		end = start + count;
-		delta = -static_cast<int32_t>( count );
-	}
+  if ( type == kInsertion )
+  {
+    m_start = start;
+    m_end   = start;
+    m_delta = static_cast<int32_t>( count );
+  }
+  else if ( type == kDeletion )
+  {
+    m_start = start;
+    m_end   = m_start + count;
+    m_delta = -static_cast<int32_t>( count );
+  }
+  else
+  {
+    m_start = start;
+    m_end   = m_start + count;
+    m_delta = 0;
+  }
 }
 
-void CharChange::operator+=( CharChange change )
+void CharChange::Add( const CharChange& change )
 {
-	if ( start == end && delta == 0 )
-	{
-		start = change.start;
-		end = change.end;
-	}
-	else
-	{
-		if ( change.start > start )
-			change.start -= std::min<int32_t>( change.start - start, delta );
+  if ( m_start == m_end && m_delta == 0 )
+  {
+    m_start = change.start();
+    m_end   = change.end();
+    m_delta = change.delta();
+  }
+  else
+  {
+    size_t changeStart = change.start();
+    size_t changeEnd   = change.end();
 
-		if ( change.end > start )
-			change.end -= std::min<int32_t>( change.end - start, delta );
+    if ( changeStart > m_start )
+      changeStart -= std::min<int32_t>( changeStart - m_start, m_delta );
 
-		start = std::min( start, change.start );
-		end = std::max( end, change.end );
-	}
+    if ( changeEnd > m_start )
+      changeEnd -= std::min<int32_t>( changeEnd - m_start, m_delta );
 
-	delta += change.delta;
+    m_start = std::min( start, changeStart );
+    m_end   = std::max( end, changeEnd );
+    delta  += change.delta;
+  }
 }

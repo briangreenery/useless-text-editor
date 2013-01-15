@@ -3,60 +3,39 @@
 #ifndef ArrayRef_h
 #define ArrayRef_h
 
-#include <stdint.h>
 #include <cassert>
 
-// ArrayRef is a reference to a section of an array
+// ArrayRef is a const reference to a section of an array.
 
 template < class T >
-class ArrayRef
+struct ArrayRef
 {
-public:
-	ArrayRef()
-		: m_begin( 0 )
-		, m_end( 0 )
-	{
-	}
+  ArrayRef()
+    : start( 0 )
+    , end( 0 )
+  {}
 
-	ArrayRef( T* begin, T* end )
-		: m_begin( begin )
-		, m_end( end )
-	{
-	}
+  ArrayRef( const T* start, const T* end )
+    : start( start )
+    , end( end )
+  {}
 
-	ArrayRef( T* begin, size_t size )
-		: m_begin( begin )
-		, m_end( begin + size )
-	{
-	}
+  ArrayRef( const ArrayRef& other )
+    : start( other.start )
+    , end( other.end )
+  {}
 
-	ArrayRef( const ArrayRef& other )
-		: m_begin( other.m_begin )
-		, m_end( other.m_end )
-	{
-	}
+  const T& operator[]( size_t i ) const
+  {
+    assert( i < Length() );
+    return start[i];
+  }
 
-	ArrayRef& operator=( const ArrayRef& other )
-	{
-		m_begin = other.m_begin;
-		m_end   = other.m_end;
-		return *this;
-	}
+  size_t Length() const { return end - start; }
+  bool IsEmpty() const  { return end == start; }
 
-	T* begin() const                { return m_begin; }
-	T* end() const                  { return m_end; }
-
-	T* rbegin() const               { return m_end - 1; }
-	T* rend() const                 { return m_begin - 1; }
-
-	size_t size() const             { return m_end - m_begin; }
-	bool empty() const              { return m_begin == m_end; }
-
-	T& operator[]( size_t i ) const { assert( i < size() ); return m_begin[i]; }
-
-private:
-	T* m_begin;
-	T* m_end;
+  const T* start;
+  const T* end;
 };
 
 #endif

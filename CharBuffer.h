@@ -18,10 +18,10 @@ public:
 	~CharBuffer();
 
 	CharChange Insert( size_t pos, wchar_t );
-	CharChange Insert( size_t pos, ArrayRef<const wchar_t> );
+	CharChange Insert( size_t pos, ArrayRef<wchar_t> );
 	CharChange Delete( size_t pos, size_t count );
 
-	ArrayRef<const wchar_t> Read( size_t start, size_t count ) const;
+	ArrayRef<wchar_t> Read( size_t start, size_t count ) const;
 
 	size_t Length() const                    { return m_buffer.Length(); }
 	wchar_t operator[]( size_t pos ) const   { return m_buffer[pos]; }

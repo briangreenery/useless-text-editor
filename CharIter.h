@@ -47,7 +47,7 @@ public:
 	virtual CharacterIterator* clone() const;
 
 private:
-	const GapArray<wchar_t>& m_buffer;
+	const GapArray<wchar_t>& buffer_;
 };
 
 #endif

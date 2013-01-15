@@ -12,28 +12,28 @@
 class Document
 {
 public:
-	Document();
+  Document();
 
-	CharChange Insert( size_t pos, ArrayRef<const wchar_t> text );
-	CharChange Delete( size_t pos, size_t count );
+  CharChange Insert( size_t pos, ArrayRef<wchar_t> text );
+  CharChange Delete( size_t pos, size_t count );
 
-	ArrayRef<const wchar_t> Read( size_t pos, size_t count ) const;
+  ArrayRef<wchar_t> Read( size_t pos, size_t count ) const;
 
-	void NewUndoGroup();
+  void NewUndoGroup();
 
-	bool CanUndo() const { return m_undoBuffer.CanUndo(); }
-	bool CanRedo() const { return m_undoBuffer.CanRedo(); }
+  bool CanUndo() const;
+  bool CanRedo() const;
 
-	UndoChange Undo();
-	CharChange Redo();
+  UndoChange Undo();
+  CharChange Redo();
 
-	const CharBuffer& Chars() const { return m_charBuffer; }
-	const LineBuffer& Lines() const { return m_lineBuffer; }
+  const CharBuffer& text() const  { return m_text; }
+  const LineBuffer& lines() const { return m_lines; }
 
 private:
-	CharBuffer m_charBuffer;
-	LineBuffer m_lineBuffer;
-	UndoBuffer m_undoBuffer;
+  CharBuffer m_text;
+  LineBuffer m_lines;
+  UndoBuffer m_undo;
 };
 
 #endif
